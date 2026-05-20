@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="ATS Resume Scorer is a browser-local job match analyzer for comparing multiple resume versions against bulk imported job descriptions."
+    />
+    <meta property="og:title" content="ATS Resume Scorer — Local Job Match Analyzer" />
+    <meta
+      property="og:description"
+      content="Score resume versions against job descriptions, sort best matches, and find missing attributes from job clusters. Runs locally in your browser."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../src/styles.css" />
+    <title>ATS Resume Scorer — Local Job Match Analyzer</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="../" aria-label="ATS Resume Toolkit home">
+            <span class="brand-mark" aria-hidden="true">
+              <span>RT</span>
+            </span>
+            <span class="brand-name">ATS Resume Toolkit</span>
+          </a>
+
+          <nav class="nav" aria-label="Primary navigation">
+            <a class="nav-link" href="../">Home</a>
+            <a class="nav-link" href="../#install">Extension</a>
+            <a
+              class="button button-small button-dark"
+              href="https://github.com/tanzir71/ats-scoring"
+              rel="noreferrer"
+              target="_blank"
+            >
+              View repo
+            </a>
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        <section class="app-hero">
+          <div class="app-hero-inner">
+            <div>
+              <p class="status-pill">
+                <span class="mono">app</span>
+                <span aria-hidden="true">⚡</span>
+                <span>Browser-local &bull; bulk jobs &bull; resume variants</span>
+              </p>
+              <h1>ATS Resume Scorer</h1>
+              <p class="hero-description">
+                Upload several resume versions, import job descriptions or extension export files,
+                then run local matching to see ranked fits and missing attributes.
+              </p>
+            </div>
+            <div class="header-actions" aria-label="Workspace actions">
+              <button class="icon-button" type="button" id="exportData" aria-label="Export data">
+                <svg aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" />
+                </svg>
+              </button>
+              <label class="icon-button file-action" aria-label="Import data">
+                <input id="importData" type="file" accept="application/json,.json" />
+                <svg aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M12 21V9m0 0 4 4m-4-4-4 4M5 7V4h14v3" />
+                </svg>
+              </label>
+              <button class="icon-button" type="button" id="clearData" aria-label="Clear data">
+                <svg aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M4 7h16M9 7V5h6v2m-8 0 1 13h8l1-13" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="workspace">
+          <section class="controls" aria-label="Inputs">
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Resume versions</h2>
+                <span id="resumeCount" class="counter">0</span>
+              </div>
+              <form id="resumeForm" class="stack">
+                <label class="field">
+                  <span>Version name</span>
+                  <input id="resumeName" type="text" placeholder="Frontend v2" autocomplete="off" />
+                </label>
+                <label class="file-zone">
+                  <input id="resumeFile" type="file" multiple accept=".txt,.md,.rtf,.csv,.json,.pdf,.doc,.docx" />
+                  <span>Upload resume file</span>
+                </label>
+                <label class="field">
+                  <span>Resume text</span>
+                  <textarea id="resumeText" rows="6" placeholder="Paste a resume version"></textarea>
+                </label>
+                <button class="primary-button" type="submit">Add resume</button>
+              </form>
+              <div id="resumeList" class="list" aria-live="polite"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Job descriptions</h2>
+                <span id="jobCount" class="counter">0</span>
+              </div>
+              <form id="jobForm" class="stack">
+                <label class="file-zone">
+                  <input id="jobFiles" type="file" multiple accept=".txt,.md,.rtf,.csv,.json,.pdf,.doc,.docx" />
+                  <span>Bulk upload job files</span>
+                </label>
+                <label class="field">
+                  <span>Bulk import</span>
+                  <textarea
+                    id="jobText"
+                    rows="8"
+                    placeholder="Paste job descriptions separated by ---"
+                  ></textarea>
+                </label>
+                <button class="secondary-button" type="submit">Import jobs</button>
+              </form>
+              <div id="jobList" class="list" aria-live="polite"></div>
+            </div>
+          </section>
+
+          <section class="results" aria-label="Matching results">
+            <div class="run-panel">
+              <div>
+                <h2>Match run</h2>
+                <p id="runSummary">No run yet</p>
+              </div>
+              <button class="run-button" id="runMatches" type="button">Run</button>
+            </div>
+
+            <div class="results-grid">
+              <section class="panel output-panel">
+                <div class="panel-heading">
+                  <h2>Ranked matches</h2>
+                  <span id="resultCount" class="counter">0</span>
+                </div>
+                <div id="rankedResults" class="ranked-results empty-state">
+                  Add resumes and jobs, then run matches.
+                </div>
+              </section>
+
+              <section class="panel insight-panel">
+                <div class="panel-heading">
+                  <h2>Missing attributes</h2>
+                  <span id="clusterCount" class="counter">0</span>
+                </div>
+                <div id="missingAttributes" class="missing-attributes empty-state">
+                  Cluster suggestions appear after a run.
+                </div>
+              </section>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+    <script type="module" src="../src/app.js"></script>
+  </body>
+</html>

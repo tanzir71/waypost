@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ATS Job Collector</title>
+    <link rel="stylesheet" href="./src/popup.css" />
+  </head>
+  <body>
+    <main class="popup-shell">
+      <header class="topbar">
+        <div>
+          <p>Local collector</p>
+          <h1>Job Collector</h1>
+        </div>
+        <button id="captureJob" class="icon-button" type="button" aria-label="Capture current job">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      </header>
+
+      <section class="summary">
+        <div>
+          <span id="jobCount">0</span>
+          <p>jobs saved</p>
+        </div>
+        <div>
+          <span id="dateCount">0</span>
+          <p>dates</p>
+        </div>
+      </section>
+
+      <section class="toolbar" aria-label="Export controls">
+        <button id="selectAll" type="button">Select all</button>
+        <button id="exportText" type="button">Export TXT</button>
+        <button id="exportJson" type="button">Export JSON</button>
+      </section>
+
+      <section id="dateGroups" class="date-groups" aria-live="polite"></section>
+
+      <footer>
+        <button id="clearJobs" class="subtle-button" type="button">Clear saved jobs</button>
+      </footer>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./src/popup.js"></script>
+  </body>
+</html>

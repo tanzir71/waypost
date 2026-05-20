@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="ATS Resume Toolkit is a local-first resume scoring app and browser job collector for comparing resume versions against job descriptions from your own browser."
+    />
+    <meta property="og:title" content="ATS Resume Toolkit — Local Resume Scoring & Job Collector" />
+    <meta
+      property="og:description"
+      content="Score resume versions against bulk job descriptions, collect job posts by date, and manually import exported jobs into a private browser-only ATS scoring workflow."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <title>ATS Resume Toolkit — Local Resume Scoring & Job Collector</title>
+  </head>
+  <body>
+    <div class="page-shell">
+      <a class="skip-link" href="#content">Skip to content</a>
+
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="./" aria-label="ATS Resume Toolkit home">
+            <span class="brand-mark" aria-hidden="true">
+              <span>RT</span>
+            </span>
+            <span class="brand-name">ATS Resume Toolkit</span>
+          </a>
+
+          <nav class="nav" aria-label="Primary navigation">
+            <a class="nav-link" href="#workflow">Workflow</a>
+            <a class="nav-link" href="#extension">Extension</a>
+            <a class="nav-link" href="#install">Install</a>
+            <a class="button button-small button-dark" href="./app/">Open scorer</a>
+          </nav>
+        </div>
+      </header>
+
+      <main id="content">
+        <section class="hero">
+          <div class="hero-glow" aria-hidden="true"></div>
+          <div class="hero-inner">
+            <div class="hero-copy">
+              <p class="status-pill">
+                <span class="mono">v1</span>
+                <span aria-hidden="true">💼</span>
+                <span>Local-first &bull; browser storage &bull; manual file import</span>
+              </p>
+
+              <h1>Private resume scoring and job collection for your search.</h1>
+              <p class="hero-description">
+                Upload resume versions, bulk import job descriptions, score matches locally,
+                and use the companion extension to save job posts by date before exporting a
+                file for manual import.
+              </p>
+
+              <div class="hero-actions">
+                <a class="button button-large button-dark" href="./app/">Open scorer</a>
+                <a
+                  class="button button-large button-light"
+                  href="https://github.com/tanzir71/ats-scoring/tree/main/extension"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  View extension
+                </a>
+              </div>
+
+              <div class="keyword-list" aria-label="Project keywords">
+                <span>ATS scoring</span>
+                <span>Resume versions</span>
+                <span>Job collector</span>
+                <span>LocalStorage</span>
+                <span>JSON/TXT export</span>
+                <span>GitHub Pages</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="workflow">
+          <div class="section-heading">
+            <h2>Workflow</h2>
+            <p>Collect &rarr; export &rarr; import &rarr; score. All browser-local by default.</p>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card">
+              <h3>Capture jobs</h3>
+              <p>
+                Save the current job title, link and visible description from the browser
+                extension into local extension storage.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Organize by date</h3>
+              <p>
+                Captured jobs are grouped by the date they were collected, so batches stay
+                tied to real search sessions.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Export selected dates</h3>
+              <p>
+                Pick one or more dates and download a TXT or JSON file. Nothing is sent
+                directly to the scorer.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Score resume versions</h3>
+              <p>
+                Manually import the exported file, run matching, and compare which resume
+                version fits each job cluster best.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="extension">
+          <div class="section-heading">
+            <h2>Tools</h2>
+            <p>Two small surfaces that stay independent and file-based.</p>
+          </div>
+
+          <div class="tool-grid">
+            <article class="tool-card">
+              <div>
+                <p class="tool-label">Web app</p>
+                <h3>ATS Resume Scorer</h3>
+                <p>
+                  Store resume versions, import bulk job descriptions, sort matches and
+                  review missing attributes from job clusters.
+                </p>
+              </div>
+              <a class="button button-medium button-dark" href="./app/">Launch app</a>
+            </article>
+            <article class="tool-card">
+              <div>
+                <p class="tool-label">Browser extension</p>
+                <h3>Job Collector</h3>
+                <p>
+                  Capture job descriptions and links while browsing, then download selected
+                  date batches for manual scoring import.
+                </p>
+              </div>
+              <a
+                class="button button-medium button-light"
+                href="https://github.com/tanzir71/ats-scoring/tree/main/extension"
+                rel="noreferrer"
+                target="_blank"
+              >
+                Open folder
+              </a>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="install">
+          <div class="section-heading">
+            <h2>Install extension</h2>
+            <p>Install from the GitHub repo as an unpacked Chromium extension.</p>
+          </div>
+
+          <div class="stack-panel">
+            <ol class="install-list">
+              <li>
+                Clone or download
+                <a href="https://github.com/tanzir71/ats-scoring" rel="noreferrer" target="_blank">
+                  github.com/tanzir71/ats-scoring
+                </a>.
+              </li>
+              <li>Open <span class="mono">chrome://extensions</span> or <span class="mono">edge://extensions</span>.</li>
+              <li>Enable Developer mode, choose Load unpacked, then select the <span class="mono">extension/</span> folder.</li>
+              <li>Capture jobs from job pages, export selected dates, then import the downloaded file in the scorer.</li>
+            </ol>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <p>Built for private, file-based job search workflows.</p>
+          <div class="footer-links">
+            <a href="https://github.com/tanzir71/ats-scoring" rel="noreferrer" target="_blank">GitHub</a>
+            <a href="./app/">Scorer</a>
+            <a href="https://github.com/tanzir71/ats-scoring/issues" rel="noreferrer" target="_blank">Issues</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
