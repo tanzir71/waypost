@@ -42,8 +42,8 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Offer comparison and Deadlines are available as M7 features. Letters, contacts
-and optional AI remain Coming soon while M7 continues.
+Offer comparison, Deadlines, Letters & outreach, Story bank and Contacts are
+available as M7 features. Optional AI remains off and is still being built.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -97,6 +97,22 @@ tokens stay out of exports and result JSON. Revocation, key recovery and vault
 deletion invalidate URLs; disconnecting sync leaves published feeds online.
 Calendar apps may keep prior copies. See [server setup and upgrade notes](server/README.md)
 for PHP's in-place migration and the one-time M6 D1 upgrade script.
+
+Letters & outreach composes cover letters, referral/advice requests and
+follow-ups from the evidence blocks you choose. Resume evidence comes from
+the same requirement matcher; saved STAR stories contribute their action and
+result text. Map blocks to requirements, add your own facts, edit the subject
+and draft, save/copy drafts, and copy or download TXT. No message is sent.
+Private input links and unsaved Match reports can prefill writing inputs
+without saving their source text. Saved drafts retain copied evidence and its
+provenance, and protect referenced sample stories/contacts when samples clear.
+
+Story bank supports editable situation/task/action/result fields and skill
+tags, including explicitly labelled incomplete drafts. Contacts stores people,
+notes, safe links, interaction history and reminder dates. Tracker can link
+contacts to applications; contact reminders appear in Today, and a contact can
+prefill an outreach recipient. All these records work offline, survive reviewed
+workspace backups and use the existing encrypted sync when it is enabled.
 
 Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
 permissions are exactly activeTab, storage, downloads and scripting. Configure

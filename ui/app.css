@@ -286,6 +286,26 @@ main { padding: 32px; flex: 1; }
 .calendar-entries > article { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
 .calendar-entries p { margin-top: 4px; font: var(--wp-body-s); }
 .calendar-exports { margin-top: 16px; }
+.contacts-layout { display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 16px; align-items: start; }
+.contacts-layout > div, .contacts-layout > section { min-width: 0; }
+.contact-list article { padding: 12px; border-radius: var(--wp-radius-md); background: var(--wp-surface); }
+.contact-title { padding: 0; min-height: 24px; justify-content: start; font: var(--wp-h3); }
+.contact-list p { font: var(--wp-body-s); margin-top: 4px; }
+.contact-notes, .writing-quote { white-space: pre-wrap; overflow-wrap: anywhere; }
+.letters-layout { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 16px; align-items: start; margin-top: 16px; }
+.letters-layout > section, .letters-layout aside { min-width: 0; }
+.letters-layout .card { padding: 20px; }
+.writing-block { background: var(--wp-surface); padding: 12px; border-radius: var(--wp-radius-md); display: grid; gap: 8px; }
+.writing-block h3 { font: var(--wp-label-m); }
+.writing-block p { font: var(--wp-body-s); }
+.story-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.story-list .card { align-content: start; }
+.story-list h4 { font: var(--wp-label-m); margin-bottom: 4px; color: var(--wp-ink-2); }
+.story-title { font: var(--wp-h3); padding: 0; min-height: 24px; justify-content: start; text-align: left; }
+.story-list [data-selected="true"] { background: var(--wp-surface-2); }
+#stories-panel { margin-top: 16px; }
+@media (max-width: 1200px) { .contacts-layout { grid-template-columns: 260px minmax(0,1fr); } .letters-layout { grid-template-columns: minmax(0,1fr); } .letters-layout aside { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; } }
+@media (max-width: 700px) { .contacts-layout, .story-list, .letters-layout aside { grid-template-columns: 1fr; } .contact-list { max-height: 320px; overflow-y: auto; } }
 :root[data-theme="dark"] .calendar-agenda-row > img, :root[data-theme="dark"] .calendar-heading img, :root[data-theme="dark"] .offer-note img { filter: brightness(1.8); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme]) .calendar-agenda-row > img, :root:not([data-theme]) .calendar-heading img, :root:not([data-theme]) .offer-note img { filter: brightness(1.8); } }
 @media (max-width: 1200px) { .calendar-layout { grid-template-columns: minmax(0,1fr); } .calendar-layout aside { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; } }

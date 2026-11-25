@@ -8416,5 +8416,63 @@
         "team": 6
       }
     }
+  ],
+  "contacts": [
+    {
+      "id": "sample-contact-nadia",
+      "name": "Nadia Rahman (sample)",
+      "company": "Northwind",
+      "role": "Recruiter",
+      "email": "nadia@example.test",
+      "link": "",
+      "notes": "Fictional sample contact. Ask about the interview process.",
+      "remindAt": "2026-11-28T12:00:00.000Z",
+      "history": [
+        {
+          "id": "sample-interaction-nadia",
+          "at": "2026-11-24T12:00:00.000Z",
+          "kind": "note",
+          "event": "Saved the recruiter’s details from the sample job."
+        }
+      ]
+    },
+    {
+      "id": "sample-contact-farhan",
+      "name": "Farhan Ahmed (sample)",
+      "company": "University careers group",
+      "role": "Peer mentor",
+      "email": "farhan@example.test",
+      "link": "",
+      "notes": "Fictional sample contact. Keep referral notes here.",
+      "remindAt": null,
+      "history": []
+    }
+  ],
+  "stories": [
+    {
+      "id": "sample-story-api",
+      "title": "A repeatable API test setup (sample)",
+      "situation": "A university project team used different local setups.",
+      "task": "Make the project easier to test together.",
+      "action": "Wrote integration tests and documented the local setup.",
+      "result": "The team could run the same checks before sharing changes.",
+      "skills": [
+        "Testing",
+        "Documentation",
+        "Teamwork"
+      ]
+    },
+    {
+      "id": "sample-story-review",
+      "title": "Explaining a code review (sample)",
+      "situation": "A teammate wanted to understand a review comment.",
+      "task": "Explain the concern clearly.",
+      "action": "Reproduced the behavior and walked through the test case.",
+      "result": "The team agreed on a change and kept the test as documentation.",
+      "skills": [
+        "Communication",
+        "Code review"
+      ]
+    }
   ]
 }

@@ -14,8 +14,14 @@
   migration. Recovery/deletion revoke feeds; stale updates/confirmations cannot
   republish them. All 121 tests and release checks pass, including actual
   SQLite upgrade preservation and calendar view/controller contracts.
+- Added local Letters & outreach with requirement-mapped evidence, editable
+  drafts/copies and private Match handoff; STAR Story bank with skill tags and
+  truthful incomplete state; and Contacts with history, reminders and Tracker links.
+- Added typed portable records, source-reference mapping and protection when
+  sample data clears. All 131 tests and release checks pass. These tools make
+  no network requests by default and never send messages.
 - Corrected the Setup card surface, stale landing labels and missing Figma
-  info/chevron assets. Writing/contact tools and optional AI remain in progress;
+  info/chevron assets. Optional AI and the final audit remain in progress;
   no M7 tag yet.
 
 ## M6 — 2026-11-25

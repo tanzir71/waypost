@@ -1,5 +1,6 @@
 import {stages,responseRates,followupApplications} from '../tracker/index.js';
 import {calendarEvents} from '../calendar/index.js';
+import {contactSummary} from '../contacts/index.js';
 const dayMs=86400000;
 export function todaySummary(records,{now,day=now.slice(0,10)}) {
   const nowMs=Date.parse(now);if(!Number.isFinite(nowMs))throw new Error('A valid current timestamp is required.');
@@ -15,6 +16,7 @@ export function todaySummary(records,{now,day=now.slice(0,10)}) {
     else if(app.stage==='interview'&&app.next?.at&&app.next.at.slice(0,10)<=weekEnd)next.push({id:`interview:${app.id}`,type:'interview',applicationId:app.id,jobId:app.jobId,title:`Interview at ${job?.company??'your next company'}`,detail:app.next.label,at:app.next.at});
   }
   for(const deadline of calendarEvents({...records,applications:[]},{scales:records.scales??[]}).filter(row=>row.date>=day&&row.date<=weekEnd))next.push({id:`deadline:${deadline.id}`,type:'deadline',deadlineId:deadline.id,title:deadline.title,detail:deadline.detail||deadline.kind,at:deadline.date});
+  for(const contact of contactSummary(records.contacts??[],{day}).filter(row=>row.due))next.push({id:`contact:${contact.id}`,type:'contact',contactId:contact.id,title:`Contact reminder · ${contact.name}`,detail:contact.company||contact.role||'',at:contact.remindAt});
   const seen=new Set();
   for(const report of (records.matchReports??[]).filter(row=>!row.deleted&&jobs.has(row.jobId))) for(const knockout of report.knockouts??[]) {
     const answered=jobs.get(report.jobId).knockoutAnswers?.[knockout.question]??knockout.answered;

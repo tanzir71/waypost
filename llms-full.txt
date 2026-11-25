@@ -13,9 +13,9 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 M6 ships optional encrypted sync, actual server checks, recovery codes and a
 self-hosting ZIP. M5 shipped PWA/offline support, the command menu, Settings, Agents, shared-job
 review, GPA planner, Final needed, Scale converter, Today, Tracker, import
-review, Honest Match, Parse check and Resumes. Offer compare and Deadlines/ICS
-are M7 features. Letters, Stories, Contacts and optional AI remain in M7. Unbuilt
-routes remain placeholders. Read PROGRESS.md; never assume a placeholder computed.
+review, Honest Match, Parse check and Resumes. M7 adds Offer compare, Deadlines/ICS,
+Letters & outreach, Story bank and Contacts. Optional AI is still in progress
+and off. Read PROGRESS.md; never assume an unavailable feature computed.
 
 ## Routes and private inputs
 
@@ -44,8 +44,10 @@ oversized links say Paste instead. M4 #plan=base64url(JSON) links still work.
 | Setup | app/setup/#provider=php&endpoint=SAME_ORIGIN_HTTPS_ENDPOINT |
 | Offers | app/offers/#selected=OFFER_UUID |
 | Deadlines | app/deadlines/#month=2026-12 |
-| Letters (M7) | app/letters/#job=JOB_UUID&resume=VERSION_UUID |
-| Contacts (M7) | app/contacts/#id=CONTACT_UUID |
+| Letters | app/letters/#job=JOB_UUID&resume=VERSION_UUID |
+| Saved draft | app/letters/#id=LETTER_UUID |
+| Story bank | app/letters/#tab=stories&story=STORY_UUID |
+| Contacts | app/contacts/#id=CONTACT_UUID |
 
 GPA also accepts locked=COURSE_UUID:A,COURSE_UUID:A%2B and scope=degree for all
 planned terms. Finals puts the unknown final last in w and omits it from s;
@@ -172,6 +174,19 @@ Every actionable native control also has a test hook. Navigation uses nav-ROUTE.
 
 ## Documentation
 
+Writing hooks: `letter-job`, `letter-resume`, `letter-contact`, `letter-kind`,
+`letter-use-evidence`, `letter-block-requirement`, `letter-compose`,
+`letter-text`, `letter-save`, `letter-save-copy`, `letter-delete-confirm`.
+`story-add` / `story-save` store STAR fields and skill tags; `story-use` copies
+the chosen action/result into the editor. `writing-tab-stories` opens Story bank.
+Composing does not save or send. Copy/download only uses the text in the editor.
+Private jdText/resumeText/draft/subject/recipient/sender inputs use encoded
+fragments; saved-record IDs remain local references. No AI provider is active.
+CRM hooks: `contact-search`, `contact-add`, `contact-save`, `contact-open`,
+`contact-add-interaction`, `interaction-save`, `contact-clear-reminder`,
+`contact-draft`, `contact-delete-confirm`. `contact-row` and `contact-history-row`
+identify result rows. Contact actions never send email or social messages.
+
 Deadlines: `calendar-previous`, `calendar-today`, `calendar-next` navigate the
 month. `calendar-event` / `deadline-open` read an entry; `deadline-add` and
 `deadline-save` explicitly write one. `deadline-delete-confirm` writes a
@@ -261,8 +276,8 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Offer comparison and Deadlines are available as M7 features. Letters, contacts
-and optional AI remain Coming soon while M7 continues.
+Offer comparison, Deadlines, Letters & outreach, Story bank and Contacts are
+available as M7 features. Optional AI remains off and is still being built.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -316,6 +331,22 @@ tokens stay out of exports and result JSON. Revocation, key recovery and vault
 deletion invalidate URLs; disconnecting sync leaves published feeds online.
 Calendar apps may keep prior copies. See [server setup and upgrade notes](server/README.md)
 for PHP's in-place migration and the one-time M6 D1 upgrade script.
+
+Letters & outreach composes cover letters, referral/advice requests and
+follow-ups from the evidence blocks you choose. Resume evidence comes from
+the same requirement matcher; saved STAR stories contribute their action and
+result text. Map blocks to requirements, add your own facts, edit the subject
+and draft, save/copy drafts, and copy or download TXT. No message is sent.
+Private input links and unsaved Match reports can prefill writing inputs
+without saving their source text. Saved drafts retain copied evidence and its
+provenance, and protect referenced sample stories/contacts when samples clear.
+
+Story bank supports editable situation/task/action/result fields and skill
+tags, including explicitly labelled incomplete drafts. Contacts stores people,
+notes, safe links, interaction history and reminder dates. Tracker can link
+contacts to applications; contact reminders appear in Today, and a contact can
+prefill an outreach recipient. All these records work offline, survive reviewed
+workspace backups and use the existing encrypted sync when it is enabled.
 
 Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
 permissions are exactly activeTab, storage, downloads and scripting. Configure

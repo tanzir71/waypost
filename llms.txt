@@ -8,9 +8,9 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 M6 ships optional encrypted sync, actual server checks, recovery codes and a
 self-hosting ZIP. M5 shipped PWA/offline support, the command menu, Settings, Agents, shared-job
 review, GPA planner, Final needed, Scale converter, Today, Tracker, import
-review, Honest Match, Parse check and Resumes. Offer compare and Deadlines/ICS
-are M7 features. Letters, Stories, Contacts and optional AI remain in M7. Unbuilt
-routes remain placeholders. Read PROGRESS.md; never assume a placeholder computed.
+review, Honest Match, Parse check and Resumes. M7 adds Offer compare, Deadlines/ICS,
+Letters & outreach, Story bank and Contacts. Optional AI is still in progress
+and off. Read PROGRESS.md; never assume an unavailable feature computed.
 
 ## Routes and private inputs
 
@@ -39,8 +39,10 @@ oversized links say Paste instead. M4 #plan=base64url(JSON) links still work.
 | Setup | app/setup/#provider=php&endpoint=SAME_ORIGIN_HTTPS_ENDPOINT |
 | Offers | app/offers/#selected=OFFER_UUID |
 | Deadlines | app/deadlines/#month=2026-12 |
-| Letters (M7) | app/letters/#job=JOB_UUID&resume=VERSION_UUID |
-| Contacts (M7) | app/contacts/#id=CONTACT_UUID |
+| Letters | app/letters/#job=JOB_UUID&resume=VERSION_UUID |
+| Saved draft | app/letters/#id=LETTER_UUID |
+| Story bank | app/letters/#tab=stories&story=STORY_UUID |
+| Contacts | app/contacts/#id=CONTACT_UUID |
 
 GPA also accepts locked=COURSE_UUID:A,COURSE_UUID:A%2B and scope=degree for all
 planned terms. Finals puts the unknown final last in w and omits it from s;
@@ -166,6 +168,19 @@ Requirement rows expose data-status met/partial/missing. Job rows expose
 Every actionable native control also has a test hook. Navigation uses nav-ROUTE.
 
 ## Documentation
+
+Writing hooks: `letter-job`, `letter-resume`, `letter-contact`, `letter-kind`,
+`letter-use-evidence`, `letter-block-requirement`, `letter-compose`,
+`letter-text`, `letter-save`, `letter-save-copy`, `letter-delete-confirm`.
+`story-add` / `story-save` store STAR fields and skill tags; `story-use` copies
+the chosen action/result into the editor. `writing-tab-stories` opens Story bank.
+Composing does not save or send. Copy/download only uses the text in the editor.
+Private jdText/resumeText/draft/subject/recipient/sender inputs use encoded
+fragments; saved-record IDs remain local references. No AI provider is active.
+CRM hooks: `contact-search`, `contact-add`, `contact-save`, `contact-open`,
+`contact-add-interaction`, `interaction-save`, `contact-clear-reminder`,
+`contact-draft`, `contact-delete-confirm`. `contact-row` and `contact-history-row`
+identify result rows. Contact actions never send email or social messages.
 
 Deadlines: `calendar-previous`, `calendar-today`, `calendar-next` navigate the
 month. `calendar-event` / `deadline-open` read an entry; `deadline-add` and

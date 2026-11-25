@@ -6,7 +6,7 @@ import {exportWorkspace} from '../workspace-export.js';
 import {planTargetGpa} from '../../core/gpa/index.js';
 import {builtInScales} from '../../core/scales/index.js';
 export async function renderToday({store,basePath,view,actions}) {
-  const records=Object.fromEntries(await Promise.all(['jobs','applications','resumeVersions','matchReports','deadlines','offers','courses','scales'].map(async type=>[type,await store.all(type)])));records.scales=[...builtInScales(),...records.scales];
+  const records=Object.fromEntries(await Promise.all(['jobs','applications','resumeVersions','matchReports','deadlines','offers','courses','scales','contacts'].map(async type=>[type,await store.all(type)])));records.scales=[...builtInScales(),...records.scales];
   const now=new Date(),day=localDay(now);
   const summary=todaySummary(records,{now:now.toISOString(),day});
   const lastExport=(await store.setting('last-export'))?.value;
@@ -15,7 +15,7 @@ export async function renderToday({store,basePath,view,actions}) {
   const left=el('div',{class:'stack'}),right=el('aside',{class:'stack','aria-label':'Study and workspace'}),layout=el('div',{class:'today-layout'},left,right);
   const next=el('section',{class:'card stack today-next'},el('div',{class:'section-title'},el('h2',{text:'Next up'}),el('span',{class:'wp-num',text:summary.next.length})));
   for(const item of summary.next) {
-    const href=item.type==='knockout'?`app/match/#job=${encodeURIComponent(item.jobId)}&resume=${encodeURIComponent(item.resumeVersionId)}`:item.type==='deadline'?`app/deadlines/#id=${encodeURIComponent(item.deadlineId)}`:`app/tracker/#selected=${encodeURIComponent(item.applicationId)}&edit=1`;
+    const href=item.type==='knockout'?`app/match/#job=${encodeURIComponent(item.jobId)}&resume=${encodeURIComponent(item.resumeVersionId)}`:item.type==='deadline'?`app/deadlines/#id=${encodeURIComponent(item.deadlineId)}`:item.type==='contact'?`app/contacts/#id=${encodeURIComponent(item.contactId)}`:`app/tracker/#selected=${encodeURIComponent(item.applicationId)}&edit=1`;
     const icon=item.type==='followup'?'bell':item.type==='deadline'?'calendar-reminder':item.type==='interview'?'message-reminder':'alert-reminder';
     next.append(el('article',{class:'next-row','data-testid':'next-up-row','data-record-id':item.id},el('span',{class:'next-icon'},el('img',{src:`${basePath}assets/icons/${icon}.svg`,width:18,height:18,alt:'','aria-hidden':true})),el('div',{class:'next-copy'},el('h3',{text:item.title}),el('p',{class:'muted',text:[item.detail,item.at.slice(0,10)].filter(Boolean).join(' · ')})),el('a',{class:'button small',href:basePath+href,text:item.type==='knockout'?'Answer':item.type==='interview'?'Prepare':'Open','aria-label':`${item.type==='knockout'?'Answer':'Open'} ${item.title}`,'data-testid':'next-up-action'})));
   }

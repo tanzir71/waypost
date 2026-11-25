@@ -51,7 +51,7 @@ export function validateWorkspace(workspace) {
 }
 export function assertRecord(type,record) {
   if(!stores.includes(type)) throw new Error(`Unknown store: ${type}`);
-  const definition={resumeVersions:'resumeVersion',jobs:'job',matchReports:'matchReport',applications:'application',contacts:'contact',offers:'offer',terms:'term',courses:'course',scales:'scale',deadlines:'deadline'}[type];
+  const definition={resumeVersions:'resumeVersion',jobs:'job',matchReports:'matchReport',applications:'application',contacts:'contact',letters:'letter',stories:'story',offers:'offer',terms:'term',courses:'course',scales:'scale',deadlines:'deadline'}[type];
   const errors=validate(record,definition?schema.$defs[definition]:schema.$defs.base);
   if(errors.length) throw new Error(errors.slice(0,5).join('; '));
   return record;

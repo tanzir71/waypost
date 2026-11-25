@@ -11,7 +11,7 @@ Live demo: https://tanzir71.github.io/waypost/
 | M4 Study tools | done | m4 | /app/gpa/, /app/finals/, /app/scales/ |
 | M5 PWA, agents, settings | done | m5 | /app/settings/, /app/agents/, /agents/, /app/share/ |
 | M6 Encrypted sync | done | m6 | /app/setup/, /downloads/waypost-self-host.zip |
-| M7 Offers and supporting tools | in progress | | /app/offers/, /app/deadlines/ |
+| M7 Offers and supporting tools | in progress | | /app/offers/, /app/deadlines/, /app/letters/, /app/contacts/ |
 
 ## M0
 
@@ -244,8 +244,22 @@ Live demo: https://tanzir71.github.io/waypost/
   history. All 121 tests and release checks pass, including multi-device feed
   updates, open-view refresh, native publication/revocation acknowledgement,
   no demo network calls, asset callsites, PHP lint and exact deployment ZIP.
-- Letters/Stories, Contacts, optional AI and the final full-spec audit remain
-  active work. No M7 tag has been created.
+- Added Letters & outreach with the shared matcher's exact resume evidence,
+  requirement-mapped blocks, selected story actions/results, cover/referral /
+  follow-up templates, manual blocks, editable drafts/copies and local TXT/copy
+  actions. No messages are sent. Private Match inputs can carry into writing
+  without being saved; unavailable references do not substitute another record.
+- Added searchable STAR Story bank, skill tags, truthful incomplete status,
+  per-story links, and explicit save/delete. Added Contacts with safe links,
+  email copying, history, reminder dates, Tracker associations and outreach
+  handoff. Actual due reminders appear in Today.
+- Added typed letter/story/history exports and shared source-reference mapping.
+  Personal drafts protect their sample story/contact sources when samples clear;
+  new demo examples seed once and cleared samples do not return. All 131 tests
+  and release checks pass for the local tools, including native CRUD, exact
+  evidence, private prefill, backups, sync projection and zero-fetch behavior.
+- Optional AI and the final full-spec audit remain active work. No M7 tag has
+  been created.
 
 ## Deployment status
 

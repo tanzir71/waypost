@@ -18,6 +18,8 @@
         "matchReports": { "type": "array", "items": { "$ref": "#/$defs/matchReport" } },
         "applications": { "type": "array", "items": { "$ref": "#/$defs/application" } },
         "contacts": { "type": "array", "items": { "$ref": "#/$defs/contact" } },
+        "letters": { "type": "array", "items": { "$ref": "#/$defs/letter" } },
+        "stories": { "type": "array", "items": { "$ref": "#/$defs/story" } },
         "offers": { "type": "array", "items": { "$ref": "#/$defs/offer" } },
         "terms": { "type": "array", "items": { "$ref": "#/$defs/term" } },
         "courses": { "type": "array", "items": { "$ref": "#/$defs/course" } },
@@ -125,7 +127,15 @@
     "contact": {
       "allOf": [{ "$ref": "#/$defs/base" }],
       "type": "object",
-      "properties": { "name": { "type": "string" }, "company": { "type": "string" }, "role": { "type": "string" }, "link": { "type": "string" }, "notes": { "type": "string" }, "remindAt": { "type": ["string", "null"], "format": "date-time" } }
+      "properties": { "name": { "type": "string" }, "company": { "type": "string" }, "role": { "type": "string" }, "link": { "type": "string" }, "email": { "type": "string" }, "notes": { "type": "string" }, "remindAt": { "type": ["string", "null"], "format": "date-time" }, "history": { "type": "array", "items": { "type": "object", "properties": { "id": { "type": "string" }, "at": { "type": "string", "format": "date-time" }, "kind": { "type": "string" }, "event": { "type": "string" } } } } }
+    },
+    "story": {
+      "allOf": [{ "$ref": "#/$defs/base" }], "type": "object",
+      "properties": { "title": { "type": "string" }, "situation": { "type": "string" }, "task": { "type": "string" }, "action": { "type": "string" }, "result": { "type": "string" }, "skills": { "type": "array", "items": { "type": "string" } } }
+    },
+    "letter": {
+      "allOf": [{ "$ref": "#/$defs/base" }], "type": "object",
+      "properties": { "title": { "type": "string" }, "kind": { "enum": ["cover", "referral", "followup"] }, "jobId": { "type": ["string", "null"] }, "resumeVersionId": { "type": ["string", "null"] }, "contactId": { "type": ["string", "null"] }, "recipient": { "type": "string" }, "sender": { "type": "string" }, "subject": { "type": "string" }, "text": { "type": "string" }, "blocks": { "type": "array", "items": { "type": "object", "properties": { "source": { "enum": ["resume", "story", "manual"] }, "sourceId": { "type": ["string", "null"] }, "requirement": { "type": "string" }, "text": { "type": "string" } } } } }
     },
     "offer": {
       "allOf": [{ "$ref": "#/$defs/base" }],

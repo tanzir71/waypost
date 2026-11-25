@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {contactInput,contactSummary,addInteraction,removeInteraction} from '../core/contacts/index.js';
+test('contacts validate safe links, preserve user notes and derive actual reminders/contact history',()=>{
+ const contact={id:'one',...contactInput({name:' Amina ',company:'Example',email:'amina@example.test',link:'https://example.test/person',remindAt:'2026-11-26T12:00:00Z',notes:'Met at a careers event'})};assert.equal(contact.name,'Amina');assert.equal(contactSummary([contact],{day:'2026-11-26'})[0].due,true);assert.equal(contactSummary([contact],{day:'2026-11-25',q:'example'})[0].due,false);assert.equal(contactSummary([contact],{day:'2026-11-26',q:'unrelated'}).length,0);
+ const withNote=addInteraction(contact,{id:'interaction',at:'2026-11-25T12:00:00Z',kind:'contacted',event:'Sent a personal introduction'});assert.equal(contact.history,undefined);assert.equal(contactSummary([withNote],{day:'2026-11-26'})[0].lastContactAt,'2026-11-25T12:00:00.000Z');assert.equal(removeInteraction(withNote,'interaction').history.length,0);for(const value of [{name:''},{name:'X',link:'javascript:alert(1)'},{name:'X',email:'invalid'},{name:'X',remindAt:'invalid'}])assert.throws(()=>contactInput(value));assert.throws(()=>addInteraction(contact,{id:'i',at:'bad',event:'Note'}));
+});

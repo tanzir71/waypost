@@ -3,6 +3,7 @@ import {applicationFields} from '../../core/tracker/index.js';
 import {createScorer} from '../worker-client.js';
 import {el,button,field,result,announce,download,copyJSON,safeURL,dialog} from '../dom.js';
 import {readLink,syncLink,shareLinkButton} from '../links.js';
+import {buildDeepLink} from '../../core/links/deep.js';
 import {tierBadge,requirementRow,titleCase} from '../components/match-report.js';
 const tierOrder=['strong','good','partial','limited'];
 const reportOrder=(a,b)=>tierOrder.indexOf(a.tier)-tierOrder.indexOf(b.tier)||b.requiredScore-a.requiredScore||b.preferredBonus-a.preferredBonus;
@@ -126,7 +127,7 @@ export async function renderMatch({store,basePath,view,actions,scorerFactory=cre
     });
     rail.append(knockouts);
     report.stuffingWarnings.forEach(warning=>rail.append(el('p',{class:'warning-callout',text:warning})));
-    rail.append(el('a',{class:'button',href:`${basePath}app/letters/#job=${encodeURIComponent(selectedJob.id)}&resume=${encodeURIComponent(selectedResume.id)}`,text:'Draft letter from this report','data-testid':'draft-letter'}),button('Add to tracker',addToTracker,'add-to-tracker',{class:'ghost'}));
+    rail.append(el('a',{class:'button',href:buildDeepLink('letters',{job:selectedJob.id,resume:selectedResume.id,...(selectedJob._ephemeral?{jdText:selectedJob.text}:{}),...(selectedResume._ephemeral?{resumeText:selectedResume.text}:{})},{basePath}),text:'Draft letter from this report','data-testid':'draft-letter'}),button('Add to tracker',addToTracker,'add-to-tracker',{class:'ghost'}));
     result(report);
   }
   const fragment=new URLSearchParams(location.hash.slice(1));selectedResume=versions.find(row=>row.id===linked.state.resume||row.label===linked.state.resume)??(!linked.state.resume?selectedResume:null);
