@@ -14,6 +14,7 @@ for (const path of await files(root)) {
   const code = content.replace(/<a\b[^>]*href="https?:\/\/[^\"]*"/g, '<a').replace(/\/\/[^\n]*https?:\/\/[^\n]*/g, '');
   for (const match of code.matchAll(/https?:\/\/[^\s"'`<>)}]+/g)) {
     if(path==='extension/defaults.js'&&match[0]==='https://tanzir71.github.io/waypost/')continue; // explicit user-initiated handoff destination
+    if(path==='server/worker/ai.js'&&match[0]==='https://api.openai.com/v1/responses')continue; // fixed server-only BYOK upstream, never requested by browser code
     if (!/^https?:\/\/(?:schema\.org(?:\/|$)|github\.com\/tanzir71\/waypost(?:\/|$)|tanziro\.com(?:\/|$)|www\.w3\.org\/2000\/svg$)/.test(match[0])) violations.push(`${path}: ${match[0]}`);
   }
 }

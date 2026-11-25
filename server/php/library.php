@@ -81,6 +81,7 @@ final class Server {
         $count=$this->transaction(function()use($bucket,$window){$this->query('DELETE FROM rate_limits WHERE window < ?',[$window-60]);return $this->query('INSERT INTO rate_limits(bucket,window,count) VALUES(?,?,1) ON CONFLICT(bucket) DO UPDATE SET count=count+1 RETURNING count',[$bucket,$window])->fetchColumn();});
         if($count>($sensitive?30:($this->deployment['config']['rate_per_minute']??600)))fail('rate_limit','Rate limit reached. Retry after one minute.',429);
     }
+    public function limitAI(string $ip): void { $this->rate($ip,'ai',true); }
     private function calendarStatus(string $id): array {
         $vault=$this->vault($id);if(!$vault)fail('vault_missing','Vault not found.',404);$feed=$this->query('SELECT * FROM calendar_feeds WHERE vault_id=?',[$id])->fetch();return ['version'=>(int)$vault['calendar_version'],'published'=>(bool)$feed,'updatedAt'=>$feed?$feed['updated_at']:null,'contentHash'=>$feed?$feed['content_hash']:null,'nonce'=>$feed?$feed['nonce']:null];
     }

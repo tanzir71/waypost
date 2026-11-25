@@ -43,7 +43,7 @@ recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
 Offer comparison, Deadlines, Letters & outreach, Story bank and Contacts are
-available as M7 features. Optional AI remains off and is still being built.
+available as M7 features. Optional AI writing is available and stays off by default.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -113,6 +113,21 @@ notes, safe links, interaction history and reminder dates. Tracker can link
 contacts to applications; contact reminders appear in Today, and a contact can
 prefill an outreach recipient. All these records work offline, survive reviewed
 workspace backups and use the existing encrypted sync when it is enabled.
+
+Optional AI rewrites English text selected in the letter editor (or the whole
+draft, up to 12,000 characters). Settings offers Off, Chrome built-in and OpenAI
+BYOK. Chrome availability is feature-detected; model preparation/download is an
+explicit action and writing stays on-device. BYOK requires your own same-origin
+HTTPS PHP/Worker relay, a model ID and API key; it is disabled on GitHub Pages.
+The request dialog shows the selected text and off-device warning before sending.
+Only that selection and writing instructions are sent, without resume/job context.
+Every suggestion shows a complete accept/reject diff. Quantified sentences are
+locked verbatim; suggestions adding/changing/removing them are rejected. Review
+the other facts and meaning yourself. Accept changes only the editor, then save
+separately. Errors, cancellation, rejection and stale reviews preserve your text.
+Keys stay in internal device settings, excluded from exports, sync and result
+JSON. Forget AI key turns AI off and removes the stored key. Imported workspaces
+always leave connections off. See [optional relay setup](server/README.md#optional-ai-relay).
 
 Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
 permissions are exactly activeTab, storage, downloads and scripting. Configure

@@ -2,9 +2,11 @@ import {SyncRepository,RepositoryError} from './repository.js';
 import {validateEnvelope,validateVault,unbase64,requireUUID,keyVersion,MAX_REQUEST_BYTES,MAX_BATCH_RECORDS,bytesLength} from '../../core/sync/protocol.js';
 import {digest} from '../../core/sync/crypto.js';
 import {handleCalendarFeed} from './calendar.js';
+import {handleAI} from './ai.js';
 const response=(value,status=200,extra={})=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',...extra}});
 async function body(request){if(Number(request.headers.get('content-length'))>MAX_REQUEST_BYTES)throw new RepositoryError('request_limit','Request exceeds 5 MB.',413);const reader=request.body?.getReader();let size=0,text='';if(reader){const decoder=new TextDecoder();for(;;){const item=await reader.read();if(item.done)break;size+=item.value.length;if(size>MAX_REQUEST_BYTES){await reader.cancel();throw new RepositoryError('request_limit','Request exceeds 5 MB.',413);}text+=decoder.decode(item.value,{stream:true});}text+=decoder.decode();}if(!text)return {};try{return JSON.parse(text);}catch{throw new RepositoryError('invalid_json','Expected a JSON body.',400);}}
 export async function handleRequest(request,env){
+  if(/\/api\/ai\/?$/.test(new URL(request.url).pathname))return handleAI(request,env);
   if(/\/api\/ics(?:\/|$)/.test(new URL(request.url).pathname))return handleCalendarFeed(request,env);
   const url=new URL(request.url),path=url.pathname.replace(/^.*\/api\/sync/,'')||'/',repo=new SyncRepository(env);
   try{

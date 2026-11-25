@@ -258,8 +258,20 @@ Live demo: https://tanzir71.github.io/waypost/
   new demo examples seed once and cleared samples do not return. All 131 tests
   and release checks pass for the local tools, including native CRUD, exact
   evidence, private prefill, backups, sync projection and zero-fetch behavior.
-- Optional AI and the final full-spec audit remain active work. No M7 tag has
-  been created.
+- Added optional English letter rewrites via Chrome's on-device Prompt API and
+  same-origin OpenAI BYOK relays for PHP/Worker. Settings stays off by default;
+  Chrome model preparation and each request are explicit. Every suggestion is a
+  complete accept/reject diff, edits only the selected editor text, and needs a
+  separate save. Quantified sentences stay verbatim; fabricated metrics, stale
+  edits, cancellation and errors cannot replace the draft.
+- Keys stay in internal device settings, excluded from backups, sync, links and
+  result JSON. BYOK is disabled in the demo. Fixed upstreams, HTTPS/origin
+  checks, per-IP rate limits, redacted errors, bounded requests/output and
+  timeout/cancel behavior are tested without network, accounts or real keys.
+- All 143 tests and release checks pass, including provider fakes, actual PHP
+  adapter execution, native review controls, default-off settings, key exclusion,
+  no automatic model download, and changed-provider warning guards.
+- The final full-spec audit remains active work. No M7 tag has been created.
 
 ## Deployment status
 

@@ -14,8 +14,8 @@ M6 ships optional encrypted sync, actual server checks, recovery codes and a
 self-hosting ZIP. M5 shipped PWA/offline support, the command menu, Settings, Agents, shared-job
 review, GPA planner, Final needed, Scale converter, Today, Tracker, import
 review, Honest Match, Parse check and Resumes. M7 adds Offer compare, Deadlines/ICS,
-Letters & outreach, Story bank and Contacts. Optional AI is still in progress
-and off. Read PROGRESS.md; never assume an unavailable feature computed.
+Letters & outreach, Story bank, Contacts and optional AI rewrites (off by default).
+Read PROGRESS.md; never assume an unavailable feature computed.
 
 ## Routes and private inputs
 
@@ -138,7 +138,7 @@ Settings reports actual quota/persistence, exports JSON, reviews imports and
 supports folder backups where available. Imports merge by updatedAt, tie-break
 by deviceId, keep newer local records and leave AI/sync off. Original OPFS files
 are not in JSON backups; extracted text is retained. Demo mode hides sync.
-AI is off until M7 writing features ship. Appearance offers Light/Dark/System.
+AI is off by default. Appearance offers Light/Dark/System.
 
 The worker precaches every route, UI/core module, font, icon and local data file.
 Vendor/parser files cache after first use; use PDF/DOCX once online before
@@ -181,7 +181,19 @@ Writing hooks: `letter-job`, `letter-resume`, `letter-contact`, `letter-kind`,
 the chosen action/result into the editor. `writing-tab-stories` opens Story bank.
 Composing does not save or send. Copy/download only uses the text in the editor.
 Private jdText/resumeText/draft/subject/recipient/sender inputs use encoded
-fragments; saved-record IDs remain local references. No AI provider is active.
+fragments; saved-record IDs remain local references. AI is optional and off by default.
+AI hooks: `ai-provider`, `ai-model`, `ai-endpoint`, `ai-key`, `ai-save`,
+`ai-forget`, `ai-prepare`, `ai-prepare-cancel`, `ai-goal`, `ai-rewrite`,
+`ai-before`, `ai-request`, `ai-diff-row`, `ai-accept`, `ai-reject`, `ai-cancel`.
+Enable Chrome built-in or BYOK in Settings. Chrome model preparation is explicit;
+BYOK requires a same-origin HTTPS relay and sends only selected English letter
+text, never an automatic workspace export. BYOK is disabled in demo. Review AI
+rewrite opens a native dialog before any request. Request suggestion computes
+a diff and updates #result-data.aiReview. Accept edits that selection only;
+save the draft separately. Reject/close/cancel leave it untouched. Quantified
+source sentences must stay verbatim; new or changed metrics are rejected before
+display. Edited drafts cannot accept stale suggestions. Keys never enter
+result JSON, workspace backups, sync or URLs. Do not enter a key into share links.
 CRM hooks: `contact-search`, `contact-add`, `contact-save`, `contact-open`,
 `contact-add-interaction`, `interaction-save`, `contact-clear-reminder`,
 `contact-draft`, `contact-delete-confirm`. `contact-row` and `contact-history-row`
@@ -277,7 +289,7 @@ recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
 Offer comparison, Deadlines, Letters & outreach, Story bank and Contacts are
-available as M7 features. Optional AI remains off and is still being built.
+available as M7 features. Optional AI writing is available and stays off by default.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -347,6 +359,21 @@ notes, safe links, interaction history and reminder dates. Tracker can link
 contacts to applications; contact reminders appear in Today, and a contact can
 prefill an outreach recipient. All these records work offline, survive reviewed
 workspace backups and use the existing encrypted sync when it is enabled.
+
+Optional AI rewrites English text selected in the letter editor (or the whole
+draft, up to 12,000 characters). Settings offers Off, Chrome built-in and OpenAI
+BYOK. Chrome availability is feature-detected; model preparation/download is an
+explicit action and writing stays on-device. BYOK requires your own same-origin
+HTTPS PHP/Worker relay, a model ID and API key; it is disabled on GitHub Pages.
+The request dialog shows the selected text and off-device warning before sending.
+Only that selection and writing instructions are sent, without resume/job context.
+Every suggestion shows a complete accept/reject diff. Quantified sentences are
+locked verbatim; suggestions adding/changing/removing them are rejected. Review
+the other facts and meaning yourself. Accept changes only the editor, then save
+separately. Errors, cancellation, rejection and stale reviews preserve your text.
+Keys stay in internal device settings, excluded from exports, sync and result
+JSON. Forget AI key turns AI off and removes the stored key. Imported workspaces
+always leave connections off. See [optional relay setup](server/README.md#optional-ai-relay).
 
 Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
 permissions are exactly activeTab, storage, downloads and scripting. Configure

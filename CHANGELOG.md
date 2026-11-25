@@ -20,9 +20,15 @@
 - Added typed portable records, source-reference mapping and protection when
   sample data clears. All 131 tests and release checks pass. These tools make
   no network requests by default and never send messages.
+- Added optional English letter rewrites via Chrome built-in and same-origin
+  OpenAI BYOK relays. AI stays off by default; model preparation, text sending
+  and every accept/reject diff require explicit actions. Quantified claims stay
+  verbatim, and stale/cancelled/rejected suggestions cannot overwrite drafts.
+- Keys are excluded from backups, sync, private links and result JSON. PHP and
+  Worker relays use fixed HTTPS upstreams, rate/size/time limits and redacted
+  errors. Provider adapters and native review flows are tested with fakes.
 - Corrected the Setup card surface, stale landing labels and missing Figma
-  info/chevron assets. Optional AI and the final audit remain in progress;
-  no M7 tag yet.
+  info/chevron assets. The final audit remains in progress; no M7 tag yet.
 
 ## M6 — 2026-11-25
 
