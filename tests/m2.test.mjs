@@ -30,6 +30,19 @@ test('the worker message contract calls the shared engine and rejects invalid ba
   assert.deepEqual(scoreMessage(input),scoreBatch(input.resumes,input.jobs,{now:input.now}));
   assert.throws(()=>scoreMessage({resumes:null,jobs:[]}),/arrays/);
 });
+test('shared batch preparation preserves independent evidence and per-job knockout answers',()=>{
+  const jobs=[{...fixture.job,id:'first',title:'Backend Engineer'},{...fixture.job,id:'second',title:'Platform Engineer',text:fixture.job.text+'\nDo you require sponsorship?',knockoutAnswers:{'Do you require sponsorship?':false}}];
+  const reports=scoreBatch([fixture.resume],jobs,{now:'2026-11-25'});
+  for(let i=0;i<jobs.length;i++) {
+    const standalone=matchResume(fixture.resume,jobs[i],{now:'2026-11-25'});
+    assert.equal(reports[i].tier,standalone.tier);assert.deepEqual(reports[i].checks,standalone.checks);
+    assert.deepEqual(reports[i].required.map(({clusterPrevalence,...row})=>row),standalone.required);
+  }
+  assert.notEqual(reports[0].required[0],reports[1].required[0]);
+  reports[0].required[0].evidence.line='Changed by a consumer';
+  assert.notEqual(reports[0].required[0].evidence.line,reports[1].required[0].evidence.line);
+  assert.equal(reports[1].tier,'partial');
+});
 test('IndexedDB adapter seeds once, preserves linked UUIDv7 records and clears only samples',async()=>{
   const indexedDB=memoryIndexedDB(),localStorage=memoryLocalStorage();let persistCalls=0;
   const store=await openWorkspace({indexedDB,localStorage,storage:{persist:async()=>{persistCalls++;return true;}}});

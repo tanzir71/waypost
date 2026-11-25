@@ -48,11 +48,11 @@ export function extractRequirements(description) {
   return rows;
 }
 
-export function indexResume(text) {
+export function indexResume(text,normalizer=normalize) {
   let section = 'CONTACT';
   const lines = String(text).replace(/\r\n/g,'\n').split('\n').map((line,lineIndex)=>{
     if (headings.test(line.trim())) section=line.trim().replace(/:$/,'').toUpperCase();
-    const tokens=normalize(line), frequencies=new Map();
+    const tokens=normalizer(line), frequencies=new Map();
     tokens.forEach(term=>frequencies.set(term,(frequencies.get(term)??0)+1));
     return { line, lineIndex:lineIndex+1, section, tokens, frequencies, heading:headings.test(line.trim()) };
   }).filter(item=>item.line.trim());
@@ -100,9 +100,9 @@ export function yearsOfExperience(text, now = null) {
   return Math.round(merged.reduce((sum,[start,end])=>sum+end-start,0)/12*10)/10;
 }
 
-function prepareRequirement(requirement) {
+function prepareRequirement(requirement,normalizer=normalize) {
   const alternatives=requirement.text.match(/\b([\w+#.]+)\s+or\s+([\w+#.]+)\b/i);
-  return {terms:[...new Set(normalize(requirement.text))],either:alternatives?alternatives.slice(1).map(word=>normalize(word)[0]).filter(Boolean):[],ask:Number(requirement.text.match(/(\d+(?:\.\d+)?)\+?\s*(?:years|yrs)\b/i)?.[1]??0)};
+  return {terms:[...new Set(normalizer(requirement.text))],either:alternatives?alternatives.slice(1).map(word=>normalizer(word)[0]).filter(Boolean):[],ask:Number(requirement.text.match(/(\d+(?:\.\d+)?)\+?\s*(?:years|yrs)\b/i)?.[1]??0)};
 }
 function scoreRequirement(requirement,index,years,prepared=prepareRequirement(requirement)) {
   const {terms,either,ask}=prepared;
@@ -161,7 +161,16 @@ export function matchResume(resume,job,options={}) {
   const preparedJob=options.preparedJob??prepareJob(job);
   const {index,years,bullets,title:resumeTitle}=preparedResume;
   const {requirements,title}=preparedJob;
-  const scored=requirements.map((req,i)=>scoreRequirement(req,index,years,preparedJob.requirementData[i]));
+  const scored=requirements.map((req,i)=>{
+    const cache=preparedResume.requirementCache;
+    if(!cache)return scoreRequirement(req,index,years,preparedJob.requirementData[i]);
+    const key=JSON.stringify([req.kind,req.text]);
+    if(!cache.has(key))cache.set(key,scoreRequirement(req,index,years,preparedJob.requirementData[i]));
+    const row=cache.get(key);
+    // Reports own their rows: cluster prevalence and consumer edits must not
+    // leak into another job's evidence when requirement text is shared.
+    return {...row,evidence:row.evidence?{...row.evidence}:null,supportingEvidence:row.supportingEvidence.map(item=>({...item}))};
+  });
   const required=scored.filter(req=>req.kind==='required'), preferred=scored.filter(req=>req.kind==='preferred');
   const points=row=>row.status==='met'?1:row.status==='partial'?.5:0;
   const requiredScore=required.length ? required.reduce((sum,row)=>sum+points(row),0)/required.length : 0;
@@ -180,24 +189,31 @@ export function matchResume(resume,job,options={}) {
 }
 
 function prepareResume(resume,options) {
-  const index=options.index??indexResume(resume.text);
+  const index=options.index??indexResume(resume.text,options.normalizer);
   const bullets=index.lines.filter(line=>!line.heading && /EXPERIENCE|PROJECT|LEADERSHIP/.test(line.section) && /^\s*[-•*]\s/.test(line.line));
   const role=index.lines.filter(line=>/EXPERIENCE|EMPLOYMENT/.test(line.section)).map(line=>line.line.match(/(?:(?:sr|jr|senior|junior|lead|staff|principal|backend|frontend|full.stack|software|product|data|platform|ui|ux)\.?\s+)*(?:engineer|developer|designer|analyst|manager)/i)?.[0]).find(Boolean)??'';
   return {index,years:yearsOfExperience(resume.text,options.now),bullets,quantified:bullets.filter(line=>/\d|[%$£€]|\b(?:hours?|minutes?|seconds?)\b/.test(line.line)).length,title:new Set(normalize(role)),counts:frequencies(index.lines.flatMap(line=>line.tokens)),attributes:new Set(extractAttributes(resume.text))};
 }
-function prepareJob(job) {
+function prepareJob(job,normalizer=normalize) {
   const requirements=extractRequirements(job.text);
-  return {requirements,requirementData:requirements.map(prepareRequirement),title:new Set(normalize(job.title??'')),counts:frequencies(normalize(job.text)),attributes:extractAttributes(job.text),knockouts:job.text.split(/\n|(?<=[.?])\s+/).filter(isKnockoutQuestion).map(line=>line.trim())};
+  return {requirements,requirementData:requirements.map(row=>prepareRequirement(row,normalizer)),title:new Set(normalizer(job.title??'')),counts:frequencies(normalizer(job.text)),attributes:extractAttributes(job.text),knockouts:job.text.split(/\n|(?<=[.?])\s+/).filter(isKnockoutQuestion).map(line=>line.trim())};
 }
 export function scoreBatch(resumes,jobs,options={}) {
-  const indexed=resumes.map(resume=>({resume,preparedResume:prepareResume(resume,options)}));
+  // All caches belong to this invocation: repeated imports share preparation,
+  // while no resume/job text survives in module state after a batch completes.
+  const normalized=new Map(),preparedJobs=new Map();
+  const normalizer=text=>{if(!normalized.has(text))normalized.set(text,normalize(text));return normalized.get(text);};
+  const indexed=resumes.map(resume=>({resume,preparedResume:{...prepareResume(resume,{...options,normalizer}),requirementCache:new Map()}}));
+  const jobsById=new Map();
   const reports=jobs.flatMap(job=>{
-    const preparedJob=prepareJob(job);
+    const key=JSON.stringify([job.title??'',job.text]);
+    if(!preparedJobs.has(key))preparedJobs.set(key,prepareJob(job,normalizer));
+    const preparedJob=preparedJobs.get(key);jobsById.set(job.id,preparedJob);
     return indexed.map(({resume,preparedResume})=>matchResume(resume,job,{...options,preparedResume,preparedJob}));
   });
-  const clusters=clusterJobs(jobs);
+  const clusters=clusterJobs(jobs,{attributesById:new Map([...jobsById].map(([id,prepared])=>[id,prepared.attributes]))});
   const vocab=skillPatterns.map(skill=>({label:skill.label,token:stem(skill.token)}));
-  const jobTokens=new Map(jobs.map(job=>[job.id,new Set(normalize(job.text))]));
+  const jobTokens=new Map(jobs.map(job=>[job.id,new Set(jobsById.get(job.id).counts.keys())]));
   for(const {resume,preparedResume} of indexed) {
     for(const cluster of clusters) {
       const ids=new Set(cluster.jobIds);
@@ -205,7 +221,7 @@ export function scoreBatch(resumes,jobs,options={}) {
       for(const report of reports.filter(report=>report.resumeVersionId===resume.id&&ids.has(report.jobId))) {
         report.clusterGaps=gaps;report.clusterJobCount=cluster.jobIds.length;
         for(const row of [...report.required,...report.preferred].filter(row=>row.status==='missing')) {
-          const terms=new Set(normalize(row.text));
+          const terms=new Set(normalizer(row.text));
           row.clusterPrevalence={count:cluster.jobIds.filter(id=>[...terms].filter(term=>hardSkills.has(term)).some(term=>jobTokens.get(id)?.has(term))).length,of:cluster.jobIds.length};
         }
       }

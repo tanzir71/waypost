@@ -194,11 +194,11 @@ export function rankResumeMatches(resumes, jobs) {
   });
 }
 
-export function clusterJobs(jobs) {
+export function clusterJobs(jobs,prepared={}) {
   const clusters = [];
 
   for (const job of jobs) {
-    const attributes = new Set(extractAttributes(job.text));
+    const attributes = new Set(prepared.attributesById?.get(job.id) ?? extractAttributes(job.text));
     let bestCluster = null;
     let bestSimilarity = 0;
 
