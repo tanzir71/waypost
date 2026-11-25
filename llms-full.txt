@@ -13,8 +13,8 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 M6 ships optional encrypted sync, actual server checks, recovery codes and a
 self-hosting ZIP. M5 shipped PWA/offline support, the command menu, Settings, Agents, shared-job
 review, GPA planner, Final needed, Scale converter, Today, Tracker, import
-review, Honest Match, Parse check and Resumes. Offers,
-Deadlines, Letters, Stories, Contacts and optional AI arrive in M7. Unbuilt
+review, Honest Match, Parse check and Resumes. Offer compare is the first M7
+feature. Deadlines, Letters, Stories, Contacts and optional AI remain in M7. Unbuilt
 routes remain placeholders. Read PROGRESS.md; never assume a placeholder computed.
 
 ## Routes and private inputs
@@ -42,7 +42,7 @@ oversized links say Paste instead. M4 #plan=base64url(JSON) links still work.
 | Agents | app/agents/#tool=gpa |
 | Settings | app/settings/#section=storage |
 | Setup | app/setup/#provider=php&endpoint=SAME_ORIGIN_HTTPS_ENDPOINT |
-| Offers (M7) | app/offers/#selected=OFFER_UUID |
+| Offers | app/offers/#selected=OFFER_UUID |
 | Deadlines (M7) | app/deadlines/#month=2026-11 |
 | Letters (M7) | app/letters/#job=JOB_UUID&resume=VERSION_UUID |
 | Contacts (M7) | app/contacts/#id=CONTACT_UUID |
@@ -172,6 +172,15 @@ Every actionable native control also has a test hook. Navigation uses nav-ROUTE.
 
 ## Documentation
 
+Offers: `offer-add` opens a labelled native form; `offer-save` writes a record.
+`offer-compare` calculates prefilled inputs without saving. Money rows use
+`offer-row-base`, `offer-row-total`, `offer-row-adjusted`, `offer-row-year1Cash`;
+`offer-priority-result` exposes a score only when weights/ratings are valid.
+`offer-import-index` / `offer-cost-csv` load a user-supplied city,index file;
+editing an offer explicitly applies a city. `offer-save-weights` saves priorities.
+`offer-delete` opens confirmation and `offer-delete-confirm` writes a tombstone.
+No salary, tax, exchange-rate or cost-index data is fetched automatically.
+
 Sync is optional and hidden in demo. On self-hosted HTTPS deployments, use
 app/setup/ to check the same-origin PHP or Worker server, create/unlock a vault,
 save eight recovery codes and verify encrypted write/read before turning it on.
@@ -240,7 +249,8 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Offers, letters, contacts, deadlines and optional AI remain Coming soon until M7.
+Offer comparison is available as the first M7 feature. Letters, contacts,
+deadlines and optional AI remain Coming soon while M7 continues.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -267,6 +277,18 @@ The mockup's UK 2:1 label conflicts with its percentage method: 72.4% falls in
 the First band, so this implementation labels it First (estimate), following
 [the published UK bands](https://student.sussex.ac.uk/your-studies/degree).
 The supplied mix is distinct from the greedy solver's concentrated upgrades.
+
+Offer compare uses your annual compensation, vesting/cliff details, benefits
+value and cost-of-living index; no salary, exchange-rate, tax or index service
+is queried. Import `city,index` CSV data and explicitly apply a city while
+editing an offer. Priority sliders must total 100%; compensation is relative
+to the best entered adjusted total, while growth/flexibility/team ratings come
+from you. Missing ratings leave weighted scores uncomputed. A partial-year
+cliff needs an explicit vested-equity estimate. The labelled year-1 cash
+estimate includes entered benefits and target bonus and is not take-home pay.
+Fixtures reproduce £110,600 total, £105,488 adjusted and £98,600 year-1 cash.
+Offers and priorities survive exports/imports and encrypted sync. Private input
+links prefill without saving; calculation needs Compare offers or autorun=1.
 
 Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
 permissions are exactly activeTab, storage, downloads and scripting. Configure

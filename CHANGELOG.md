@@ -1,5 +1,15 @@
 # Changelog
 
+## M7 in progress — 2026-11-26
+
+- Added offer/current-job comparison, compensation and vesting calculations,
+  cost-index CSV import, adjusted-total bars/table, priority sliders and
+  user-supplied ratings. Required offer fixtures and native record flows pass.
+- Added portable/synced offer priorities and private input links that calculate
+  only on request. All 106 tests and release checks pass for this feature.
+- Corrected the Setup card surface and stale landing sync labels. Calendar,
+  writing/contact tools and optional AI remain in progress; no M7 tag yet.
+
 ## M6 — 2026-11-25
 
 - Shipped optional encrypted sync with PHP/SQLite and Worker/D1/R2 backends,

@@ -233,7 +233,36 @@ main { padding: 32px; flex: 1; }
 @media (min-width: 701px) and (max-width: 1350px) { .study-layout { grid-template-columns: minmax(0,1fr) 280px; } .gpa-fields { grid-template-columns: repeat(2,minmax(0,1fr)); } .course-row { flex-wrap: wrap; gap: 8px; } .course-row .course-name { min-width: 100%; } .study-result { flex-wrap: wrap; } .conversion-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 :root[data-theme="dark"] .nav-item img { filter: brightness(1.8); }
 :root[data-theme="dark"] .brand img { content: url('../assets/icons/logo-dark.svg'); }
-.setup-card { max-width: 680px; margin: 32px auto 56px; padding: 32px; gap: 20px; }
+.setup-card { max-width: 680px; margin: 32px auto 56px; padding: 32px; gap: 20px; background: var(--wp-surface); }
+.strong-text, .best-value { color: var(--wp-tier-strong); }
+.warning-text { color: var(--wp-tier-limited); }
+.offer-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 16px; align-items: start; }
+.offer-layout > div, .offer-layout aside { min-width: 0; }
+.offer-layout .card { padding: 20px; }
+.offer-layout .offer-comparison { padding: 8px; }
+.offer-table { min-width: 700px; }
+.offer-table th, .offer-table td { padding: 11px 12px; vertical-align: top; }
+.offer-table thead th { height: 110px; min-width: 190px; }
+.offer-table h2 { font: var(--wp-h3); }
+.offer-table thead p { margin-top: 4px; font: var(--wp-body-s); }
+.offer-table tbody tr { border: 0; }
+.offer-table tbody tr:nth-child(odd) { background: var(--wp-surface); }
+.offer-table th:first-child { min-width: 170px; }
+.offer-table small { display: block; font: var(--wp-mono-s); }
+.offer-bars { display: grid; gap: 8px; padding: 16px 12px 8px; }
+.offer-bars > div { display: grid; grid-template-columns: 110px minmax(60px,1fr) 90px; gap: 12px; align-items: center; font: var(--wp-label-m); }
+.offer-bars .wp-num { font: var(--wp-mono-s); }
+.offer-bars meter { width: 100%; height: 6px; accent-color: var(--wp-accent); }
+.offer-weight { display: grid; grid-template-columns: 100px minmax(60px,1fr) 32px; gap: 8px; align-items: center; }
+.offer-weight label { margin: 0; font: var(--wp-body-s); }
+.offer-weight input { padding: 0; width: 100%; accent-color: var(--wp-accent); }
+.offer-weight output { font: var(--wp-mono-s); color: var(--wp-ink-3); }
+.offer-selection { display: flex; flex-wrap: wrap; gap: 12px; }
+.offer-note { display: flex; align-items: start; gap: 8px; font: var(--wp-body-s); color: var(--wp-ink-2); }
+.offer-note img { flex-shrink: 0; margin-top: 2px; }
+.offer-exports { margin-top: 16px; }
+@media (max-width: 1200px) { .offer-layout { grid-template-columns: minmax(0,1fr); } .offer-layout aside { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; } }
+@media (max-width: 700px) { .offer-layout aside { grid-template-columns: 1fr; } }
 body[data-route="setup"] { display: block; }
 body[data-route="setup"] .sidebar, body[data-route="setup"] .mobile-header, body[data-route="setup"] .bottom-nav { display: none; }
 body[data-route="setup"] .app-main { margin: 0; min-height: 100dvh; background: var(--wp-bg); }

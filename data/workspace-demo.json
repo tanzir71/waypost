@@ -8311,5 +8311,80 @@
       "termId": "study-s6",
       "scaleId": "bd-ugc"
     }
+  ],
+  "offers": [
+    {
+      "id": "offer-beacon",
+      "company": "Beacon",
+      "role": "Backend Engineer",
+      "location": "London, hybrid",
+      "currency": "GBP",
+      "base": 82000,
+      "bonusTarget": 8200,
+      "equityPerYear": 12000,
+      "vesting": "4 years; 1-year cliff",
+      "cliffMonths": 12,
+      "signing": 5000,
+      "benefitsValue": 3400,
+      "colIndex": 100,
+      "costCity": "London",
+      "commute": "2 days · 50 min",
+      "decideBy": "2026-12-05",
+      "isCurrent": false,
+      "ratings": {
+        "growth": 8,
+        "flexibility": 4,
+        "team": 9
+      }
+    },
+    {
+      "id": "offer-fjord",
+      "company": "Fjord",
+      "role": "Backend Engineer",
+      "location": "Remote, Manchester",
+      "currency": "GBP",
+      "base": 74000,
+      "bonusTarget": 3700,
+      "equityPerYear": 6000,
+      "vesting": "4 years",
+      "cliffMonths": 0,
+      "signing": 0,
+      "benefitsValue": 2800,
+      "colIndex": 82,
+      "costCity": "Manchester",
+      "commute": "None",
+      "decideBy": null,
+      "isCurrent": false,
+      "ratings": {
+        "growth": 7,
+        "flexibility": 9,
+        "team": 2
+      },
+      "notes": "Pays the same in any city; this cost index assumes a move."
+    },
+    {
+      "id": "offer-current",
+      "company": "Arcadia Bank",
+      "role": "Current",
+      "location": "London",
+      "currency": "GBP",
+      "base": 64000,
+      "bonusTarget": 3200,
+      "equityPerYear": 0,
+      "vesting": "",
+      "cliffMonths": 0,
+      "signing": 0,
+      "benefitsValue": 2600,
+      "colIndex": 100,
+      "costCity": "London",
+      "commute": "5 days · 40 min",
+      "decideBy": null,
+      "isCurrent": true,
+      "ratings": {
+        "growth": 5,
+        "flexibility": 3,
+        "team": 6
+      }
+    }
   ]
 }

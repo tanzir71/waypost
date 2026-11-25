@@ -133,7 +133,10 @@
       "properties": {
         "company": { "type": "string" }, "role": { "type": "string" }, "currency": { "type": "string", "default": "GBP" },
         "base": { "type": "number" }, "bonusTarget": { "type": "number" }, "equityPerYear": { "type": "number" }, "vesting": { "type": "string" }, "cliffMonths": { "type": "integer" },
-        "signing": { "type": "number" }, "benefitsValue": { "type": "number" }, "colIndex": { "type": "number", "default": 100 }, "commute": { "type": "string" }, "decideBy": { "type": ["string", "null"], "format": "date" }, "isCurrent": { "type": "boolean" }
+          "signing": { "type": "number" }, "benefitsValue": { "type": "number" }, "colIndex": { "type": "number", "minimum": 0.01, "default": 100 }, "commute": { "type": "string" }, "decideBy": { "type": ["string", "null"], "format": "date" }, "isCurrent": { "type": "boolean" },
+          "location": { "type": "string" }, "costCity": { "type": "string" }, "notes": { "type": "string" },
+          "vestedEquityYear1": { "type": ["number", "null"], "minimum": 0 },
+          "ratings": { "type": "object", "properties": { "growth": { "type": ["number", "null"], "minimum": 0, "maximum": 10 }, "flexibility": { "type": ["number", "null"], "minimum": 0, "maximum": 10 }, "team": { "type": ["number", "null"], "minimum": 0, "maximum": 10 } } }
       }
     },
     "term": {
@@ -182,6 +185,7 @@
             "institutionTables": { "type": "array", "items": { "type": "object", "required": ["id", "name", "system", "rows"], "properties": { "id": { "type": "string" }, "name": { "type": "string" }, "system": { "type": "string" }, "source": { "type": "string" }, "rows": { "type": "array", "minItems": 1, "maxItems": 100, "items": { "type": "object", "required": ["min", "max", "value"], "properties": { "min": { "type": "number", "minimum": 0 }, "max": { "type": "number", "minimum": 0 }, "value": { "type": ["number", "string"] } } } } } } }
           }
         },
+        "offers": { "type": "object", "properties": { "weights": { "type": "object", "properties": { "compensation": { "type": "number", "minimum": 0, "maximum": 100 }, "growth": { "type": "number", "minimum": 0, "maximum": 100 }, "flexibility": { "type": "number", "minimum": 0, "maximum": 100 }, "team": { "type": "number", "minimum": 0, "maximum": 100 } } } } },
         "theme": { "enum": ["light", "dark", "system"], "default": "system" },
         "defaultScaleId": { "type": "string" },
         "defaultResumeVersionId": { "type": ["string", "null"] },

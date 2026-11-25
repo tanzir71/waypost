@@ -1,6 +1,7 @@
 import {validateWorkspace,stores,settingsDefaults} from './schema.js';
 import {compareRecords} from './merge.js';
 import {exportStudyPreferences} from '../study/preferences.js';
+import {offerPreferences} from '../offers/index.js';
 export function planWorkspaceImport(workspace,existing={}) {
   const validation=validateWorkspace(workspace);if(!validation.valid)throw new Error(`Invalid workspace: ${validation.errors.slice(0,4).join('; ')}`);
   const records={},summary={added:0,updated:0,skipped:0,originalsUnavailable:0};
@@ -16,7 +17,7 @@ export function planWorkspaceImport(workspace,existing={}) {
     }
   }
   const value=workspace.records.settings??{},defaults=settingsDefaults();
-  const preferences={...defaults,theme:value.theme??defaults.theme,defaultScaleId:value.defaultScaleId??defaults.defaultScaleId,defaultResumeVersionId:value.defaultResumeVersionId??null,...(value.study?{study:exportStudyPreferences(value.study)}:{})};
+  const preferences={...defaults,theme:value.theme??defaults.theme,defaultScaleId:value.defaultScaleId??defaults.defaultScaleId,defaultResumeVersionId:value.defaultResumeVersionId??null,...(value.study?{study:exportStudyPreferences(value.study)}:{}),...(value.offers?{offers:offerPreferences(value.offers)}:{})};
   // Imported endpoint/provider preferences never activate external connections.
   return {records,preferences,summary};
 }

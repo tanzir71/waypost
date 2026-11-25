@@ -11,7 +11,7 @@ Live demo: https://tanzir71.github.io/waypost/
 | M4 Study tools | done | m4 | /app/gpa/, /app/finals/, /app/scales/ |
 | M5 PWA, agents, settings | done | m5 | /app/settings/, /app/agents/, /agents/, /app/share/ |
 | M6 Encrypted sync | done | m6 | /app/setup/, /downloads/waypost-self-host.zip |
-| M7 Offers and supporting tools | pending | | |
+| M7 Offers and supporting tools | in progress | | /app/offers/ |
 
 ## M0
 
@@ -215,6 +215,21 @@ Live demo: https://tanzir71.github.io/waypost/
   deployed precache and ZIP bytes match local release artifacts. Pages serves
   the static demo/package; optional PHP/Worker execution needs self-hosting.
 - M7 and the final full-spec audit remain active work.
+
+## M7 (in progress)
+
+- Added the Figma offer comparison, editable current job/offers, user-supplied
+  cost-index CSV, adjusted-total bars with their table twin, priority sliders
+  and explicit personal ratings. The three monetary fixtures pass; missing
+  ratings and partial-year vesting assumptions stay uncomputed. Benefits and
+  target-bonus inclusion are disclosed beside year-1 cash estimates.
+- Offer priorities survive reviewed backups and encrypted sync through a shared
+  safe preference projection. Private input links prefill without saving;
+  native view tests exercise real create/edit/delete and imported city values.
+- All 106 Node tests and release checks pass for the offer feature, including
+  all earlier arithmetic fixtures, PHP lint and current extension/cache/ZIP builds.
+- Deadlines/ICS, Letters/Stories, Contacts, optional AI and the final full-spec
+  audit remain active work. No M7 tag has been created.
 
 ## Deployment status
 

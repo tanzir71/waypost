@@ -42,7 +42,8 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Offers, letters, contacts, deadlines and optional AI remain Coming soon until M7.
+Offer comparison is available as the first M7 feature. Letters, contacts,
+deadlines and optional AI remain Coming soon while M7 continues.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -69,6 +70,18 @@ The mockup's UK 2:1 label conflicts with its percentage method: 72.4% falls in
 the First band, so this implementation labels it First (estimate), following
 [the published UK bands](https://student.sussex.ac.uk/your-studies/degree).
 The supplied mix is distinct from the greedy solver's concentrated upgrades.
+
+Offer compare uses your annual compensation, vesting/cliff details, benefits
+value and cost-of-living index; no salary, exchange-rate, tax or index service
+is queried. Import `city,index` CSV data and explicitly apply a city while
+editing an offer. Priority sliders must total 100%; compensation is relative
+to the best entered adjusted total, while growth/flexibility/team ratings come
+from you. Missing ratings leave weighted scores uncomputed. A partial-year
+cliff needs an explicit vested-equity estimate. The labelled year-1 cash
+estimate includes entered benefits and target bonus and is not take-home pay.
+Fixtures reproduce £110,600 total, £105,488 adjusted and £98,600 year-1 cash.
+Offers and priorities survive exports/imports and encrypted sync. Private input
+links prefill without saving; calculation needs Compare offers or autorun=1.
 
 Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
 permissions are exactly activeTab, storage, downloads and scripting. Configure

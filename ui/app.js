@@ -25,7 +25,7 @@ try {
 const theme=document.querySelector('#app-theme');
 theme.value=document.documentElement.dataset.theme??'system';
 theme.addEventListener('change',()=>setTheme(theme.value,store).catch(error=>announce(error.message)));
-const views={today:()=>import('./views/today.js'),tracker:()=>import('./views/tracker.js'),import:()=>import('./views/import.js'),match:()=>import('./views/match.js'),parse:()=>import('./views/parse.js'),resumes:()=>import('./views/resumes.js'),gpa:()=>import('./views/gpa.js'),finals:()=>import('./views/finals.js'),scales:()=>import('./views/scales.js'),settings:()=>import('./views/settings.js'),agents:()=>import('./views/agents.js'),share:()=>import('./views/share.js'),setup:()=>import('./views/setup.js')};
+const views={today:()=>import('./views/today.js'),tracker:()=>import('./views/tracker.js'),import:()=>import('./views/import.js'),match:()=>import('./views/match.js'),parse:()=>import('./views/parse.js'),resumes:()=>import('./views/resumes.js'),gpa:()=>import('./views/gpa.js'),finals:()=>import('./views/finals.js'),scales:()=>import('./views/scales.js'),settings:()=>import('./views/settings.js'),agents:()=>import('./views/agents.js'),share:()=>import('./views/share.js'),setup:()=>import('./views/setup.js'),offers:()=>import('./views/offers.js')};
 const syncController=store?await initializeSync({store,mode:config.mode}):null;
 syncController?.subscribe(status=>{for(const pill of document.querySelectorAll('[data-status-pill]')){pill.textContent=({local:'Local',demo:'Demo',syncing:'Syncing…',synced:'Synced',offline:'Offline',locked:'Unlock sync',error:'Sync error'})[status.state]??'Local';pill.title=status.message??'Workspace storage status';}});
 installPalette({store,basePath:config.basePath});

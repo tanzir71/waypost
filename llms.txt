@@ -8,8 +8,8 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 M6 ships optional encrypted sync, actual server checks, recovery codes and a
 self-hosting ZIP. M5 shipped PWA/offline support, the command menu, Settings, Agents, shared-job
 review, GPA planner, Final needed, Scale converter, Today, Tracker, import
-review, Honest Match, Parse check and Resumes. Offers,
-Deadlines, Letters, Stories, Contacts and optional AI arrive in M7. Unbuilt
+review, Honest Match, Parse check and Resumes. Offer compare is the first M7
+feature. Deadlines, Letters, Stories, Contacts and optional AI remain in M7. Unbuilt
 routes remain placeholders. Read PROGRESS.md; never assume a placeholder computed.
 
 ## Routes and private inputs
@@ -37,7 +37,7 @@ oversized links say Paste instead. M4 #plan=base64url(JSON) links still work.
 | Agents | app/agents/#tool=gpa |
 | Settings | app/settings/#section=storage |
 | Setup | app/setup/#provider=php&endpoint=SAME_ORIGIN_HTTPS_ENDPOINT |
-| Offers (M7) | app/offers/#selected=OFFER_UUID |
+| Offers | app/offers/#selected=OFFER_UUID |
 | Deadlines (M7) | app/deadlines/#month=2026-11 |
 | Letters (M7) | app/letters/#job=JOB_UUID&resume=VERSION_UUID |
 | Contacts (M7) | app/contacts/#id=CONTACT_UUID |
@@ -166,6 +166,15 @@ Requirement rows expose data-status met/partial/missing. Job rows expose
 Every actionable native control also has a test hook. Navigation uses nav-ROUTE.
 
 ## Documentation
+
+Offers: `offer-add` opens a labelled native form; `offer-save` writes a record.
+`offer-compare` calculates prefilled inputs without saving. Money rows use
+`offer-row-base`, `offer-row-total`, `offer-row-adjusted`, `offer-row-year1Cash`;
+`offer-priority-result` exposes a score only when weights/ratings are valid.
+`offer-import-index` / `offer-cost-csv` load a user-supplied city,index file;
+editing an offer explicitly applies a city. `offer-save-weights` saves priorities.
+`offer-delete` opens confirmation and `offer-delete-confirm` writes a tombstone.
+No salary, tax, exchange-rate or cost-index data is fetched automatically.
 
 Sync is optional and hidden in demo. On self-hosted HTTPS deployments, use
 app/setup/ to check the same-origin PHP or Worker server, create/unlock a vault,

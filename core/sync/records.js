@@ -1,7 +1,8 @@
 import {assertRecord,stores} from '../store/schema.js';
 import {exportStudyPreferences} from '../study/preferences.js';
 import {compareRecords} from '../store/merge.js';
-export const syncedPreferences=value=>({theme:value.theme??'system',defaultScaleId:value.defaultScaleId??'bd-ugc',defaultResumeVersionId:value.defaultResumeVersionId??null,...(value.study?{study:exportStudyPreferences(value.study)}:{})});
+import {offerPreferences} from '../offers/index.js';
+export const syncedPreferences=value=>({theme:value.theme??'system',defaultScaleId:value.defaultScaleId??'bd-ugc',defaultResumeVersionId:value.defaultResumeVersionId??null,...(value.study?{study:exportStudyPreferences(value.study)}:{}),...(value.offers?{offers:offerPreferences(value.offers)}:{})});
 export function syncRecords(records,{vaultId}){
   const output=[];
   for(const type of stores.filter(type=>!['settings','changes'].includes(type)))for(const row of records[type]??[]){const record=type==='resumeVersions'?{...row,originalFile:null}:structuredClone(row);assertRecord(type,record);output.push({type,record});}
