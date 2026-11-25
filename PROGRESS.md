@@ -6,9 +6,9 @@ Live demo: https://tanzir71.github.io/waypost/
 |---|---|---|---|
 | M0 Rename, scaffold, Pages | done | m0 | / and /app/ |
 | M1 Landing | done | m1 | / |
-| M2 Match, parse, resumes | implemented; Pages pending | m2 | /app/match/, /app/parse/, /app/resumes/ |
-| M3 Today, tracker, clipper | implemented; Pages pending | m3 | /app/, /app/tracker/, /app/import/ |
-| M4 Study tools | pending | | |
+| M2 Match, parse, resumes | done | m2 | /app/match/, /app/parse/, /app/resumes/ |
+| M3 Today, tracker, clipper | done | m3 | /app/, /app/tracker/, /app/import/ |
+| M4 Study tools | done | m4 | /app/gpa/, /app/finals/, /app/scales/ |
 | M5 PWA, agents, settings | pending | | |
 | M6 Encrypted sync | pending | | |
 | M7 Offers and supporting tools | pending | | |
@@ -101,13 +101,55 @@ Live demo: https://tanzir71.github.io/waypost/
   aggregation and migration. Static a11y, routes, syntax, same-origin resources,
   vendor integrity and extension bundle checks also pass. No owner QA required.
 
+## M4
+
+- Shipped GPA planning with current/target CGPA, completed/remaining credits,
+  reachability, maximum achievable CGPA and the actual formula. Save terms and
+  courses, select a semester or all planned terms, lock target grades, set
+  difficulty 1–3, and solve the deterministic greedy mix. Today uses the saved
+  result. Each course links to its final exam calculator.
+- Added replace, average and both-count retake what-ifs with explicit counted
+  credit assumptions; reported or computed term trends with a real table twin;
+  and editable custom grade scales. Built-in tables cover Bangladesh UGC, an
+  illustrative US plus/minus pattern, and the labelled common Indian pattern.
+- Final needed validates a 100% weight total and exactly one unknown category,
+  saves categories to linked courses, and shows every cutoff, reachability and
+  maximum score. Scale conversion shows methods, confidence, cohort-based ECTS
+  only with supplied counts, and editable/exportable institution tables.
+- Study settings and institution tables survive workspace exports; arbitrary
+  credential fields are excluded. Existing demos receive the study examples once;
+  clearing samples prevents them from being silently seeded again.
+- Validation: all 66 Node tests and release checks pass. Fixtures reproduce
+  3.78 needed; the supplied mix 3.81; final targets 61.8 / 74.3 / 49.3 / 36.8
+  with maximum 90.3; and 72.4% / 9.05 conversions. Native DOM/IDB contract tests
+  exercise real views, fresh workspace saves, course-linked finals and custom
+  institution mappings. Static accessibility, nested paths, routes, local assets,
+  parser integrity, syntax and extension parity also pass.
+- The complete check exposed a cold-batch performance failure. Reused normalized
+  inputs, job preparation and requirement evidence within one batch, with separate
+  mutable report rows and no retained text cache. The unchanged 250-report gate
+  now passes at about 136 ms in the full suite. Standalone-vs-batch evidence,
+  independent rows and per-job knockout answers have regression coverage.
+- Figma/spec discrepancies are resolved through the stated formulas: the UK
+  percentage method maps 72.4% to First (estimate), not the mockup's 2:1, following
+  [published UK bands](https://student.sussex.ac.uk/your-studies/degree). The supplied
+  A/A/A+/A/A mix averages 3.81; the mandated greedy rule may concentrate upgrades
+  differently. The C→A three-credit replace retake computes 3.71 needed, rather
+  than the mockup's 3.69. No invented thresholds or course outcomes were added.
+- Pages URLs: https://tanzir71.github.io/waypost/app/gpa/,
+  https://tanzir71.github.io/waypost/app/finals/,
+  https://tanzir71.github.io/waypost/app/scales/.
+
 ## Deployment status
 
 - Pages is still configured for main from / with .nojekyll and no workflows.
-- M1 is the last independently verified live release.
-- The M2 builds were reported errored by the Pages API with only “Page build
-  failed.” The M3 feature build is running. Source, tags and all local release
-  checks are available; newer live deployment remains unverified.
+- Pages recovered on commit 62c9989, which the API reports built. HTTP smoke checks
+  confirmed the current workspace app script, Match, Parse, Resumes, Tracker,
+  Import and GPA core return 200. M2 and M3 are now deployed.
+- Older M2/M3 builds reported only “Page build failed.” The newer successful
+  deployment supersedes those failures. Commit d661dff is built; HTTP checks
+  confirm the GPA, Finals and Scales routes, view modules, bundled scale table,
+  and updated application entry point are live at the /waypost/ base path.
 - Continue checking the Pages build API while implementing the remaining
   milestones. No Actions workflows, force pushes or owner approval are needed.
 

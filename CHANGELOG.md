@@ -1,5 +1,20 @@
 # Changelog
 
+## M4 — 2026-11-25
+
+- Shipped GPA target planning, saved terms/courses, locked greedy mixes,
+  difficulty controls, retake comparisons and grade-scale editing.
+- Shipped linked final-exam targets with saved assessment categories and the full
+  grade ladder, plus method-labelled scale conversions, cohort-dependent ECTS,
+  custom institution tables and exports.
+- Added local scale data, private study-input links, trend table twins, workspace
+  backup support, and one-time demo upgrades that respect cleared samples.
+- All 66 tests and release checks pass, including every M4 arithmetic fixture
+  and view/storage integration. Fixed repeated work in matching batches while
+  preserving separate report evidence; the 300 ms benchmark remains unchanged.
+- Corrected conflicting mockup labels using the specified formulas; details are
+  in PROGRESS.md. GitHub Pages recovered; M2, M3 and M4 are now verified live.
+
 ## M3 — 2026-11-25
 
 - Shipped Today, application board/table tracking, stage history, next steps,
