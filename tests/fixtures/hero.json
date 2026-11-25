@@ -1,0 +1,15 @@
+{
+  "source": "Figma ATS-Scoring 8:385",
+  "expected": { "tier": "good", "met": 4, "partial": 1, "missing": 1, "total": 6 },
+  "resume": {
+    "id": "hero-backend-v3",
+    "label": "v3 · Backend",
+    "text": "Alex Morgan\nalex@example.test\nEXPERIENCE\nBackend Engineer · Jan 2019–Dec 2025\nMoved billing to Go services, building distributed systems across 3 regions.\nHandled on-call incident response and reduced recovery time by 30%.\nProvisioned infrastructure using Terraform.\nMentored 4 engineers through code reviews.\nSKILLS\nGo, PostgreSQL, Terraform"
+  },
+  "job": {
+    "id": "hero-northwind",
+    "title": "Backend Engineer, Payments",
+    "company": "Northwind",
+    "text": "Backend Engineer, Payments — Northwind\nRequired:\n5+ years with Go or Rust building distributed systems\nPostgreSQL at scale\non-call experience\nPreferred:\nKafka\nTerraform\nmentoring engineers"
+  }
+}
