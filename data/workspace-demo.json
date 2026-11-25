@@ -7855,5 +7855,333 @@
       "createdAt": "2026-11-25T00:00:00.000Z",
       "updatedAt": "2026-11-25T00:00:00.000Z"
     }
+  ],
+  "applications": [
+    {
+      "id": "sample-application-northwind-job",
+      "jobId": "northwind-job",
+      "resumeVersionId": "northwind-v3",
+      "stage": "applied",
+      "appliedAt": "2026-11-17",
+      "next": {
+        "label": "Follow up",
+        "at": "2026-11-25T09:00:00.000Z"
+      },
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        },
+        {
+          "at": "2026-11-17T12:00:00.000Z",
+          "event": "Applied with saved resume",
+          "stage": "applied"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-ledgerline",
+      "jobId": "ledgerline",
+      "resumeVersionId": "northwind-v3",
+      "stage": "screen",
+      "appliedAt": "2026-11-17",
+      "next": null,
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        },
+        {
+          "at": "2026-11-17T12:00:00.000Z",
+          "event": "Applied with saved resume",
+          "stage": "applied"
+        },
+        {
+          "at": "2026-11-23T12:00:00.000Z",
+          "event": "Moved to screen",
+          "stage": "screen"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-arcadia",
+      "jobId": "arcadia",
+      "resumeVersionId": "northwind-v2",
+      "stage": "applied",
+      "appliedAt": "2026-11-17",
+      "next": {
+        "label": "Follow up",
+        "at": "2026-11-25T09:00:00.000Z"
+      },
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        },
+        {
+          "at": "2026-11-17T12:00:00.000Z",
+          "event": "Applied with saved resume",
+          "stage": "applied"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-kestrel",
+      "jobId": "kestrel",
+      "resumeVersionId": "northwind-v3",
+      "stage": "saved",
+      "appliedAt": null,
+      "next": null,
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-tidewater",
+      "jobId": "tidewater",
+      "resumeVersionId": "northwind-v3",
+      "stage": "applied",
+      "appliedAt": "2026-11-17",
+      "next": {
+        "label": "Follow up",
+        "at": "2026-11-25T09:00:00.000Z"
+      },
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        },
+        {
+          "at": "2026-11-17T12:00:00.000Z",
+          "event": "Applied with saved resume",
+          "stage": "applied"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-orbit",
+      "jobId": "orbit",
+      "resumeVersionId": "northwind-v3",
+      "stage": "screen",
+      "appliedAt": "2026-11-17",
+      "next": null,
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        },
+        {
+          "at": "2026-11-17T12:00:00.000Z",
+          "event": "Applied with saved resume",
+          "stage": "applied"
+        },
+        {
+          "at": "2026-11-23T12:00:00.000Z",
+          "event": "Moved to screen",
+          "stage": "screen"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-meridian",
+      "jobId": "meridian",
+      "resumeVersionId": "northwind-v3",
+      "stage": "saved",
+      "appliedAt": null,
+      "next": null,
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-cedar",
+      "jobId": "cedar",
+      "resumeVersionId": "northwind-v3",
+      "stage": "saved",
+      "appliedAt": null,
+      "next": null,
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-halcyon",
+      "jobId": "halcyon",
+      "resumeVersionId": "northwind-v1",
+      "stage": "interview",
+      "appliedAt": "2026-11-17",
+      "next": {
+        "label": "Prepare interview examples",
+        "at": "2026-11-26T10:00:00.000Z"
+      },
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        },
+        {
+          "at": "2026-11-17T12:00:00.000Z",
+          "event": "Applied with saved resume",
+          "stage": "applied"
+        },
+        {
+          "at": "2026-11-23T12:00:00.000Z",
+          "event": "Moved to interview",
+          "stage": "interview"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-orchard",
+      "jobId": "orchard",
+      "resumeVersionId": "northwind-v2",
+      "stage": "saved",
+      "appliedAt": null,
+      "next": null,
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-harbor",
+      "jobId": "harbor",
+      "resumeVersionId": "northwind-v3",
+      "stage": "offer",
+      "appliedAt": "2026-11-17",
+      "next": {
+        "label": "Compare the offer",
+        "at": "2026-12-05T12:00:00.000Z"
+      },
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        },
+        {
+          "at": "2026-11-17T12:00:00.000Z",
+          "event": "Applied with saved resume",
+          "stage": "applied"
+        },
+        {
+          "at": "2026-11-23T12:00:00.000Z",
+          "event": "Moved to offer",
+          "stage": "offer"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    },
+    {
+      "id": "sample-application-atlas",
+      "jobId": "atlas",
+      "resumeVersionId": "northwind-v3",
+      "stage": "closed",
+      "appliedAt": "2026-11-17",
+      "next": null,
+      "contactIds": [],
+      "notes": "Sample application. Replace it with your own details.",
+      "history": [
+        {
+          "at": "2026-11-15T12:00:00.000Z",
+          "event": "Saved application",
+          "stage": "saved"
+        },
+        {
+          "at": "2026-11-17T12:00:00.000Z",
+          "event": "Applied with saved resume",
+          "stage": "applied"
+        },
+        {
+          "at": "2026-11-23T12:00:00.000Z",
+          "event": "Moved to closed",
+          "stage": "closed"
+        }
+      ],
+      "createdAt": "2026-11-15T12:00:00.000Z",
+      "updatedAt": "2026-11-23T12:00:00.000Z"
+    }
+  ],
+  "deadlines": [
+    {
+      "id": "sample-scholarship",
+      "title": "Scholarship essay (sample)",
+      "date": "2026-11-28",
+      "kind": "scholarship",
+      "createdAt": "2026-11-21T12:00:00.000Z",
+      "updatedAt": "2026-11-21T12:00:00.000Z"
+    },
+    {
+      "id": "sample-exam",
+      "title": "Algorithms revision (sample)",
+      "date": "2026-11-30",
+      "kind": "exam",
+      "createdAt": "2026-11-21T12:00:00.000Z",
+      "updatedAt": "2026-11-21T12:00:00.000Z"
+    }
   ]
 }

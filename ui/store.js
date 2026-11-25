@@ -94,16 +94,30 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
       await putMany(records,{meaningful:false});await setSetting('demo-seeded',true);
     },
     async seed(seed) {
-      if(await setting('demo-seeded')) return;
+      if(await setting('demo-seeded')) {
+        // Existing M2 demos receive the M3 examples once. A cleared demo has no
+        // active sample jobs, so it never gets silently populated again.
+        if(await setting('demo-supplements-m3'))return;
+        const existingJobs=(await all('jobs')).filter(row=>row.sample),existingVersions=(await all('resumeVersions')).filter(row=>row.sample);
+        if(!existingJobs.length)return;
+        const mapping=new Map();
+        for(const job of seed.jobs??[]) {const existing=existingJobs.find(row=>row.seedId===job.id||(row.title===job.title&&row.company===job.company));if(existing)mapping.set(job.id,existing.id);}
+        for(const version of seed.resumeVersions??[]) {const existing=existingVersions.find(row=>row.seedId===version.id||row.label===version.label);if(existing)mapping.set(version.id,existing.id);}
+        const additions={applications:[],deadlines:[]};
+        for(const app of seed.applications??[]) if(mapping.has(app.jobId))additions.applications.push(record({...app,id:uuidv7(),seedId:app.id,jobId:mapping.get(app.jobId),resumeVersionId:mapping.get(app.resumeVersionId)??null,sample:true}));
+        for(const deadline of seed.deadlines??[]) additions.deadlines.push(record({...deadline,id:uuidv7(),seedId:deadline.id,sample:true}));
+        additions.settings=[record({key:'demo-supplements-m3',value:true})];
+        await putMany(additions,{meaningful:false,guardSetting:'demo-supplements-m3'});return;
+      }
       const mapping=new Map();
       for(const rows of Object.values(seed)) if(Array.isArray(rows)) for(const row of rows) if(row.id) mapping.set(row.id,uuidv7());
       const records={};
       const references=['parentId','jobId','resumeVersionId','termId','retakeOf','clusterId'];
       for(const [type,rows] of Object.entries(seed)) {
         if(!stores.includes(type)||!Array.isArray(rows)) continue;
-        records[type]=rows.map(row=>{const copy={...row,id:mapping.get(row.id),sample:true};for(const key of references)if(mapping.has(copy[key]))copy[key]=mapping.get(copy[key]);return record(copy);});
+        records[type]=rows.map(row=>{const copy={...row,id:mapping.get(row.id),seedId:row.id,sample:true};for(const key of references)if(mapping.has(copy[key]))copy[key]=mapping.get(copy[key]);return record(copy);});
       }
-      records.settings=[record({key:'demo-seeded',value:true})];
+      records.settings=[record({key:'demo-seeded',value:true}),record({key:'demo-supplements-m3',value:true})];
       await putMany(records,{meaningful:false,guardSetting:'demo-seeded'});
     }
   };

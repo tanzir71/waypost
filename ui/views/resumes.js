@@ -1,4 +1,5 @@
 import {diffText,medianTier,matchingEffect} from '../../core/diff/index.js';
+import {responseRates} from '../../core/tracker/index.js';
 import {analyzeText,jsonResumeFromText} from '../../core/parse/index.js';
 import {readResumeFile,saveOriginal} from '../read-file.js';
 import {el,button,field,result,announce,download,dialog} from '../dom.js';
@@ -11,10 +12,8 @@ export async function renderResumes({store,basePath,view,actions}) {
   const list=el('aside',{class:'resume-list','aria-label':'Resume versions'}),main=el('section',{class:'resume-detail'});
   const layout=el('div',{class:'resumes-layout'},list,main);
   async function reload(id) {versions=(await store.all('resumeVersions')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));selected=versions.find(row=>row.id===id)??versions.at(-1);paint();}
-  const status=version=>{
-    const sent=applications.filter(row=>row.resumeVersionId===version.id&&row.appliedAt);
-    return {sent:sent.length,replies:sent.filter(row=>['screen','interview','offer'].includes(row.stage)||row.history?.some(event=>['screen','interview','offer'].includes(event.stage))).length};
-  };
+  const usageByVersion=new Map(responseRates(applications,versions).map(row=>[row.resumeVersionId,row]));
+  const status=version=>usageByVersion.get(version.id)??{sent:0,replies:0};
   function newVersion(parent=selected) {
     const id=crypto.randomUUID();
     const label=el('input',{id:`resume-label-${id}`,required:true,value:parent?`${parent.label} copy`:'My resume','data-testid':'resume-label'});

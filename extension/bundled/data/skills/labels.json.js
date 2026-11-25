@@ -1,0 +1,2 @@
+// Generated from data/skills/labels.json; do not edit.
+export default {"source":"Waypost seed vocabulary; labels only, not a downloaded taxonomy","license":"CC0-1.0","labels":["go","rust","postgresql","javascript","typescript","kubernetes","kafka","terraform","python","sql","react","docker","aws","accessibility","distributed systems","design systems","user research","continuous integration","machine learning","project management","data analysis","on-call","api","rest","testing","git"]};

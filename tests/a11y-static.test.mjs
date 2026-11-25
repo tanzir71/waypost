@@ -17,7 +17,7 @@ test('all pages and shell have landmarks, one heading and native accessible cont
     for (const match of html.matchAll(/<(button|a)\b([^>]*)>([\s\S]*?)<\/\1>/g)) {
       const opening = match[2];
       assert.ok(attr(opening,'aria-label') || text(match[3]) || /<img\b[^>]*alt="[^\"]+"/.test(match[3]), `${path}: unnamed ${match[1]}`);
-      if (!path.startsWith('extension/')) assert.ok(attr(opening,'data-testid'), `${path}: ${text(match[3])} needs a test hook`);
+      assert.ok(attr(opening,'data-testid'), `${path}: ${text(match[3])} needs a test hook`);
     }
     for (const match of html.matchAll(/<(input|select|textarea)\b([^>]*)>/g)) {
       const tag = match[2];

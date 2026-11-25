@@ -1,0 +1,126 @@
+/* Waypost design tokens — generated from Figma "ATS-Scoring" variables
+   Collections: "Waypost / Color" (Light, Dark) and "Waypost / Size".
+   Copy to /ui/tokens.css. Do not hand-edit values without updating Figma. */
+
+@font-face { font-family: "Geist"; src: url("../assets/fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("../assets/fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Newsreader"; src: url("../assets/fonts/Newsreader-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+
+:root {
+  color-scheme: light;
+  /* color */
+  --wp-bg: #F5F4F0;
+  --wp-surface: #FFFFFF;
+  --wp-surface-2: #ECEAE4;
+  --wp-surface-3: #E3E0D8;
+  --wp-ink: #131316;
+  --wp-ink-2: #55555E;
+  --wp-ink-3: #8A8A93;
+  --wp-line: #DEDBD3;           /* dividers only, never container borders */
+  --wp-accent: #3049E8;
+  --wp-accent-soft: #E6E9FD;
+  --wp-on-accent: #FFFFFF;
+  --wp-tier-strong: #17845A;
+  --wp-tier-strong-soft: #DDF1E7;
+  --wp-tier-good: #127C86;
+  --wp-tier-good-soft: #DAF0F1;
+  --wp-tier-partial: #A86A12;
+  --wp-tier-partial-soft: #F6EBD9;
+  --wp-tier-limited: #B93A32;
+  --wp-tier-limited-soft: #F7E1DE;
+  --wp-inverse: #131316;
+  --wp-on-inverse: #F5F4F0;
+
+  /* radius */
+  --wp-radius-sm: 6px;
+  --wp-radius-md: 10px;
+  --wp-radius-lg: 16px;
+  --wp-radius-xl: 22px;
+  --wp-radius-pill: 999px;
+
+  /* space */
+  --wp-space-1: 4px;
+  --wp-space-2: 8px;
+  --wp-space-3: 12px;
+  --wp-space-4: 16px;
+  --wp-space-5: 24px;
+  --wp-space-6: 32px;
+  --wp-space-7: 48px;
+  --wp-space-8: 64px;
+  --wp-space-9: 96px;
+
+  /* type */
+  --wp-font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --wp-font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
+  --wp-font-display: "Newsreader", Georgia, serif; /* landing headings only */
+
+  --wp-display-xl: 400 76px/80px var(--wp-font-display);  --wp-display-xl-ls: -0.025em;
+  --wp-display-l:  400 52px/58px var(--wp-font-display);  --wp-display-l-ls: -0.02em;
+  --wp-display-m:  400 36px/42px var(--wp-font-display);  --wp-display-m-ls: -0.015em;
+  --wp-h1: 600 28px/34px var(--wp-font-sans);             --wp-h1-ls: -0.015em;
+  --wp-h2: 600 20px/26px var(--wp-font-sans);             --wp-h2-ls: -0.01em;
+  --wp-h3: 500 16px/22px var(--wp-font-sans);             --wp-h3-ls: -0.005em;
+  --wp-body-l: 400 17px/26px var(--wp-font-sans);         --wp-body-l-ls: -0.005em;
+  --wp-body-m: 400 15px/22px var(--wp-font-sans);         --wp-body-m-ls: -0.003em;
+  --wp-body-s: 400 13px/18px var(--wp-font-sans);
+  --wp-label-m: 500 13px/16px var(--wp-font-sans);
+  --wp-label-s: 500 11px/14px var(--wp-font-sans);        --wp-label-s-ls: 0.02em; /* uppercase */
+  --wp-mono-m: 400 13px/18px var(--wp-font-mono);
+  --wp-mono-s: 400 11px/14px var(--wp-font-mono);
+  --wp-num-l: 500 40px/44px var(--wp-font-mono);          --wp-num-l-ls: -0.03em;
+  --wp-num-m: 500 24px/28px var(--wp-font-mono);          --wp-num-m-ls: -0.02em;
+
+  /* focus */
+  --wp-focus: 0 0 0 2px var(--wp-bg), 0 0 0 4px var(--wp-accent);
+}
+
+/* Dark values — data-theme="dark" (explicit), or no data-theme + system dark ("System" setting) */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --wp-bg: #0C0C0E;
+  --wp-surface: #141417;
+  --wp-surface-2: #1B1B1F;
+  --wp-surface-3: #24242A;
+  --wp-ink: #F3F2EE;
+  --wp-ink-2: #A5A5AD;
+  --wp-ink-3: #6F6F78;
+  --wp-line: #2A2A30;
+  --wp-accent: #7D8CFF;
+  --wp-accent-soft: #1E2350;
+  --wp-on-accent: #0C0C0E;
+  --wp-tier-strong: #4CC08C;
+  --wp-tier-strong-soft: #10291F;
+  --wp-tier-good: #45B8C2;
+  --wp-tier-good-soft: #0F2629;
+  --wp-tier-partial: #E0A24A;
+  --wp-tier-partial-soft: #2B2112;
+  --wp-tier-limited: #F0766C;
+  --wp-tier-limited-soft: #2E1614;
+  --wp-inverse: #F3F2EE;
+  --wp-on-inverse: #0C0C0E;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --wp-bg: #0C0C0E; --wp-surface: #141417; --wp-surface-2: #1B1B1F; --wp-surface-3: #24242A;
+    --wp-ink: #F3F2EE; --wp-ink-2: #A5A5AD; --wp-ink-3: #6F6F78; --wp-line: #2A2A30;
+    --wp-accent: #7D8CFF; --wp-accent-soft: #1E2350; --wp-on-accent: #0C0C0E;
+    --wp-tier-strong: #4CC08C; --wp-tier-strong-soft: #10291F; --wp-tier-good: #45B8C2; --wp-tier-good-soft: #0F2629;
+    --wp-tier-partial: #E0A24A; --wp-tier-partial-soft: #2B2112; --wp-tier-limited: #F0766C; --wp-tier-limited-soft: #2E1614;
+    --wp-inverse: #F3F2EE; --wp-on-inverse: #0C0C0E;
+  }
+}
+
+/* Dark sections inside a light page (landing study band, footer, code panel) */
+.wp-dark { color-scheme: dark;
+  --wp-bg: #0C0C0E; --wp-surface: #141417; --wp-surface-2: #1B1B1F; --wp-surface-3: #24242A;
+  --wp-ink: #F3F2EE; --wp-ink-2: #A5A5AD; --wp-ink-3: #6F6F78; --wp-line: #2A2A30;
+  --wp-accent: #7D8CFF; --wp-accent-soft: #1E2350; --wp-on-accent: #0C0C0E;
+  --wp-tier-strong: #4CC08C; --wp-tier-good: #45B8C2; --wp-tier-partial: #E0A24A; --wp-tier-limited: #F0766C;
+  background: var(--wp-bg); color: var(--wp-ink);
+}
+
+/* Global rules from the owner */
+em, i, cite, dfn, var, address { font-style: normal; font-weight: 500; }
+:focus-visible { outline: none; box-shadow: var(--wp-focus); border-radius: inherit; }
+.wp-num { font-family: var(--wp-font-mono); font-variant-numeric: tabular-nums; }

@@ -26,7 +26,7 @@ theme.addEventListener('change',async()=>{
     try {const preferences=(await store.setting('preferences')).value;await store.setSetting('preferences',{...preferences,theme:theme.value});} catch(error) {announce(error.message);}
   }
 });
-const views={match:()=>import('./views/match.js'),parse:()=>import('./views/parse.js'),resumes:()=>import('./views/resumes.js')};
+const views={today:()=>import('./views/today.js'),tracker:()=>import('./views/tracker.js'),import:()=>import('./views/import.js'),match:()=>import('./views/match.js'),parse:()=>import('./views/parse.js'),resumes:()=>import('./views/resumes.js')};
 async function mount() {
   const route=document.body.dataset.route;
   if(!store||!views[route]) return;

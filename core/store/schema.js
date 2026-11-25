@@ -15,6 +15,8 @@ export function validate(value,rule=schema,path='$',errors=[],root=schema) {
   if(rule.type && ![rule.type].flat().some(type=>types[type]?.(value))) { errors.push(`${path}: expected ${[rule.type].flat().join(' or ')}`);return errors; }
   if('const' in rule && value!==rule.const) errors.push(`${path}: expected ${rule.const}`);
   if(rule.enum && !rule.enum.includes(value)) errors.push(`${path}: unsupported value`);
+  if(typeof value==='string' && ((rule.minLength!==undefined&&value.length<rule.minLength)||(rule.maxLength!==undefined&&value.length>rule.maxLength))) errors.push(`${path}: text length out of range`);
+  if(Array.isArray(value) && ((rule.minItems!==undefined&&value.length<rule.minItems)||(rule.maxItems!==undefined&&value.length>rule.maxItems))) errors.push(`${path}: item count out of range`);
   if(typeof value==='number' && ((rule.minimum!==undefined && value<rule.minimum)||(rule.maximum!==undefined && value>rule.maximum))) errors.push(`${path}: out of range`);
   if(typeof value==='string' && rule.format==='date-time' && (!/^\d{4}-\d{2}-\d{2}T/.test(value)||!Number.isFinite(Date.parse(value)))) errors.push(`${path}: invalid timestamp`);
   if(typeof value==='string' && rule.format==='date') {

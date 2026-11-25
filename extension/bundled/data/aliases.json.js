@@ -1,0 +1,2 @@
+// Generated from data/aliases.json; do not edit.
+export default {"js":"javascript","ts":"typescript","k8s":"kubernetes","postgres":"postgresql","pg":"postgresql","golang":"go","a11y":"accessibility","ux":"user experience","ui":"interface","kpis":"metrics","sr":"senior","jr":"junior","on call":"on-call","oncall":"on-call","ci/cd":"continuous integration","mentoring":"mentor","mentored":"mentor","mentorship":"mentor"};

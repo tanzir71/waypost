@@ -1,0 +1,18 @@
+.tier-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--wp-radius-pill); font: var(--wp-label-m); white-space: nowrap; }
+.tier-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.tier-strong { color: var(--wp-tier-strong); background: var(--wp-tier-strong-soft); }
+.tier-good { color: var(--wp-tier-good); background: var(--wp-tier-good-soft); }
+.tier-partial { color: var(--wp-tier-partial); background: var(--wp-tier-partial-soft); }
+.tier-limited { color: var(--wp-tier-limited); background: var(--wp-tier-limited-soft); }
+.match-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; font: var(--wp-body-s); padding-block: 8px; }
+.requirement-list { display: grid; gap: 8px; }
+.requirement-row { display: flex; align-items: start; gap: 14px; padding: 14px 16px; background: var(--wp-bg); border-radius: var(--wp-radius-md); }
+.requirement-indicator { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.status-met { background: var(--wp-tier-strong-soft); }
+.status-partial { background: var(--wp-tier-partial-soft); }
+.status-missing { background: var(--wp-tier-limited-soft); }
+.requirement-body { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.evidence { font: var(--wp-mono-s); color: var(--wp-ink-2); overflow-wrap: anywhere; }
+.kind-tag, .stage-tag { font: var(--wp-label-m); background: var(--wp-surface-2); padding: 3px 8px; border-radius: var(--wp-radius-sm); color: var(--wp-ink-2); white-space: nowrap; }
+.stage-tag { font: var(--wp-mono-s); }
+@media (max-width: 700px) { .requirement-row { gap: 10px; padding: 12px; } .kind-tag { font: var(--wp-label-s); padding: 3px 6px; } }

@@ -91,6 +91,47 @@ main { padding: 32px; flex: 1; }
 .word-added { color: var(--wp-tier-strong); font-weight: 600; }
 .word-removed { color: var(--wp-tier-limited); text-decoration: line-through; }
 .effect-callout { background: var(--wp-accent-soft); border-radius: var(--wp-radius-md); padding: 16px; font: var(--wp-body-s); }
+.today-layout { display: grid; grid-template-columns: minmax(0,2.1fr) minmax(280px,1fr); gap: 16px; align-items: start; }
+.today-layout h2 { font: var(--wp-h3); }
+.next-row { padding: 12px; display: flex; align-items: center; gap: 12px; background: var(--wp-surface); border-radius: var(--wp-radius-md); }
+.next-icon { width: 32px; height: 32px; border-radius: var(--wp-radius-md); background: var(--wp-bg); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.next-copy { flex: 1; min-width: 0; }
+.next-copy h3 { font: var(--wp-label-m); }
+.next-copy p { font: var(--wp-body-s); margin-top: 4px; }
+.today-layout table { font: var(--wp-body-s); }
+.today-layout table th, .today-layout table td { padding: 8px 0; }
+.today-layout table td:last-child { text-align: right; }
+.today-layout meter { width: min(75%,360px); accent-color: var(--wp-accent); margin-right: 16px; }
+.study-values { display: grid; grid-template-columns: repeat(3,1fr); margin: 0; gap: 12px; }
+.study-values dt { font: var(--wp-body-s); color: var(--wp-ink-3); }
+.study-values dd { margin: 6px 0 0; font: var(--wp-num-m); }
+.study-values > div:last-child dd { color: var(--wp-accent); }
+.best-match-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-decoration: none; font: var(--wp-body-s); }
+.best-match-row strong { display: block; font-weight: 500; }
+.best-match-row small { color: var(--wp-ink-3); }
+.tracker-board { display: flex; gap: 12px; align-items: start; overflow-x: auto; padding-bottom: 16px; }
+.tracker-column { display: grid; gap: 10px; background: var(--wp-bg); border-radius: var(--wp-radius-lg); padding: 10px; flex: 1 0 190px; min-width: 190px; max-width: 270px; }
+.tracker-column > .section-title { align-items: center; }
+.tracker-column h2 { font: var(--wp-label-m); }
+.tracker-column > .section-title button { padding: 4px 8px; }
+.tracker-card { padding: 16px; border-radius: var(--wp-radius-md); background: var(--wp-surface); display: grid; gap: 12px; min-width: 0; }
+.tracker-card.selected { background: var(--wp-accent-soft); }
+.tracker-card > .stack { gap: 8px; }
+.tracker-card > .stack > p { font: var(--wp-body-s); }
+.tracker-title { background: none; padding: 0; min-height: 0; justify-content: start; text-align: left; font: var(--wp-h3); }
+.tracker-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.tracker-meta .tier-badge { font: var(--wp-label-s); padding: 2px 6px; }
+.tracker-card select { padding: 8px; font: var(--wp-label-m); }
+.closed-column { min-width: 140px; }
+.closed-column > summary { padding: 10px; background: var(--wp-bg); border-radius: var(--wp-radius-md); }
+.keyboard-hint { margin-top: 16px; color: var(--wp-ink-3); font: var(--wp-body-s); }
+.history-list { padding-left: 24px; display: grid; gap: 8px; font: var(--wp-body-s); }
+.checkbox-field { display: flex; gap: 12px; align-items: center; }
+.checkbox-field input { width: auto; accent-color: var(--wp-accent); }
+.checkbox-field label { margin: 0; }
+.import-preview { margin-top: 24px; }
+.job-import-description, .resume-import-preview { font: var(--wp-mono-s); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 400px; overflow-y: auto; }
+.table-scroll { max-width: 100%; overflow-x: auto; }
 :root[data-theme="dark"] .nav-item img, :root[data-theme="dark"] .brand img { filter: brightness(1.8); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme]) .nav-item img { filter: brightness(1.8); } }
 @media (max-width: 1400px) { .match-layout { grid-template-columns: 220px minmax(0,1fr) 240px; } .checks-rail .card { padding: 16px; } }
@@ -128,4 +169,9 @@ main { padding: 32px; flex: 1; }
   .resume-version { min-width: 250px; }
   .resume-list > p { display: none; }
   .diff-side { grid-template-columns: 1fr; }
+  .today-layout { grid-template-columns: 1fr; }
+  .today-layout .card { padding: 16px; }
+  .tracker-column { flex-basis: 240px; }
+  .next-row { gap: 8px; }
+  .next-icon { display: none; }
 }

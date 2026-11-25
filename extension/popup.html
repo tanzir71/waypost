@@ -1,49 +1,9 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ATS Job Collector</title>
-    <link rel="stylesheet" href="./src/popup.css" />
-  </head>
-  <body>
-    <main class="popup-shell">
-      <header class="topbar">
-        <div>
-          <p>Local collector</p>
-          <h1>Job Collector</h1>
-        </div>
-        <button id="captureJob" class="icon-button" type="button" aria-label="Capture current job">
-          <svg aria-hidden="true" viewBox="0 0 24 24">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </button>
-      </header>
-
-      <section class="summary">
-        <div>
-          <span id="jobCount">0</span>
-          <p>jobs saved</p>
-        </div>
-        <div>
-          <span id="dateCount">0</span>
-          <p>dates</p>
-        </div>
-      </section>
-
-      <section class="toolbar" aria-label="Export controls">
-        <button id="selectAll" type="button">Select all</button>
-        <button id="exportText" type="button">Export TXT</button>
-        <button id="exportJson" type="button">Export JSON</button>
-      </section>
-
-      <section id="dateGroups" class="date-groups" aria-live="polite"></section>
-
-      <footer>
-        <button id="clearJobs" class="subtle-button" type="button">Clear saved jobs</button>
-      </footer>
-    </main>
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <script type="module" src="./src/popup.js"></script>
-  </body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Waypost Clipper</title><link rel="stylesheet" href="./bundled/ui/tokens.css"><link rel="stylesheet" href="./bundled/ui/base.css"><link rel="stylesheet" href="./bundled/ui/match.css"><link rel="stylesheet" href="./src/popup.css"></head>
+<body><main class="popup-shell"><header class="popup-header"><h1><img src="./bundled/assets/icons/logo.svg" width="22" height="22" alt="" aria-hidden="true">Waypost Clipper</h1><button id="open-options" class="ghost small" type="button" data-testid="clipper-options">Options</button></header>
+<section id="this-page" class="card stack" aria-label="This page"><p class="eyebrow">This page</p><h2 id="page-title">Read a job page</h2><p id="page-company" class="muted"></p><p id="page-details" class="evidence">Choose Read this page to preview its job text.</p><div id="quick-match" class="quick-match"></div></section>
+<div class="actions capture-actions"><button id="read-page" class="small" type="button" data-testid="clipper-read">Read this page</button><button id="save-job" class="small" type="button" data-testid="clipper-save" disabled>Save for later</button><button id="send-job" class="primary small" type="button" data-testid="clipper-send" disabled>Send to Waypost</button></div>
+<p class="muted">Send opens Waypost for review. Job text travels in a private URL fragment and is saved only after confirmation.</p>
+<div class="checkbox-field"><input id="chip-enabled" type="checkbox" data-testid="clipper-chip"><label for="chip-enabled">Show a Waypost chip on this site</label></div>
+<section class="stack" aria-label="Captured jobs"><div class="section-title"><h2 class="eyebrow">Captured</h2><button type="button" id="select-all" class="ghost small" data-testid="clipper-select-all">Select all</button></div><div id="date-groups" class="date-groups"></div><div class="actions export-actions"><button type="button" id="export-text" class="ghost small" data-testid="clipper-export-text">Export TXT</button><button type="button" id="export-json" class="ghost small" data-testid="clipper-export-json">Export JSON</button><button type="button" id="send-selected" class="small" data-testid="clipper-send-selected">Send selected to Waypost</button></div></section>
+<p id="announcement" class="popup-status" role="status" aria-live="polite"></p><footer><p>Reads a page when you click. The site chip is off until you opt in for that origin.</p><a href="https://tanziro.com" data-testid="footer-credit">Made by tanziro.com</a></footer></main><script id="result-data" type="application/json" data-testid="result-data">null</script><script type="module" src="./src/popup.js"></script></body></html>

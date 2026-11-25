@@ -128,4 +128,5 @@ export async function renderMatch({store,basePath,view,actions}) {
   const fragment=new URLSearchParams(location.hash.slice(1));selectedResume=versions.find(row=>row.id===fragment.get('resume'))??selectedResume;
   actions.append(button('Import jobs',importDialog,'import-jobs',{class:'ghost small'}),button('Copy JSON',()=>currentReport()&&copyJSON(currentReport()),'copy-json',{class:'small'}),button('Download JSON',()=>currentReport()&&download('waypost-match.json',JSON.stringify(currentReport(),null,2)),'download-json',{class:'small'}),scoreButton);
   view.replaceChildren(layout);paint();
+  if(fragment.get('import')==='1')importDialog();
 }

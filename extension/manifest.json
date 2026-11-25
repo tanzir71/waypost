@@ -1,18 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "ATS Job Collector",
-  "description": "Capture job descriptions and export selected collection dates for the ATS scoring tool.",
-  "version": "1.0.0",
-  "permissions": ["activeTab", "downloads", "storage"],
+  "name": "Waypost Clipper",
+  "description": "Save job descriptions on click, preview evidence-based matches, and send private imports to Waypost.",
+  "version": "2.0.0",
+  "permissions": ["activeTab", "storage", "downloads", "scripting"],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
+  "background": {"service_worker":"background.js","type":"module"},
+  "options_ui": {"page":"options.html","open_in_tab":true},
   "action": {
-    "default_title": "ATS Job Collector",
+    "default_title": "Waypost Clipper",
     "default_popup": "popup.html"
-  },
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
-    }
-  ]
+  }
 }

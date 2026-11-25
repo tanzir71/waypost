@@ -1,239 +1,57 @@
-import {
-  filterJobsByDates,
-  groupJobsByDate,
-  normalizeCapturedJob,
-  toScoringJsonExport,
-  toScoringTextExport,
-} from './job-data.js';
-
-const STORAGE_KEY = 'jobs';
-let jobs = [];
-let selectedDates = new Set();
-
-const dom = {
-  captureJob: document.querySelector('#captureJob'),
-  clearJobs: document.querySelector('#clearJobs'),
-  dateCount: document.querySelector('#dateCount'),
-  dateGroups: document.querySelector('#dateGroups'),
-  exportJson: document.querySelector('#exportJson'),
-  exportText: document.querySelector('#exportText'),
-  jobCount: document.querySelector('#jobCount'),
-  selectAll: document.querySelector('#selectAll'),
-  toast: document.querySelector('#toast'),
-};
-
-dom.captureJob.addEventListener('click', captureCurrentJob);
-dom.clearJobs.addEventListener('click', clearJobs);
-dom.dateGroups.addEventListener('change', handleDateSelection);
-dom.dateGroups.addEventListener('click', handleDelete);
-dom.exportText.addEventListener('click', () => exportSelected('txt'));
-dom.exportJson.addEventListener('click', () => exportSelected('json'));
-dom.selectAll.addEventListener('click', toggleSelectAll);
-
-await loadJobs();
-render();
-
-async function captureCurrentJob() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id) {
-    showToast('No active page found.');
-    return;
-  }
-
-  let captured;
+import defaults from '../defaults.js';
+import {groupJobsByDate,filterJobsByDates,toScoringTextExport,toWaypostExport} from './job-data.js';
+import {el,announce,result} from '../bundled/ui/dom.js';
+import {tierBadge} from '../bundled/ui/components/match-report.js';
+import {captureTab,quickMatch,sendURL,showChip} from './capture.js';
+const api=chrome;let jobs=[],selectedDates=new Set(),current=null,tab=null,options={...defaults};
+const read=document.querySelector('#read-page'),save=document.querySelector('#save-job'),send=document.querySelector('#send-job'),chip=document.querySelector('#chip-enabled');
+try {const state=await api.storage.local.get({jobs:[],options:defaults});jobs=Array.isArray(state.jobs)?state.jobs:[];options={...defaults,...state.options};}catch(error){announce(error.message);}
+document.querySelector('#open-options').addEventListener('click',()=>api.runtime.openOptionsPage());
+read.addEventListener('click',async()=>{
+  read.disabled=true;
   try {
-    captured = await chrome.tabs.sendMessage(tab.id, { type: 'ATS_COLLECT_JOB' });
-  } catch {
-    captured = {
-      title: tab.title || 'Untitled job',
-      company: '',
-      description: '',
-      url: tab.url || '',
-    };
-  }
-
-  const job = normalizeCapturedJob(
-    {
-      ...captured,
-      title: captured?.title || tab.title,
-      url: captured?.url || tab.url,
-    },
-    new Date(),
-  );
-
-  if (!job.description || job.description.length < 80) {
-    showToast('Captured the link, but this page exposed very little job text.');
-  } else {
-    showToast('Job captured.');
-  }
-
-  jobs = [job, ...jobs.filter((item) => item.url !== job.url)];
-  selectedDates.add(job.collectedDate);
-  await saveJobs();
-  render();
-}
-
-async function clearJobs() {
-  if (!jobs.length || !confirm('Clear all saved jobs from this browser?')) {
-    return;
-  }
-  jobs = [];
-  selectedDates = new Set();
-  await saveJobs();
-  render();
-}
-
-function handleDateSelection(event) {
-  const checkbox = event.target.closest('[data-date]');
-  if (!checkbox) {
-    return;
-  }
-  if (checkbox.checked) {
-    selectedDates.add(checkbox.dataset.date);
-  } else {
-    selectedDates.delete(checkbox.dataset.date);
-  }
-  renderExportState();
-}
-
-async function handleDelete(event) {
-  const button = event.target.closest('[data-delete-job]');
-  if (!button) {
-    return;
-  }
-  jobs = jobs.filter((job) => job.id !== button.dataset.deleteJob);
-  await saveJobs();
-  render();
-}
-
-function toggleSelectAll() {
-  const groups = groupJobsByDate(jobs);
-  if (selectedDates.size === groups.length) {
-    selectedDates = new Set();
-  } else {
-    selectedDates = new Set(groups.map((group) => group.date));
-  }
-  render();
-}
-
-function exportSelected(format) {
-  const selectedJobs = filterJobsByDates(jobs, Array.from(selectedDates));
-  if (!selectedJobs.length) {
-    showToast('Select at least one date.');
-    return;
-  }
-
-  const dates = Array.from(selectedDates).sort();
-  const stem = dates.length === 1 ? dates[0] : `${dates[0]}-to-${dates[dates.length - 1]}`;
-  if (format === 'json') {
-    downloadBlob(
-      new Blob([JSON.stringify(toScoringJsonExport(selectedJobs), null, 2)], { type: 'application/json' }),
-      `ats-jobs-${stem}.json`,
-    );
-    return;
-  }
-
-  downloadBlob(new Blob([toScoringTextExport(selectedJobs)], { type: 'text/plain' }), `ats-jobs-${stem}.txt`);
-}
-
-function render() {
-  const groups = groupJobsByDate(jobs);
-  selectedDates = new Set(Array.from(selectedDates).filter((date) => groups.some((group) => group.date === date)));
-  dom.jobCount.textContent = jobs.length;
-  dom.dateCount.textContent = groups.length;
-  dom.selectAll.textContent = selectedDates.size === groups.length && groups.length ? 'Clear dates' : 'Select all';
-
-  if (!groups.length) {
-    dom.dateGroups.innerHTML = '<div class="empty-state">Capture a job page to start a dated collection.</div>';
-    renderExportState();
-    return;
-  }
-
-  dom.dateGroups.innerHTML = groups
-    .map(
-      (group) => `
-        <section class="date-group">
-          <div class="date-head">
-            <label class="date-check">
-              <input type="checkbox" data-date="${group.date}" ${selectedDates.has(group.date) ? 'checked' : ''} />
-              <span>${formatDate(group.date)}</span>
-            </label>
-            <span class="date-meta">${group.jobs.length} job${group.jobs.length === 1 ? '' : 's'}</span>
-          </div>
-          <div class="job-list">
-            ${group.jobs.map(renderJob).join('')}
-          </div>
-        </section>
-      `,
-    )
-    .join('');
-  renderExportState();
-}
-
-function renderJob(job) {
-  return `
-    <article class="job-row">
-      <div>
-        <h3>${escapeHtml(job.title)}</h3>
-        <span class="job-link">${escapeHtml(job.company || hostFromUrl(job.url))}</span>
-      </div>
-      <button class="delete-button" type="button" data-delete-job="${job.id}" aria-label="Delete ${escapeHtml(job.title)}">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
-      </button>
-    </article>
-  `;
-}
-
-function renderExportState() {
-  const hasSelection = filterJobsByDates(jobs, Array.from(selectedDates)).length > 0;
-  dom.exportText.disabled = !hasSelection;
-  dom.exportJson.disabled = !hasSelection;
-}
-
-async function loadJobs() {
-  const stored = await chrome.storage.local.get({ [STORAGE_KEY]: [] });
-  jobs = Array.isArray(stored[STORAGE_KEY]) ? stored[STORAGE_KEY] : [];
-}
-
-async function saveJobs() {
-  await chrome.storage.local.set({ [STORAGE_KEY]: jobs });
-}
-
-function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  chrome.downloads.download({ url, filename, saveAs: true }, () => {
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-  });
-}
-
-function showToast(message) {
-  dom.toast.textContent = message;
-  dom.toast.classList.add('visible');
-  window.clearTimeout(showToast.timer);
-  showToast.timer = window.setTimeout(() => dom.toast.classList.remove('visible'), 2400);
-}
-
-function formatDate(date) {
-  return new Intl.DateTimeFormat(undefined, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(`${date}T12:00:00`));
-}
-
-function hostFromUrl(url) {
+    [tab]=await api.tabs.query({active:true,currentWindow:true});current=await captureTab(api,tab);
+    document.querySelector('#page-title').textContent=current.title;document.querySelector('#page-company').textContent=current.company||new URL(current.url).hostname;
+    document.querySelector('#page-details').textContent=`${current.description.trim().split(/\s+/).length} words · ${current.layout??'Generic page'} layout`;
+    const report=quickMatch(current,options),quick=document.querySelector('#quick-match');quick.replaceChildren();
+    if(report)quick.append(tierBadge(report.tier),el('span',{text:`vs ${options.resumeLabel} · ${report.required.filter(row=>row.status==='met').length} of ${report.required.length} required`}));
+    else quick.append(el('span',{text:'Set a default resume in Options for a quick match.'}));
+    save.disabled=false;send.disabled=false;chip.checked=(options.chipOrigins??[]).includes(new URL(tab.url).origin);
+    result({job:current,matchReport:report});announce('Job text read on this device.');
+  }catch(error){current=null;save.disabled=true;send.disabled=true;announce(error.message);}finally{read.disabled=false;}
+});
+save.addEventListener('click',async()=>{
+  if(!current)return;try{jobs=[current,...jobs.filter(job=>job.url!==current.url)];selectedDates.add(current.collectedDate);await api.storage.local.set({jobs});paint();announce('Job saved in this browser.');}catch(error){announce(error.message);}
+});
+async function sendJobs(selected){try{if(!selected.length)throw new Error('Select at least one capture date.');await api.tabs.create({url:sendURL(selected,options)});announce('Opened Waypost. Review and confirm the import there.');}catch(error){announce(error.message);}}
+send.addEventListener('click',()=>current&&sendJobs([current]));
+document.querySelector('#send-selected').addEventListener('click',()=>sendJobs(filterJobsByDates(jobs,[...selectedDates])));
+document.querySelector('#select-all').addEventListener('click',()=>{const groups=groupJobsByDate(jobs);selectedDates=selectedDates.size===groups.length?new Set():new Set(groups.map(group=>group.date));paint();});
+for(const format of ['text','json'])document.querySelector(`#export-${format}`).addEventListener('click',async()=>{
+  const selected=filterJobsByDates(jobs,[...selectedDates]);if(!selected.length){announce('Select at least one capture date.');return;}
+  const text=format==='json'?JSON.stringify(toWaypostExport(selected,new Date()),null,2):toScoringTextExport(selected);
+  const url=URL.createObjectURL(new Blob([text],{type:format==='json'?'application/json':'text/plain'}));
+  try{await api.downloads.download({url,filename:`waypost-jobs-${new Date().toISOString().slice(0,10)}.${format==='json'?'json':'txt'}`,saveAs:true});}catch(error){announce(error.message);}finally{setTimeout(()=>URL.revokeObjectURL(url),1000);}
+});
+chip.addEventListener('change',async()=>{
   try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return 'Saved link';
+    if(!current||!tab)throw new Error('Read this page before enabling its chip.');
+    const origin=new URL(tab.url).origin;
+    if(chip.checked) {
+      const granted=await api.permissions.request({origins:[`${origin}/*`]});if(!granted){chip.checked=false;announce('Site access was not granted. The chip remains off.');return;}
+      options.chipOrigins=[...new Set([...(options.chipOrigins??[]),origin])];await api.storage.local.set({options});await showChip(api,tab,current,options);announce('Chip enabled for this origin.');
+    }else{options.chipOrigins=(options.chipOrigins??[]).filter(value=>value!==origin);await api.storage.local.set({options});await api.tabs.sendMessage(tab.id,{type:'WAYPOST_HIDE_CHIP'});await api.permissions.remove({origins:[`${origin}/*`]});announce('Chip disabled for this origin.');}
+  }catch(error){
+    const origin=tab?.url?new URL(tab.url).origin:null;
+    if(chip.checked&&origin){options.chipOrigins=(options.chipOrigins??[]).filter(value=>value!==origin);try{await api.storage.local.set({options});await api.permissions.remove({origins:[`${origin}/*`]});}catch{/* A failed rollback is explained by the original error. */}}
+    chip.checked=false;announce(error.message);
   }
+});
+function paint(){
+  const groups=groupJobsByDate(jobs),container=document.querySelector('#date-groups');container.replaceChildren();
+  selectedDates=new Set([...selectedDates].filter(date=>groups.some(group=>group.date===date)));
+  for(const group of groups){const id=`date-${group.date}`,input=el('input',{id,type:'checkbox',checked:selectedDates.has(group.date),'data-testid':'capture-date'});input.addEventListener('change',()=>{if(input.checked)selectedDates.add(group.date);else selectedDates.delete(group.date);exportsState();});container.append(el('div',{class:'date-row','data-testid':'capture-date-row'},input,el('label',{for:id,text:new Date(`${group.date}T12:00:00`).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})}),el('small',{text:`${group.jobs.length} jobs`})));}
+  if(!groups.length)container.append(el('p',{class:'muted',text:'Read a job page and save it for later to start a collection.'}));exportsState();
 }
-
-function escapeHtml(value) {
-  return String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+function exportsState(){const none=!filterJobsByDates(jobs,[...selectedDates]).length;for(const id of ['export-text','export-json','send-selected'])document.getElementById(id).disabled=none;}
+paint();
