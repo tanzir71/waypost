@@ -10,6 +10,11 @@ private workspace. MIT licensed. Made by [tanziro.com](https://tanziro.com).
 
 ## Current release
 
+M7 completes Offers, Deadlines/ICS, Letters & outreach, Story bank, Contacts and
+optional AI rewrites with accept/reject review. AI and calendar publishing are
+off by default. The [implementation audit](IMPLEMENTATION-AUDIT.md) maps the
+handover requirements to modules, tests and documented spec conflicts.
+
 M6 adds optional encrypted sync with PHP/SQLite or a Cloudflare Worker, real
 [setup checks](https://tanzir71.github.io/waypost/app/setup/), recovery codes,
 and a [self-hosting package](downloads/waypost-self-host.zip). Read the
@@ -128,6 +133,12 @@ separately. Errors, cancellation, rejection and stale reviews preserve your text
 Keys stay in internal device settings, excluded from exports, sync and result
 JSON. Forget AI key turns AI off and removes the stored key. Imported workspaces
 always leave connections off. See [optional relay setup](server/README.md#optional-ai-relay).
+
+The command menu also opens Story bank, new-record forms and saved contact,
+story, draft, offer and deadline records. Form commands never save by themselves.
+Appearance follows saved/synced preferences without writing them back to sync.
+Returning through Back/Forward reloads restored pages to reopen closed storage
+and sync connections safely.
 
 Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
 permissions are exactly activeTab, storage, downloads and scripting. Configure

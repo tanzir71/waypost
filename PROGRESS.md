@@ -11,7 +11,7 @@ Live demo: https://tanzir71.github.io/waypost/
 | M4 Study tools | done | m4 | /app/gpa/, /app/finals/, /app/scales/ |
 | M5 PWA, agents, settings | done | m5 | /app/settings/, /app/agents/, /agents/, /app/share/ |
 | M6 Encrypted sync | done | m6 | /app/setup/, /downloads/waypost-self-host.zip |
-| M7 Offers and supporting tools | in progress | | /app/offers/, /app/deadlines/, /app/letters/, /app/contacts/ |
+| M7 Offers and supporting tools | done | m7 | /app/offers/, /app/deadlines/, /app/letters/, /app/contacts/, /app/settings/#section=ai |
 
 ## M0
 
@@ -216,7 +216,7 @@ Live demo: https://tanzir71.github.io/waypost/
   the static demo/package; optional PHP/Worker execution needs self-hosting.
 - M7 and the final full-spec audit remain active work.
 
-## M7 (in progress)
+## M7
 
 - Added the Figma offer comparison, editable current job/offers, user-supplied
   cost-index CSV, adjusted-total bars with their table twin, priority sliders
@@ -271,7 +271,21 @@ Live demo: https://tanzir71.github.io/waypost/
 - All 143 tests and release checks pass, including provider fakes, actual PHP
   adapter execution, native review controls, default-off settings, key exclusion,
   no automatic model download, and changed-provider warning guards.
-- The final full-spec audit remains active work. No M7 tag has been created.
+- Completed the requirement-by-requirement audit in IMPLEMENTATION-AUDIT.md.
+  Added command-menu jumps/forms for supporting tools, current draft fragment
+  round-trips and clearing, explicit calendar action names, saved/remote theme
+  application without sync feedback, and Back/Forward connection reopening.
+  Optional AI work also cancels when leaving the page.
+- Shared offers get separate temporary identities and always save copies, even
+  if a private link contains an ID already in this workspace. Existing offers
+  cannot be overwritten by a shared-input save.
+- Rechecked comparison prices against primary sources on 26 November. Replaced
+  the unconfirmed Resume.io USD renewal claim with its displayed INR one-week
+  pass and explicit currency/localized-offer terms.
+- Validation: all 148 Node tests and release checks pass. Required fixtures,
+  same-origin/default-off boundaries, native workflows, both backends, package
+  contents and cached assets are covered without browsers, installs, network
+  access, accounts or owner actions. Final milestone commit/tag: m7.
 
 ## Deployment status
 

@@ -3,9 +3,10 @@ import {announce,dialog,el} from './dom.js';
 import {installPalette} from './palette.js';
 import {initializePwa} from './pwa.js';
 import {initializeAgentTools} from './agent-tools.js';
-import {setTheme} from './theme.js';
+import {setTheme,initializeTheme,restorePersistedPage} from './theme.js';
 import {initializeSync} from './sync.js';
 const config = window.WAYPOST_CONFIG;
+window.addEventListener('pageshow',restorePersistedPage);
 for(const link of document.querySelectorAll('.bottom-nav a'))if(link.pathname===location.pathname)link.setAttribute('aria-current','page');
 if (config.mode === 'demo') {
   document.querySelector('#demo-banner').hidden = false;
@@ -23,6 +24,7 @@ try {
   window.addEventListener('pagehide',()=>store.close(),{once:true});
 } catch(error) {announce(error.message);}
 const theme=document.querySelector('#app-theme');
+if(store)await initializeTheme(store);
 theme.value=document.documentElement.dataset.theme??'system';
 theme.addEventListener('change',()=>setTheme(theme.value,store).catch(error=>announce(error.message)));
 const views={today:()=>import('./views/today.js'),tracker:()=>import('./views/tracker.js'),import:()=>import('./views/import.js'),match:()=>import('./views/match.js'),parse:()=>import('./views/parse.js'),resumes:()=>import('./views/resumes.js'),gpa:()=>import('./views/gpa.js'),finals:()=>import('./views/finals.js'),scales:()=>import('./views/scales.js'),settings:()=>import('./views/settings.js'),agents:()=>import('./views/agents.js'),share:()=>import('./views/share.js'),setup:()=>import('./views/setup.js'),offers:()=>import('./views/offers.js'),deadlines:()=>import('./views/deadlines.js'),contacts:()=>import('./views/contacts.js'),letters:()=>import('./views/letters.js')};

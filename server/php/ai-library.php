@@ -7,6 +7,9 @@ require_once __DIR__.'/library.php';
 // shared /core/ai module before a suggestion can be shown or accepted.
 function aiText(mixed $value,int $maxBytes): string {
     if(!is_string($value)||trim($value)===''||strlen($value)>$maxBytes||!preg_match('//u',$value)||preg_match('/[\x00-\x08\x0b\x0c\x0e-\x1f]/',$value))fail('ai_input','Invalid or excessive AI text.');
+    // Match JavaScript's UTF-16 length limit without requiring mbstring/iconv.
+    $units=preg_match_all('/./us',$value)+preg_match_all('/[\x{10000}-\x{10ffff}]/u',$value);
+    if($units>intdiv($maxBytes,4))fail('ai_input','Invalid or excessive AI text.');
     return $value;
 }
 function aiInput(array $input): array {

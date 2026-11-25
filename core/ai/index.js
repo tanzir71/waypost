@@ -5,7 +5,9 @@ const bounded=(value,max,label)=>{if(typeof value!=='string'||!value.trim()||val
 // Lock the entire sentence, not just a number: changing its subject or negation
 // would turn an existing number into a new claim. English writing only for v1.
 const metric=/[\p{N}%‰$€£¥₹৳]|\b(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|trillion|percent(?:age)?|dozens?|scores?|couple|few|several|many|multiple|numerous|most|more|less|fewer|half|quarter|third|double[ds]?|triple[ds]?|quadruple[ds]?|twice|thrice|halved?|all|every|each|none|single|first|second|top|best|largest|smallest|fastest|slowest|majority|minority|annually|monthly|weekly|daily|hours?|minutes?|seconds?|days?|weeks?|months?|years?|decades?|fold)\b/iu;
-const sentences=text=>text.replace(/\r\n?/g,'\n').match(/[^.!?\n]+(?:[.!?]+|(?=\n|$))/gu)?.map(part=>part.trim()).filter(Boolean)??[];
+// A decimal point is not a sentence break. Freezing its pieces separately
+// could let a model reorder 3.6% into unrelated claims about 3 and 6%.
+const sentences=text=>text.replace(/\r\n?/g,'\n').split(/(?<=[.!?])\s+|\n+/u).map(part=>part.trim()).filter(Boolean);
 const canonical=text=>text.normalize('NFKC').replace(/\s+/g,' ').trim();
 export const quantifiedSentences=text=>sentences(String(text)).filter(sentence=>metric.test(sentence.normalize('NFKC')));
 export function rewriteRequest(text,goal='clear'){

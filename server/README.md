@@ -201,3 +201,50 @@ Fresh deployments use the complete `schema.sql`. Setup reports an outdated D1
 schema as needing attention. **PHP** adds the calendar columns/tables in place
 under a database lock on first access, preserving existing encrypted rows.
 Both upgrade paths have real SQLite preservation tests.
+
+## Optional AI relay
+
+AI is off by default and independent of encrypted sync. Chrome's built-in
+English Prompt API needs no server; Settings checks support and prepares its
+model only on request. The browser manages any model download. Writing text
+stays on-device. BYOK currently supports OpenAI's Responses API and sends only
+the selected letter text and rewrite instructions after an explicit request.
+GitHub Pages cannot run the relay, so BYOK is disabled in demo mode.
+
+For **PHP**, upload `ai.php` and `ai-library.php` with the other server files.
+Keep the existing private config/database outside the web root. Optional BYOK
+also needs PHP cURL with its HTTPS certificate store configured. In Settings,
+use `https://YOUR_HOST/BASE/server/php/ai.php` as the relay endpoint. No vault
+needs to be created; SQLite is used for the per-IP rate limit.
+
+For **Cloudflare**, the supplied Worker handles `/api/ai` alongside the sync and
+calendar routes. D1 and a private `AUTH_PEPPER` are required for rate limiting;
+AI itself needs no vault or R2 object. The existing schema needs no further
+migration. Use `https://YOUR_HOST/api/ai` in Settings. The Worker and PHP accept
+same-origin HTTPS JSON POSTs only and never grant CORS access. Configure the
+relay on the same host you trust with your key and selected text.
+
+The relay receives `{model,input,instructions}` and a `X-Waypost-AI-Key` header.
+It calls only the fixed OpenAI Responses HTTPS URL, never a caller-supplied
+upstream, with `store:false`, no tools, a 4096-output-token cap, a 45-second
+timeout and no redirects. Requests are capped at 64 KB, selected text at 12,000
+characters (the PHP adapter also bounds UTF-8 bytes), responses at 256 KB and
+requests at 30 per IP/minute. Provider failures/refusals/incomplete outputs are
+redacted to generic errors. Browser requests and responses are never cached.
+Application code never logs or persists keys/text on the server; configure host
+request logging to exclude the key header and bodies. Provider charges and
+retention policies still apply; `store:false` is not a zero-retention promise.
+
+The key is saved only in this device's internal IndexedDB settings. It is never
+synced, exported, added to result JSON or included in URLs. The UI rechecks that
+the provider/model/relay match the reviewed request. Every result is checked by
+`core/ai` and displayed as a complete accept/reject diff. Quantified English
+sentences are locked verbatim; the user reviews other meaning/facts. Accepting
+only changes the current editor, and stale editor snapshots cannot overwrite
+new edits. Workspace import leaves AI off; Forget AI key removes its local key.
+
+Provider APIs verified against the [Chrome Prompt API documentation](https://developer.chrome.com/docs/ai/prompt-api)
+and [OpenAI Responses API reference](https://developers.openai.com/api/reference/resources/responses/methods/create)
+on 26 November 2026. No SDK, gateway, CDN, model ID default or new dependency is
+required. Provider/model availability varies; tests use fakes and do not claim
+that every browser/device or model is supported.

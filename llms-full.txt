@@ -182,6 +182,11 @@ the chosen action/result into the editor. `writing-tab-stories` opens Story bank
 Composing does not save or send. Copy/download only uses the text in the editor.
 Private jdText/resumeText/draft/subject/recipient/sender inputs use encoded
 fragments; saved-record IDs remain local references. AI is optional and off by default.
+Draft links carry the current title, fields and blocks (bounded encoded JSON),
+including unsaved edits to a saved draft. Clearing a draft removes old shared
+text. `letters/#tab=stories&action=add-story`, `contacts/#action=add`,
+`offers/#action=add`, and `deadlines/#action=add` open forms without saving.
+The command menu indexes these actions and saved supporting-tool records.
 AI hooks: `ai-provider`, `ai-model`, `ai-endpoint`, `ai-key`, `ai-save`,
 `ai-forget`, `ai-prepare`, `ai-prepare-cancel`, `ai-goal`, `ai-rewrite`,
 `ai-before`, `ai-request`, `ai-diff-row`, `ai-accept`, `ai-reject`, `ai-cancel`.
@@ -234,6 +239,7 @@ Additional sync hooks: `setup-provider`, `setup-endpoint`, `setup-check`,
 `sync-delete`, `delete-vault-ack`, `sync-delete-confirm`.
 
 - [Source](https://github.com/tanzir71/waypost)
+- [Implementation audit](IMPLEMENTATION-AUDIT.md)
 - [Self-hosting and sync protocol](server/README.md)
 - [Self-hosting ZIP](downloads/waypost-self-host.zip)
 - [Workspace schema](schemas/workspace.json)
@@ -255,6 +261,11 @@ private workspace. MIT licensed. Made by [tanziro.com](https://tanziro.com).
 [Agent documentation](llms.txt)
 
 ## Current release
+
+M7 completes Offers, Deadlines/ICS, Letters & outreach, Story bank, Contacts and
+optional AI rewrites with accept/reject review. AI and calendar publishing are
+off by default. The [implementation audit](IMPLEMENTATION-AUDIT.md) maps the
+handover requirements to modules, tests and documented spec conflicts.
 
 M6 adds optional encrypted sync with PHP/SQLite or a Cloudflare Worker, real
 [setup checks](https://tanzir71.github.io/waypost/app/setup/), recovery codes,
@@ -374,6 +385,12 @@ separately. Errors, cancellation, rejection and stale reviews preserve your text
 Keys stay in internal device settings, excluded from exports, sync and result
 JSON. Forget AI key turns AI off and removes the stored key. Imported workspaces
 always leave connections off. See [optional relay setup](server/README.md#optional-ai-relay).
+
+The command menu also opens Story bank, new-record forms and saved contact,
+story, draft, offer and deadline records. Form commands never save by themselves.
+Appearance follows saved/synced preferences without writing them back to sync.
+Returning through Back/Forward reloads restored pages to reopen closed storage
+and sync connections safely.
 
 Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
 permissions are exactly activeTab, storage, downloads and scripting. Configure

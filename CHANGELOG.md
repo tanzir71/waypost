@@ -1,6 +1,6 @@
 # Changelog
 
-## M7 in progress — 2026-11-26
+## M7 — 2026-11-26
 
 - Added offer/current-job comparison, compensation and vesting calculations,
   cost-index CSV import, adjusted-total bars/table, priority sliders and
@@ -27,8 +27,15 @@
 - Keys are excluded from backups, sync, private links and result JSON. PHP and
   Worker relays use fixed HTTPS upstreams, rate/size/time limits and redacted
   errors. Provider adapters and native review flows are tested with fakes.
-- Corrected the Setup card surface, stale landing labels and missing Figma
-  info/chevron assets. The final audit remains in progress; no M7 tag yet.
+- Completed the full requirement audit, supporting-tool command jumps/forms,
+  private draft state round-trips, synced appearance and Back/Forward lifecycle.
+- Shared comparisons now use distinct temporary controls and save copies,
+  preserving local offers whose IDs appear in a shared link.
+- Corrected the Setup card surface, stale landing labels, missing Figma assets,
+  calendar action names and primary-action emphasis. Reverified dated comparison
+  sources and labelled Resume.io's displayed localized price/currency.
+- Validation: all 148 tests and route, external-URL, syntax, vendor, extension,
+  precache, seven-file PHP lint and exact release ZIP checks pass.
 
 ## M6 — 2026-11-25
 

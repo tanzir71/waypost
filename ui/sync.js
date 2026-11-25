@@ -29,7 +29,7 @@ export async function initializeSync({store,mode,origin=location.origin,events=w
   }
   function run(){if(!inflight||runGeneration!==generation){const current=generation;runGeneration=current;inflight=runOnce().finally(()=>{if(runGeneration===current)inflight=null;});}return inflight;}
   const background=()=>run().catch(()=>{/* Visible status carries the error; local edits remain usable. */});
-  const schedule=()=>{clearTimeout(debounce);if(!paused&&session)debounce=setTimeout(background,1000);};
+  const schedule=({local=true}={})=>{if(!local)return;clearTimeout(debounce);if(!paused&&session)debounce=setTimeout(background,1000);};
   const offline=()=>update({state:session?'offline':'local'}),onlineEvent=()=>background();
   const unsubscribe=store.subscribe(schedule);
   events.addEventListener('online',onlineEvent);events.addEventListener('offline',offline);

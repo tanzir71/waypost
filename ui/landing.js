@@ -91,7 +91,7 @@ try {
   const response=await fetch(`${basePath}data/competitors.json`);
   if(!response.ok) throw new Error();
   const data=await response.json();
-  document.querySelector('#pricing-date').textContent=`Paid plan prices in USD, as of ${data.verifiedAt}. Free plans and billing terms vary. Trademarks belong to their owners.`;
+  document.querySelector('#pricing-date').textContent=`Paid plan prices as of ${data.verifiedAt}: ${data.currencyNote??data.currency}. Free plans, localized offers and billing terms vary. Trademarks belong to their owners.`;
   data.plans.forEach(plan=>{
     const cell=document.querySelector(`[data-price="${plan.id}"]`);
     if(cell) cell.textContent=plan.displayPrice;

@@ -102,6 +102,7 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
     }
     const key=`sync-state:${state.vaultId}`,check=tx.objectStore('settings').index('key').get(key);
     check.onsuccess=()=>tx.objectStore('settings').put(record({...check.result,key,value:state}));await done;
+    if(rows.length)for(const listener of listeners)listener({types:[...new Set(rows.map(row=>row.type))],local:false});
   };
   return {all,get,record,putMany,setting,setSetting,applyRemoteSync,subscribe:listener=>{listeners.add(listener);return()=>listeners.delete(listener);},deviceId,migrationMessage,close:()=>{listeners.clear();db.close();},
     async save(type,data) {const row=record(data);await putMany({[type]:[row]});return row;},

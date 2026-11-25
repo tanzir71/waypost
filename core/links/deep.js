@@ -7,8 +7,8 @@ const types={
   gpa:{current:'number',completed:'number',target:'number',remaining:'number',scaleId:'text',termId:'text',scope:'text',locked:'locks'},
   finals:{weights:'numbers',scores:'numbers',target:'text',scaleId:'text',course:'text',categories:'json'},
   scales:{scaleId:'text',value:'number',to:'strings',institutionId:'text',cohort:'json',table:'json'},
-  letters:{id:'text',job:'text',resume:'text',contact:'text',kind:'text',story:'text',tab:'text',draft:'encoded',subject:'encoded',recipient:'encoded',sender:'encoded',jdText:'encoded',resumeText:'encoded'},offers:{selected:'strings',offers:'json',weights:'json'},
-  deadlines:{month:'text',id:'text',date:'text',title:'text',kind:'text'},contacts:{id:'text',q:'text'},
+  letters:{action:'text',id:'text',title:'text',blocks:'json',job:'text',resume:'text',contact:'text',kind:'text',story:'text',tab:'text',draft:'encoded',subject:'encoded',recipient:'encoded',sender:'encoded',jdText:'encoded',resumeText:'encoded'},offers:{action:'text',selected:'strings',offers:'json',weights:'json'},
+  deadlines:{action:'text',month:'text',id:'text',date:'text',title:'text',kind:'text'},contacts:{action:'text',id:'text',q:'text'},
   agents:{tool:'text',input:'json'},settings:{section:'text',action:'text'},setup:{provider:'text',endpoint:'url'},
   share:{title:'text',company:'text',url:'url',text:'encoded'},import:{job:'text',paste:'bool',text:'encoded'}
 };
