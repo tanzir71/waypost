@@ -1,5 +1,19 @@
 # Changelog
 
+## M6 — 2026-11-25
+
+- Shipped optional encrypted sync with PHP/SQLite and Worker/D1/R2 backends,
+  same-origin HTTPS, cursor/LWW merges, tombstones, quotas and rate limits.
+- Shipped actual Setup checks, encrypted round-trip verification, recovery codes,
+  atomic passphrase/key replacement, device unlock and explicit sync opt-in.
+- Added background/manual sync, offline retention, disconnect and confirmed
+  server-vault deletion. Device keys, credentials and codes stay out of exports.
+- Added a reproducible self-hosting ZIP, external private PHP configuration,
+  Worker samples, server protocol/install docs and local PHP lint/package checks.
+- All 100 tests and release checks pass, including a clean Git archive, actual
+  PHP SQLite, Worker storage fakes/SQL and native setup/recovery flows. Static
+  demo and release package are verified on Pages. M7 remains in progress.
+
 ## M5 — 2026-11-25
 
 - Shipped the installable/offline workspace, native file and job-share review,

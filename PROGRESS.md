@@ -10,7 +10,7 @@ Live demo: https://tanzir71.github.io/waypost/
 | M3 Today, tracker, clipper | done | m3 | /app/, /app/tracker/, /app/import/ |
 | M4 Study tools | done | m4 | /app/gpa/, /app/finals/, /app/scales/ |
 | M5 PWA, agents, settings | done | m5 | /app/settings/, /app/agents/, /agents/, /app/share/ |
-| M6 Encrypted sync | in progress | | /app/setup/, /downloads/waypost-self-host.zip |
+| M6 Encrypted sync | done | m6 | /app/setup/, /downloads/waypost-self-host.zip |
 | M7 Offers and supporting tools | pending | | |
 
 ## M0
@@ -180,6 +180,41 @@ Live demo: https://tanzir71.github.io/waypost/
 - Source feature commit a892011 has built on Pages. HTTP checks confirm Settings,
   both Agents paths, Share, the manifest and worker scripts return 200 with the
   correct HTML/manifest/JavaScript MIME types. M6/M7 remain active work.
+
+## M6
+
+- Added optional same-origin HTTPS sync for PHP 8.1+/PDO SQLite and Cloudflare
+  Worker/D1/R2, with shared encrypted envelopes, cursor pagination, timestamp /
+  device LWW, tombstones, atomic quota enforcement and bounded requests/rates.
+  Large Worker records use immutable R2 objects; concurrency checks protect
+  record pointers and recovery commits. Original files remain local.
+- Added WebCrypto PBKDF2-SHA256 at 600,000 iterations, separate HKDF keys,
+  AES-GCM with authenticated record metadata, nonextractable device keys and
+  eight 160-bit recovery codes shown once. Passphrases and codes never reach
+  the server or workspace exports. Recovery derives fresh keys and stages a
+  complete snapshot; concurrent edits reject the atomic commit without loss.
+- Added Figma's centered Setup flow with real server checks, create/unlock /
+  recovery, explicit code-save acknowledgement, cancellation, actual encrypted
+  round-trip timing and opt-in enable. Demo performs no sync API calls and
+  offers the deployment package. Settings reports status and offers manual
+  sync, disconnect and explicitly confirmed server deletion, keeping local data.
+- Added automatic encrypted sync after opt-in, on local edits and reconnect,
+  offline retention, cross-tab coordination and abortable/bounded retries. Only
+  safe study/appearance preferences cross devices; connections stay local.
+- Added the deterministic 3.06 MB self-hosting ZIP, secret/database exclusion,
+  HTTPS/private-file rules, external PHP configuration, Worker samples and
+  deployment/protocol documentation. Fixed dark Logo A use in the app shell.
+- Validation: all 100 tests and release checks pass in this workspace and a
+  clean Git archive. Coverage includes real PHP/SQLite API/recovery, Worker
+  HTTP with both model and SQLite-backed in-memory D1/R2, two-device merges,
+  pagination, tamper/auth/limit failures, lost commit replies, concurrent
+  cancellation/deletion and native Setup/Settings flows. All three PHP files
+  pass php -l; ZIP contents and exact freshness are checked.
+- Commit cd7d779 built on Pages. HTTP checks confirm Setup, encryption/setup
+  modules, the server guide, precache and ZIP return 200 with correct MIME;
+  deployed precache and ZIP bytes match local release artifacts. Pages serves
+  the static demo/package; optional PHP/Worker execution needs self-hosting.
+- M7 and the final full-spec audit remain active work.
 
 ## Deployment status
 
