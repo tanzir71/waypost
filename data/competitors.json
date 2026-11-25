@@ -1,0 +1,10 @@
+{
+  "verifiedAt": "2026-11-25",
+  "currency": "USD",
+  "plans": [
+    { "id": "jobscan", "name": "Jobscan Premium", "displayPrice": "$49.95 / month", "monthly": 49.95, "source": "https://app.jobscan.co/plan", "freePlan": "5 resume scans monthly; tracker and resume builder included" },
+    { "id": "teal", "name": "Teal+", "displayPrice": "$29 / month", "monthly": 29, "source": "https://help.tealhq.com/en/articles/9530153-teal-vs-teal", "freePlan": "Unlimited tracking and resumes; top 5 job keywords" },
+    { "id": "huntr", "name": "Huntr Pro", "displayPrice": "$40 / month", "monthly": 40, "source": "https://huntr.co/pricing", "freePlan": "100 tracked jobs; basic matching" },
+    { "id": "resumeio", "name": "Resume.io", "displayPrice": "$2.95 trial → $29.95 / 4 weeks", "renewal": 29.95, "periodDays": 28, "trialDays": 7, "trialPrice": 2.95, "source": "https://resume.io/pricing", "freePlan": "One resume and cover letter, TXT downloads" }
+  ]
+}

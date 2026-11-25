@@ -1,0 +1,5 @@
+header, main, footer { width: min(100% - 48px, 760px); margin-inline: auto; }
+header, footer { padding-block: 32px; }
+main { display: grid; gap: 24px; padding-block: 32px 64px; }
+main p { color: var(--wp-ink-2); }
+footer { font: var(--wp-body-s); }

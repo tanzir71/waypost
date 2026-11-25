@@ -5,9 +5,11 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 
 ## Build status
 
-M0 foundation is available. Tool routes are placeholders until their milestone
-ships. Read PROGRESS.md for the current status. Do not assume a placeholder
-performed a computation.
+M1: the landing page has a working matching demo using core/match/index.js.
+Paste the job description, select a sample or upload a .txt resume, then use
+Match. Results include exact resume evidence and can be copied or downloaded as
+JSON. PDF and DOCX uploads arrive in M2. Tool routes are placeholders until their
+milestone ships. Read PROGRESS.md; do not assume a placeholder computed a result.
 
 ## Routes
 
@@ -19,9 +21,13 @@ Future deep links use URL fragments, never queries, for private inputs.
 
 ## Results and stable hooks
 
-Every tool page has a JSON script #result-data, initially null. Native links
-have accessible names. data-testid values: `result-data`, `open-search`,
-`clear-demo`, `footer-credit`. Navigation uses nav-<route>.
+Every tool page has a JSON script #result-data, initially null. The landing
+demo updates it on each match. Native controls have accessible names.
+data-testid values: `result-data`, `open-search`, `clear-demo`, `footer-credit`,
+`hero-jd`, `hero-resume`, `hero-upload`, `score-button`, `requirement-row`,
+`copy-json`, `download-json`. Requirement rows have data-status met/partial/missing.
+Navigation uses nav-<route>. Read the JSON for all requirements; the hero shows
+representative rows. No employer hiring outcome is predicted by the tier.
 
 ## Documentation
 

@@ -165,7 +165,7 @@ export function matchResume(resume,job,options={}) {
   const intersection=[...title].filter(term=>resumeTitle.has(term)).length;
   const union=new Set([...title,...resumeTitle]).size;
   return { jobId:job.id??'job',resumeVersionId:resume.id??'resume',tier,required,preferred,
-    checks:{ coverage:tierFor(requiredScore),title:tierFor(union?intersection/union:0),years:{found:years,asked:Math.max(0,...requirements.map(req=>Number(req.text.match(/(\d+)\+?\s*(?:years|yrs)/i)?.[1]??0)))||null},quantified:{withNumbers:bullets.filter(line=>/\d|[%$£€]|\b(?:hours?|minutes?|seconds?)\b/.test(line.line)).length,bullets:bullets.length},parse:resume.parse?.issues?.length?'warnings':'clean',keywordCoverage:scoreResumeAgainstJob(resume,job).score},
+    checks:{ coverage:tierFor(requiredScore),title:tierFor(union?intersection/union:0),years:{found:years,asked:Math.max(0,...requirements.map(req=>Number(req.text.match(/(\d+)\+?\s*(?:years|yrs)/i)?.[1]??0)))||null},quantified:{withNumbers:bullets.filter(line=>/\d|[%$£€]|\b(?:hours?|minutes?|seconds?)\b/.test(line.line)).length,bullets:bullets.length},parse:resume.parse ? (resume.parse.issues?.length?'warnings':'clean') : 'warnings',keywordCoverage:scoreResumeAgainstJob(resume,job).score},
     knockouts,stuffingWarnings:stuffingWarnings(resumeText,jobText),clusterGaps:[],requiredScore,preferredBonus,
     explanation:required.length?'Based on requirement evidence, not an employer hiring prediction.':'No scorable requirements found. Add the requirements section of the job description.' };
 }

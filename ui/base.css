@@ -23,6 +23,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
 .muted { color: var(--wp-ink-2); }
 .eyebrow, .nav-group { font: var(--wp-label-s); letter-spacing: var(--wp-label-s-ls); text-transform: uppercase; color: var(--wp-ink-3); }
 .brand { display: inline-flex; align-items: center; gap: 10px; font: var(--wp-h3); text-decoration: none; }
+.brand img { flex-shrink: 0; }
 .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 .status-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--wp-surface-2); color: var(--wp-ink-2); border-radius: var(--wp-radius-pill); padding: 5px 10px; font: var(--wp-label-m); white-space: nowrap; }
 .status-pill::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--wp-tier-strong); }
