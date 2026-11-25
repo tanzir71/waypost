@@ -1,0 +1,17 @@
+import {readFile} from 'node:fs/promises';
+import {deflateRawSync,inflateRawSync} from 'node:zlib';
+import {files} from './files.mjs';
+const root=new URL('../',import.meta.url);
+const runtime=/^(?:app|agents|assets|core|ui|data|schemas|vendor|privacy)\//;
+const top=new Set(['index.html','config.js','favicon.svg','manifest.webmanifest','sw.js','precache.js','robots.txt','.nojekyll','.htaccess','README.md','PROGRESS.md','CHANGELOG.md','LICENSE','llms.txt','llms-full.txt','HANDOVER.md']);
+const server=new Set(['server/README.md','server/php/sync.php','server/php/library.php','server/php/config.sample.php','server/php/.htaccess','server/worker/index.js','server/worker/repository.js','server/worker/schema.sql','server/worker/wrangler.toml.sample']);
+export const unsafePath=path=>/(?:^|\/)(?:config\.php|\.env[^/]*|\.dev\.vars|wrangler\.toml)$|\.(?:sqlite(?:-.*)?|db|log|bak)$|(?:^|\/)\.git(?:\/|$)/i.test(path)||path.includes('..')||path.includes('\\');
+export async function deploymentFiles(){return (await files(root)).filter(path=>(runtime.test(path)||top.has(path)||server.has(path))&&!path.endsWith('/_shell.html')).filter(path=>{if(unsafePath(path))throw new Error(`Private deployment file refused: ${path}`);return true;}).sort();}
+const table=Uint32Array.from({length:256},(_,n)=>{for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;return n>>>0;});
+export function crc32(buffer){let value=0xffffffff;for(const byte of buffer)value=table[(value^byte)&255]^(value>>>8);return (value^0xffffffff)>>>0;}
+export async function buildZip(){const local=[],directory=[];let offset=0;for(const path of await deploymentFiles()){
+  const bytes=await readFile(new URL(path,root)),name=Buffer.from(path),compressed=deflateRawSync(bytes,{level:9}),crc=crc32(bytes),header=Buffer.alloc(30);
+  header.writeUInt32LE(0x04034b50);header.writeUInt16LE(20,4);header.writeUInt16LE(0x800,6);header.writeUInt16LE(8,8);header.writeUInt16LE(33,12);header.writeUInt32LE(crc,14);header.writeUInt32LE(compressed.length,18);header.writeUInt32LE(bytes.length,22);header.writeUInt16LE(name.length,26);local.push(header,name,compressed);
+  const entry=Buffer.alloc(46);entry.writeUInt32LE(0x02014b50);entry.writeUInt16LE(20,4);entry.writeUInt16LE(20,6);entry.writeUInt16LE(0x800,8);entry.writeUInt16LE(8,10);entry.writeUInt16LE(33,14);entry.writeUInt32LE(crc,16);entry.writeUInt32LE(compressed.length,20);entry.writeUInt32LE(bytes.length,24);entry.writeUInt16LE(name.length,28);entry.writeUInt32LE(offset,42);directory.push(entry,name);offset+=header.length+name.length+compressed.length;
+  }const central=Buffer.concat(directory),end=Buffer.alloc(22),count=directory.length/2;end.writeUInt32LE(0x06054b50);end.writeUInt16LE(count,8);end.writeUInt16LE(count,10);end.writeUInt32LE(central.length,12);end.writeUInt32LE(offset,16);return Buffer.concat([...local,central,end]);}
+export function readZip(buffer){const output=new Map();let offset=0;while(buffer.readUInt32LE(offset)===0x04034b50){const method=buffer.readUInt16LE(offset+8),size=buffer.readUInt32LE(offset+18),expected=buffer.readUInt32LE(offset+22),nameLength=buffer.readUInt16LE(offset+26),extra=buffer.readUInt16LE(offset+28),name=buffer.subarray(offset+30,offset+30+nameLength).toString(),start=offset+30+nameLength+extra,bytes=method===8?inflateRawSync(buffer.subarray(start,start+size)):buffer.subarray(start,start+size);if(bytes.length!==expected||crc32(bytes)!==buffer.readUInt32LE(offset+14))throw new Error(`ZIP integrity failure: ${name}`);output.set(name,bytes);offset=start+size;}return output;}

@@ -1,0 +1,19 @@
+name = "waypost-sync"
+main = "index.js"
+compatibility_date = "2026-11-25"
+# Attach this worker to YOUR_DOMAIN/api/* on the SAME origin as the static app.
+# routes = [{ pattern = "YOUR_DOMAIN/api/*", zone_name = "YOUR_DOMAIN" }]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "waypost"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[[r2_buckets]]
+binding = "BLOBS"
+bucket_name = "waypost-ciphertext"
+
+[vars]
+MAX_VAULT_BYTES = "209715200"
+RATE_PER_MINUTE = "600"
+# Set AUTH_PEPPER with wrangler secret put AUTH_PEPPER, never in this file.

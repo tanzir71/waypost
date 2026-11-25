@@ -5,9 +5,10 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 
 ## Build status
 
-M5 ships PWA/offline support, the command menu, Settings, Agents, shared-job
+M6 ships optional encrypted sync, actual server checks, recovery codes and a
+self-hosting ZIP. M5 shipped PWA/offline support, the command menu, Settings, Agents, shared-job
 review, GPA planner, Final needed, Scale converter, Today, Tracker, import
-review, Honest Match, Parse check and Resumes. Setup/sync arrives in M6; Offers,
+review, Honest Match, Parse check and Resumes. Offers,
 Deadlines, Letters, Stories, Contacts and optional AI arrive in M7. Unbuilt
 routes remain placeholders. Read PROGRESS.md; never assume a placeholder computed.
 
@@ -35,7 +36,7 @@ oversized links say Paste instead. M4 #plan=base64url(JSON) links still work.
 | Share | app/share/#title=Engineer&url=https%3A%2F%2Fexample.test%2Fjob |
 | Agents | app/agents/#tool=gpa |
 | Settings | app/settings/#section=storage |
-| Setup (M6) | app/setup/#provider=php&endpoint=HTTPS_ENDPOINT |
+| Setup | app/setup/#provider=php&endpoint=SAME_ORIGIN_HTTPS_ENDPOINT |
 | Offers (M7) | app/offers/#selected=OFFER_UUID |
 | Deadlines (M7) | app/deadlines/#month=2026-11 |
 | Letters (M7) | app/letters/#job=JOB_UUID&resume=VERSION_UUID |
@@ -166,7 +167,22 @@ Every actionable native control also has a test hook. Navigation uses nav-ROUTE.
 
 ## Documentation
 
+Sync is optional and hidden in demo. On self-hosted HTTPS deployments, use
+app/setup/ to check the same-origin PHP or Worker server, create/unlock a vault,
+save eight recovery codes and verify encrypted write/read before turning it on.
+Sync merges timestamp/device LWW records and tombstones. Original files and
+device credentials are local. Recovery replaces keys and invalidates old codes.
+Never copy passphrases, bearer tokens or recovery codes into logs or result JSON.
+Never enable a connection or delete a server vault on behalf of an unasked user.
+Additional sync hooks: `setup-provider`, `setup-endpoint`, `setup-check`,
+`vault-action`, `vault-id`, `vault-passphrase`, `vault-confirm`,
+`vault-recovery-code`, `setup-vault`, `recovery-saved`, `recovery-continue`,
+`setup-roundtrip`, `setup-enable`, `sync-now`, `sync-disconnect`,
+`sync-delete`, `delete-vault-ack`, `sync-delete-confirm`.
+
 - [Source](https://github.com/tanzir71/waypost)
+- [Self-hosting and sync protocol](server/README.md)
+- [Self-hosting ZIP](downloads/waypost-self-host.zip)
 - [Workspace schema](schemas/workspace.json)
 - [Full docs](llms-full.txt)
 - [Human agent guide](agents/)

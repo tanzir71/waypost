@@ -10,9 +10,10 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 
 ## Build status
 
-M5 ships PWA/offline support, the command menu, Settings, Agents, shared-job
+M6 ships optional encrypted sync, actual server checks, recovery codes and a
+self-hosting ZIP. M5 shipped PWA/offline support, the command menu, Settings, Agents, shared-job
 review, GPA planner, Final needed, Scale converter, Today, Tracker, import
-review, Honest Match, Parse check and Resumes. Setup/sync arrives in M6; Offers,
+review, Honest Match, Parse check and Resumes. Offers,
 Deadlines, Letters, Stories, Contacts and optional AI arrive in M7. Unbuilt
 routes remain placeholders. Read PROGRESS.md; never assume a placeholder computed.
 
@@ -40,7 +41,7 @@ oversized links say Paste instead. M4 #plan=base64url(JSON) links still work.
 | Share | app/share/#title=Engineer&url=https%3A%2F%2Fexample.test%2Fjob |
 | Agents | app/agents/#tool=gpa |
 | Settings | app/settings/#section=storage |
-| Setup (M6) | app/setup/#provider=php&endpoint=HTTPS_ENDPOINT |
+| Setup | app/setup/#provider=php&endpoint=SAME_ORIGIN_HTTPS_ENDPOINT |
 | Offers (M7) | app/offers/#selected=OFFER_UUID |
 | Deadlines (M7) | app/deadlines/#month=2026-11 |
 | Letters (M7) | app/letters/#job=JOB_UUID&resume=VERSION_UUID |
@@ -171,7 +172,22 @@ Every actionable native control also has a test hook. Navigation uses nav-ROUTE.
 
 ## Documentation
 
+Sync is optional and hidden in demo. On self-hosted HTTPS deployments, use
+app/setup/ to check the same-origin PHP or Worker server, create/unlock a vault,
+save eight recovery codes and verify encrypted write/read before turning it on.
+Sync merges timestamp/device LWW records and tombstones. Original files and
+device credentials are local. Recovery replaces keys and invalidates old codes.
+Never copy passphrases, bearer tokens or recovery codes into logs or result JSON.
+Never enable a connection or delete a server vault on behalf of an unasked user.
+Additional sync hooks: `setup-provider`, `setup-endpoint`, `setup-check`,
+`vault-action`, `vault-id`, `vault-passphrase`, `vault-confirm`,
+`vault-recovery-code`, `setup-vault`, `recovery-saved`, `recovery-continue`,
+`setup-roundtrip`, `setup-enable`, `sync-now`, `sync-disconnect`,
+`sync-delete`, `delete-vault-ack`, `sync-delete-confirm`.
+
 - [Source](https://github.com/tanzir71/waypost)
+- [Self-hosting and sync protocol](server/README.md)
+- [Self-hosting ZIP](downloads/waypost-self-host.zip)
 - [Workspace schema](schemas/workspace.json)
 - [Full docs](llms-full.txt)
 - [Human agent guide](agents/)
@@ -192,7 +208,11 @@ private workspace. MIT licensed. Made by [tanziro.com](https://tanziro.com).
 
 ## Current release
 
-M5 adds offline support, a keyboard command palette,
+M6 adds optional encrypted sync with PHP/SQLite or a Cloudflare Worker, real
+[setup checks](https://tanzir71.github.io/waypost/app/setup/), recovery codes,
+and a [self-hosting package](downloads/waypost-self-host.zip). Read the
+[server guide](server/README.md) for deployment and the encryption protocol.
+M5 added offline support, a keyboard command palette,
 [Settings](https://tanzir71.github.io/waypost/app/settings/) and
 [agent tools](https://tanzir71.github.io/waypost/app/agents/).
 The study tools include [GPA planning](https://tanzir71.github.io/waypost/app/gpa/),
@@ -220,8 +240,7 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Offers, letters, contacts, deadlines, optional AI and encrypted sync remain
-Coming soon until M6/M7.
+Offers, letters, contacts, deadlines and optional AI remain Coming soon until M7.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -278,7 +297,8 @@ python -m http.server 4173
 Serve this directory, then open http://localhost:4173/. To test a subdirectory,
 serve its parent and open /ats-scoring/; config.js detects the deployment root.
 On GitHub Pages, mode auto becomes demo; other hosts default to pwa. Sync and AI
-remain off. M6 adds optional encrypted sync.
+remain off until explicitly enabled. Encrypted sync requires a same-origin HTTPS
+PHP or Worker deployment; GitHub Pages serves the static demo and package only.
 
 ## Offline and browser integration
 
@@ -286,7 +306,11 @@ The app registers a versioned service worker and caches the shell, every route,
 fonts, scripts, scale data and documentation. PDF/DOCX parsers are loaded and
 cached on first use; use them once online before opening those formats offline.
 Updates wait for the “New version ready — Reload” action. The offline banner
-shows when the browser reports no connection. Nothing is automatically synced.
+shows when the browser reports no connection. Nothing is synced until you opt in.
+After setup, encrypted sync follows local edits and reconnects automatically;
+Settings also offers manual sync, disconnect and server-vault deletion. Recovery
+replaces keys atomically and invalidates the old passphrase and recovery codes.
+Device keys, authentication and recovery codes never enter workspace exports.
 
 Installation is offered after a second browser session, never the first visit.
 iOS shows Share → Add to Home Screen instructions.

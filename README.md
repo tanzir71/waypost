@@ -10,7 +10,11 @@ private workspace. MIT licensed. Made by [tanziro.com](https://tanziro.com).
 
 ## Current release
 
-M5 adds offline support, a keyboard command palette,
+M6 adds optional encrypted sync with PHP/SQLite or a Cloudflare Worker, real
+[setup checks](https://tanzir71.github.io/waypost/app/setup/), recovery codes,
+and a [self-hosting package](downloads/waypost-self-host.zip). Read the
+[server guide](server/README.md) for deployment and the encryption protocol.
+M5 added offline support, a keyboard command palette,
 [Settings](https://tanzir71.github.io/waypost/app/settings/) and
 [agent tools](https://tanzir71.github.io/waypost/app/agents/).
 The study tools include [GPA planning](https://tanzir71.github.io/waypost/app/gpa/),
@@ -38,8 +42,7 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Offers, letters, contacts, deadlines, optional AI and encrypted sync remain
-Coming soon until M6/M7.
+Offers, letters, contacts, deadlines and optional AI remain Coming soon until M7.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -96,7 +99,8 @@ python -m http.server 4173
 Serve this directory, then open http://localhost:4173/. To test a subdirectory,
 serve its parent and open /ats-scoring/; config.js detects the deployment root.
 On GitHub Pages, mode auto becomes demo; other hosts default to pwa. Sync and AI
-remain off. M6 adds optional encrypted sync.
+remain off until explicitly enabled. Encrypted sync requires a same-origin HTTPS
+PHP or Worker deployment; GitHub Pages serves the static demo and package only.
 
 ## Offline and browser integration
 
@@ -104,7 +108,11 @@ The app registers a versioned service worker and caches the shell, every route,
 fonts, scripts, scale data and documentation. PDF/DOCX parsers are loaded and
 cached on first use; use them once online before opening those formats offline.
 Updates wait for the “New version ready — Reload” action. The offline banner
-shows when the browser reports no connection. Nothing is automatically synced.
+shows when the browser reports no connection. Nothing is synced until you opt in.
+After setup, encrypted sync follows local edits and reconnects automatically;
+Settings also offers manual sync, disconnect and server-vault deletion. Recovery
+replaces keys atomically and invalidates the old passphrase and recovery codes.
+Device keys, authentication and recovery codes never enter workspace exports.
 
 Installation is offered after a second browser session, never the first visit.
 iOS shows Share → Add to Home Screen instructions.

@@ -10,7 +10,7 @@ Live demo: https://tanzir71.github.io/waypost/
 | M3 Today, tracker, clipper | done | m3 | /app/, /app/tracker/, /app/import/ |
 | M4 Study tools | done | m4 | /app/gpa/, /app/finals/, /app/scales/ |
 | M5 PWA, agents, settings | done | m5 | /app/settings/, /app/agents/, /agents/, /app/share/ |
-| M6 Encrypted sync | pending | | |
+| M6 Encrypted sync | in progress | | /app/setup/, /downloads/waypost-self-host.zip |
 | M7 Offers and supporting tools | pending | | |
 
 ## M0

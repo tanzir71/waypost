@@ -1,6 +1,7 @@
 import { stores,assertRecord,settingsDefaults } from '../core/store/schema.js';
 import { migrateLegacy } from '../core/store/migration.js';
 import { sampleRemovalPlan } from '../core/store/samples.js';
+import {chooseRemote} from '../core/sync/records.js';
 
 export function uuidv7(now=Date.now()) {
   const bytes=crypto.getRandomValues(new Uint8Array(16));
@@ -36,7 +37,8 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
     const tx=db.transaction(type,'readonly');const done=complete(tx);
     const row=await request(tx.objectStore(type).get(id));await done;return row;
   };
-  const record=(data={})=>{const now=new Date().toISOString();return {...data,id:data.id??uuidv7(),createdAt:data.createdAt??now,updatedAt:now,deviceId,deleted:data.deleted??false};};
+  let lastUpdated=0;const listeners=new Set();
+  const record=(data={})=>{lastUpdated=Math.max(Date.now(),lastUpdated+1,(Date.parse(data.updatedAt)||0)+1);const now=new Date(lastUpdated).toISOString();return {...data,id:data.id??uuidv7(),createdAt:data.createdAt??now,updatedAt:now,deviceId,deleted:data.deleted??false};};
   let persistenceRequested=false;
   const putMany=async(records,{meaningful=true,guardSetting=null}={})=>{
     const types=Object.keys(records).filter(type=>records[type].length);
@@ -53,6 +55,7 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
       check.onsuccess=()=>{if(!check.result)write();};
     } else write();
     await done;
+    if(written&&(types.some(type=>!['settings','changes'].includes(type))||records.settings?.some(row=>row.key==='preferences')))for(const listener of listeners)listener({types,local:true});
     if(meaningful && !persistenceRequested) {
       persistenceRequested=true;
       try {await storage?.persist?.();} catch { /* Settings reports persistence and quota separately. */ }
@@ -86,7 +89,20 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
     } catch(error) {migrationMessage=`Migration could not finish: ${error.message} Your original data is unchanged.`;}
   }
   if(!(await setting('preferences'))) await setSetting('preferences',settingsDefaults());
-  return {all,get,record,putMany,setting,setSetting,deviceId,migrationMessage,close:()=>db.close(),
+  const applyRemoteSync=async(rows,state)=>{
+    for(const {type,record:row}of rows)assertRecord(type,row);
+    // Device credentials, probes and unknown settings must never reach the local
+    // settings index. Only the explicit preference projection crosses devices.
+    rows=rows.filter(({type,record:row})=>type!=='settings'||row.key==='preferences');
+    for(const {type,record:row}of rows)if(type==='settings')chooseRemote(null,row,type);
+    const names=[...new Set([...rows.map(row=>row.type),'settings'])],tx=db.transaction(names,'readwrite'),done=complete(tx);
+    for(const {type,record:row}of rows){const table=tx.objectStore(type),check=type==='settings'?table.index('key').get(row.key):table.get(row.id);
+      check.onsuccess=()=>{const next=chooseRemote(check.result,row,type);if(next)table.put(next);};
+    }
+    const key=`sync-state:${state.vaultId}`,check=tx.objectStore('settings').index('key').get(key);
+    check.onsuccess=()=>tx.objectStore('settings').put(record({...check.result,key,value:state}));await done;
+  };
+  return {all,get,record,putMany,setting,setSetting,applyRemoteSync,subscribe:listener=>{listeners.add(listener);return()=>listeners.delete(listener);},deviceId,migrationMessage,close:()=>{listeners.clear();db.close();},
     async save(type,data) {const row=record(data);await putMany({[type]:[row]});return row;},
     async remove(type,id) {const previous=await get(type,id);if(previous) await putMany({[type]:[record({...previous,deleted:true})]});},
     async clearSamples() {
