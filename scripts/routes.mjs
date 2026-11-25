@@ -3,7 +3,7 @@ import { routes, routePath } from '../core/routes.js';
 export const root = new URL('../', import.meta.url);
 export async function renderRoutes() {
   const shell = await readFile(new URL('app/_shell.html', root), 'utf8');
-  return routes.map(route => {
+  const rendered=routes.map(route => {
     const prefix = route.id === 'today' ? '../' : '../../';
     let group;
     const navigation = routes.filter(item => item.group).map(item => {
@@ -15,4 +15,6 @@ export async function renderRoutes() {
       jsonld: JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebApplication', name: `${route.label} — Waypost`, description: route.description, isAccessibleForFree: true, applicationCategory: 'EducationalApplication' }) };
     return { path: `${routePath(route)}index.html`, html: shell.replace(/\{\{(\w+)\}\}/g, (_, key) => values[key]) };
   });
+  const agents=rendered.find(page=>page.path==='app/agents/index.html');
+  return [...rendered,{path:'agents/index.html',html:agents.html.replaceAll('../../','../')}];
 }

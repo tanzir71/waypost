@@ -2,35 +2,39 @@ import {parseImportedJobs} from '../../core/scoring.js';
 import {applicationFields} from '../../core/tracker/index.js';
 import {createScorer} from '../worker-client.js';
 import {el,button,field,result,announce,download,copyJSON,safeURL,dialog} from '../dom.js';
+import {readLink,syncLink,shareLinkButton} from '../links.js';
 import {tierBadge,requirementRow,titleCase} from '../components/match-report.js';
 const tierOrder=['strong','good','partial','limited'];
 const reportOrder=(a,b)=>tierOrder.indexOf(a.tier)-tierOrder.indexOf(b.tier)||b.requiredScore-a.requiredScore||b.preferredBonus-a.preferredBonus;
-export async function renderMatch({store,basePath,view,actions}) {
+export async function renderMatch({store,basePath,view,actions,scorerFactory=createScorer}) {
   let jobs=(await store.all('jobs')).sort((a,b)=>(a.seedOrder??Number.MAX_SAFE_INTEGER)-(b.seedOrder??Number.MAX_SAFE_INTEGER)||a.createdAt.localeCompare(b.createdAt)),versions=(await store.all('resumeVersions')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)),reports=await store.all('matchReports');
-  const preferences=(await store.setting('preferences')).value;
-  let selectedJob=jobs.find(job=>job.id===new URLSearchParams(location.hash.slice(1)).get('job'))??jobs[0];
+  const preferences=(await store.setting('preferences')).value,linked=readLink('match');
+  if(linked.state.jdText)jobs=[{id:'link-job',title:linked.state.jdText.split('\n')[0]||'Shared job description',text:linked.state.jdText,source:'deep-link',_ephemeral:true}];
+  if(linked.state.resumeText)versions=[{id:'link-resume',label:'Unsaved link resume',text:linked.state.resumeText,_ephemeral:true}];
+  let selectedJob=jobs.find(job=>job.id===linked.state.job)??jobs[0];
   let selectedResume=versions.find(version=>version.id===preferences.defaultResumeVersionId)??versions.at(-1);
   let filter='all',busy=false,lastElapsed;
-  const scorer=createScorer();window.addEventListener('pagehide',()=>scorer.close(),{once:true});
+  const scorer=scorerFactory();window.addEventListener('pagehide',()=>scorer.close(),{once:true});
   const list=el('aside',{class:'job-list','aria-label':'Jobs'}),main=el('section',{class:'match-report','aria-label':'Requirement evidence'}),rail=el('aside',{class:'checks-rail','aria-label':'Match checks'});
   const layout=el('div',{class:'match-layout'},list,main,rail);
   const scoreButton=button('',score,'score-button',{class:'primary small'});
   const currentReport=()=>reports.find(report=>report.jobId===selectedJob?.id&&report.resumeVersionId===selectedResume?.id);
   const bestReport=job=>reports.filter(report=>report.jobId===job.id).sort(reportOrder)[0];
-  const syncFragment=()=>history.replaceState(null,'',`#job=${encodeURIComponent(selectedJob?.id??'')}&resume=${encodeURIComponent(selectedResume?.id??'')}`);
+  const linkState=()=>({...(!selectedJob?{}:selectedJob._ephemeral?{jdText:selectedJob.text}:{job:selectedJob.id}),...(!selectedResume?{}:selectedResume._ephemeral?{resumeText:selectedResume.text}:{resume:selectedResume.id})});
+  const syncFragment=()=>syncLink('match',linkState(),{basePath});
   function updateCount(elapsed=lastElapsed) {
     lastElapsed=elapsed;
     document.querySelector('.view-header .muted').textContent=`${jobs.length} jobs · ${versions.length} resume versions${elapsed!==undefined?` · scored on this device in ${Math.round(elapsed)} ms`:''}`;
     scoreButton.textContent=busy?'Scoring…':`Score ${jobs.length} jobs`;scoreButton.disabled=busy||!jobs.length||!versions.length;
   }
-  async function score() {
+  async function score({persist=true}={}) {
     if(busy||!jobs.length||!versions.length) return;
     busy=true;updateCount();const start=performance.now();
     try {
       const computed=await scorer.score(versions,jobs);
       const previous=new Map(reports.map(report=>[`${report.jobId}:${report.resumeVersionId}`,report]));
       reports=computed.map(report=>store.record({...previous.get(`${report.jobId}:${report.resumeVersionId}`),...report,sample:Boolean(jobs.find(job=>job.id===report.jobId)?.sample&&versions.find(version=>version.id===report.resumeVersionId)?.sample)}));
-      await store.putMany({matchReports:reports});
+      if(persist)await store.putMany({matchReports:reports.filter(row=>!jobs.find(job=>job.id===row.jobId)?._ephemeral&&!versions.find(version=>version.id===row.resumeVersionId)?._ephemeral)});
       const best=[...reports].sort(reportOrder)[0];
       announce(`Scoring complete: ${jobs.length} jobs, best match ${titleCase(best?.tier??'limited')}.`);
       lastElapsed=performance.now()-start;
@@ -60,8 +64,8 @@ export async function renderMatch({store,basePath,view,actions}) {
   function addToTracker() {
     if(!selectedJob)return;
     const job=selectedJob,resume=selectedResume;
-    const form=el('div',{class:'stack'},el('p',{text:`Save ${job.title} at ${job.company||'this company'} to the Saved stage with ${resume?.label??'no resume selected'}?`}),button('Save application',async()=>{
-      try {await store.save('applications',applicationFields(job,resume?.id,new Date().toISOString()));modal.close();announce('Application saved to your tracker.');}catch(error){announce(error.message);}
+    const form=el('div',{class:'stack'},el('p',{text:`Save ${job.title} at ${job.company||'this company'} to the Saved stage with ${resume?._ephemeral?'no saved resume (link text stays unsaved)':resume?.label??'no resume selected'}?`}),button('Save application',async()=>{
+      try {let savedJob=job;if(job._ephemeral){const {id,_ephemeral,...data}=job;savedJob=store.record(data);}const application=store.record(applicationFields(savedJob,resume?._ephemeral?null:resume?.id,new Date().toISOString()));await store.putMany({...(job._ephemeral?{jobs:[savedJob]}:{}),applications:[application]});modal.close();announce('Application saved to your tracker.');}catch(error){announce(error.message);}
     },'tracker-confirm-add',{class:'primary'}));const modal=dialog('Add to tracker',form);
   }
   function paint() {
@@ -117,7 +121,7 @@ export async function renderMatch({store,basePath,view,actions}) {
     report.knockouts.forEach(knockout=>{
       const id=`knockout-${selectedJob.id}-${encodeURIComponent(knockout.question)}`;
       const select=el('select',{id,'data-testid':'knockout-answer'},el('option',{value:'',text:'Not answered',selected:knockout.answered===null}),el('option',{value:'yes',text:'Requirement satisfied',selected:knockout.answered===true}),el('option',{value:'no',text:'Requirement not satisfied',selected:knockout.answered===false}));
-      select.addEventListener('change',async()=>{try{selectedJob=await store.save('jobs',{...selectedJob,knockoutAnswers:{...selectedJob.knockoutAnswers,[knockout.question]:select.value===''?null:select.value==='yes'}});jobs=jobs.map(job=>job.id===selectedJob.id?selectedJob:job);await score();}catch(error){announce(error.message);}});
+      select.addEventListener('change',async()=>{try{const patch={...selectedJob,knockoutAnswers:{...selectedJob.knockoutAnswers,[knockout.question]:select.value===''?null:select.value==='yes'}};selectedJob=selectedJob._ephemeral?patch:await store.save('jobs',patch);jobs=jobs.map(job=>job.id===selectedJob.id?selectedJob:job);await score({persist:!selectedJob._ephemeral});}catch(error){announce(error.message);}});
       knockouts.append(field(knockout.question,id,select));
     });
     rail.append(knockouts);
@@ -125,8 +129,9 @@ export async function renderMatch({store,basePath,view,actions}) {
     rail.append(el('a',{class:'button',href:`${basePath}app/letters/#job=${encodeURIComponent(selectedJob.id)}&resume=${encodeURIComponent(selectedResume.id)}`,text:'Draft letter from this report','data-testid':'draft-letter'}),button('Add to tracker',addToTracker,'add-to-tracker',{class:'ghost'}));
     result(report);
   }
-  const fragment=new URLSearchParams(location.hash.slice(1));selectedResume=versions.find(row=>row.id===fragment.get('resume'))??selectedResume;
-  actions.append(button('Import jobs',importDialog,'import-jobs',{class:'ghost small'}),button('Copy JSON',()=>currentReport()&&copyJSON(currentReport()),'copy-json',{class:'small'}),button('Download JSON',()=>currentReport()&&download('waypost-match.json',JSON.stringify(currentReport(),null,2)),'download-json',{class:'small'}),scoreButton);
+  const fragment=new URLSearchParams(location.hash.slice(1));selectedResume=versions.find(row=>row.id===linked.state.resume||row.label===linked.state.resume)??selectedResume;
+  actions.append(shareLinkButton('match',linkState,basePath),button('Import jobs',importDialog,'import-jobs',{class:'ghost small'}),button('Copy JSON',()=>currentReport()&&copyJSON(currentReport()),'copy-json',{class:'small'}),button('Download JSON',()=>currentReport()&&download('waypost-match.json',JSON.stringify(currentReport(),null,2)),'download-json',{class:'small'}),scoreButton);
   view.replaceChildren(layout);paint();
-  if(fragment.get('import')==='1')importDialog();
+  if(linked.state.import)importDialog();
+  if(linked.autorun)await score({persist:false});
 }

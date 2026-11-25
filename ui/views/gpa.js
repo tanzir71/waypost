@@ -1,17 +1,17 @@
 import {planTargetGpa,weightedGpa,solveCourseMix,retakeWhatIf,termTrend} from '../../core/gpa/index.js';
-import {encodeText,decodeText} from '../../core/links/index.js';
+import {readLink,syncLink} from '../links.js';
 import {el,button,field,result,announce,dialog} from '../dom.js';
 import {numberInput,selectInput,gradeSelect,studyPreferences,saveStudy,scaleOptions,studyActions,editScale} from '../study.js';
 export async function renderGpa({store,basePath,view,actions}) {
   document.body.classList.add('study-view');
   document.querySelector('h1').textContent='GPA target planner';
-  const preferences=await studyPreferences(store),params=new URLSearchParams(location.hash.slice(1));
-  let initial=preferences.gpa??{current:3.42,completed:64,target:3.6,remaining:64,scaleId:'bd-ugc',scope:'semester'};
-  if(params.has('plan')){try{initial={...initial,...JSON.parse(decodeText(params.get('plan'),16000))};}catch(error){announce(error.message);}}
-  if(params.has('target')&&Number.isFinite(Number(params.get('target'))))initial.target=Number(params.get('target'));
+  const preferences=await studyPreferences(store),linked=readLink('gpa');
+  const initial={current:3.42,completed:64,target:3.6,remaining:64,scaleId:'bd-ugc',scope:'semester',...preferences.gpa,...linked.state};
+  let canCompute=!linked.provided||linked.autorun;
   let scales=await scaleOptions(store),scale=scales.find(row=>row.id===initial.scaleId)??scales[0],courses=await store.all('courses'),terms=await store.all('terms'),scope=initial.scope==='degree'?'degree':'semester',output=null;
+  courses=courses.map(row=>{const lock=linked.state.locked?.find(item=>item.courseId===row.id);return lock?{...row,locked:true,targetGrade:lock.grade}:row;});
   let selectedTerm=initial.termId??terms.find(row=>row.planned)?.id??'';
-  const inputs=Object.fromEntries(['current','completed','target','remaining'].map(key=>[key,numberInput(`gpa-${key}`,initial[key],{required:true,min:key==='remaining'?0.01:0,...(['current','target'].includes(key)?{max:scale.max}:{})})]));
+  const inputs=Object.fromEntries([['current',{'data-testid':'gpa-input-current'}],['completed',{'data-testid':'gpa-input-credits'}],['target',{'data-testid':'gpa-input-target'}],['remaining',{'data-testid':'gpa-input-remaining'}]].map(([key,hook])=>[key,numberInput(`gpa-${key}`,initial[key],{required:true,min:key==='remaining'?0.01:0,...(['current','target'].includes(key)?{max:scale.max}:{}),...hook})]));
   const scaleControl=selectInput('gpa-scale',scales,scale.id),termControl=selectInput('gpa-term',[{id:'',name:'Choose a term'},...terms],selectedTerm);
   for(const option of termControl.options)if(option.value)option.textContent=terms.find(row=>row.id===option.value)?.label??option.textContent;
   const fields=el('form',{class:'study-fields gpa-fields'},field('Current CGPA','gpa-current',inputs.current),field('Credits completed','gpa-completed',inputs.completed),field('Target CGPA','gpa-target',inputs.target),field('Credits remaining','gpa-remaining',inputs.remaining));
@@ -21,13 +21,14 @@ export async function renderGpa({store,basePath,view,actions}) {
   const mix=el('section',{class:'card stack'},el('div',{class:'section-title'},el('h2',{text:'This semester · course mix'}),switches),courseRows,mixNote,el('div',{class:'actions'},field('Term','gpa-term',termControl),button('Add course',()=>editCourse(),'gpa-add-course',{class:'small'}),button('Add term',()=>editTerm(),'gpa-add-term',{class:'ghost small'})));
   left.append(mix);view.replaceChildren(el('div',{class:'study-layout'},left,right));
   const planInput=()=>({...Object.fromEntries(Object.entries(inputs).map(([key,node])=>[key,node.value===''?NaN:Number(node.value)])),scale});
-  const config=()=>({...Object.fromEntries(Object.entries(inputs).map(([key,node])=>[key,Number(node.value)])),scaleId:scale.id,termId:selectedTerm,scope});
+  const config=()=>({...Object.fromEntries(Object.entries(inputs).map(([key,node])=>[key,Number(node.value)])),scaleId:scale.id,termId:selectedTerm,scope,locked:rowsInScope().filter(row=>row.locked).map(row=>({courseId:row.id,grade:row.targetGrade??row.grade}))});
   const rowsInScope=()=>courses.filter(row=>(row.scaleId??'bd-ugc')===scale.id&&(scope==='degree'?terms.find(term=>term.id===row.termId)?.planned:row.termId===selectedTerm));
-  const share=()=>{const url=new URL(location.href);url.hash=new URLSearchParams({plan:encodeText(JSON.stringify(config()))});return url.href;};
+  const share=()=>syncLink('gpa',config(),{basePath});
   async function persist(){await saveStudy(store,'gpa',config());if(output?.plan){await store.setSetting('gpa-result',output.plan);}history.replaceState(null,'',share());}
-  async function solve(){try{if(!fields.reportValidity())return;const plan=planTargetGpa(planInput()),rows=rowsInScope();if(!rows.length){paint();await persist();announce('GPA target saved. Add courses to solve a grade mix.');return;}const solved=solveCourseMix({courses:rows,needed:plan.needed,scale});const saved=solved.courses.map(row=>store.record({...row}));await store.putMany({courses:saved});courses=await store.all('courses');paint();await persist();announce(solved.reachable?'Course mix solved and saved.':'Target cannot be reached with these course locks. The maximum mix is shown.');}catch(error){announce(error.message);}}
+  async function solve(){try{if(!fields.reportValidity())return;canCompute=true;const plan=planTargetGpa(planInput()),rows=rowsInScope();if(!rows.length){paint();await persist();announce('GPA target saved. Add courses to solve a grade mix.');return;}const solved=solveCourseMix({courses:rows,needed:plan.needed,scale});const saved=solved.courses.map(row=>store.record({...row}));await store.putMany({courses:saved});courses=await store.all('courses');paint();await persist();announce(solved.reachable?'Course mix solved and saved.':'Target cannot be reached with these course locks. The maximum mix is shown.');}catch(error){announce(error.message);}}
   studyActions(actions,{getValue:()=>output,getLink:share,compute:solve,label:'Solve',testid:'gpa-solve'});
   function paint(){
+    if(!canCompute){summary.replaceChildren(el('p',{text:'Inputs prefilled. Choose Solve to calculate your target and mix.'}));output=null;result(null);paintScale();return;}
     let plan;try{plan=planTargetGpa(planInput());}catch(error){summary.replaceChildren(el('p',{text:error.message}));output={error:error.message};result(output);return;}
     const rows=rowsInScope();let weighted;try{weighted=weightedGpa(rows,scale);}catch(error){weighted={average:null,credits:0};announce(error.message);}
     const trendRows=termTrend(terms.filter(term=>(term.scaleId??'bd-ugc')===scale.id),courses.filter(row=>(row.scaleId??'bd-ugc')===scale.id),scale);
@@ -61,9 +62,9 @@ export async function renderGpa({store,basePath,view,actions}) {
   function paintScale(){
     scalePanel.replaceChildren(el('h2',{text:'Grade scale'}),field('Active scale','gpa-scale',scaleControl),el('table',{},el('caption',{class:'sr-only',text:scale.name}),el('thead',{class:'sr-only'},el('tr',{},['Letter','Points','Percentage band'].map(text=>el('th',{scope:'col',text})))),el('tbody',{},scale.grades.map(row=>el('tr',{'data-testid':'grade-scale-row'},el('th',{scope:'row',text:row.letter}),el('td',{class:'wp-num',text:row.points.toFixed(2)}),el('td',{class:'wp-num',text:row.min===undefined?'—':`${row.min}–${row.max}`}))))),el('p',{class:'muted',text:scale.source??'Custom scale'}),button('Edit scale',()=>editScale({store,scale,onSave:async saved=>{scales=await scaleOptions(store);scaleControl.append(el('option',{value:saved.id,text:saved.name}));scaleControl.value=saved.id;changeScale();}}),'gpa-edit-scale',{class:'ghost small'}));
   }
-  function changeScale(){scale=scales.find(row=>row.id===scaleControl.value);inputs.current.max=scale.max;inputs.target.max=scale.max;paint();}
+  function changeScale(){canCompute=true;scale=scales.find(row=>row.id===scaleControl.value);inputs.current.max=scale.max;inputs.target.max=scale.max;paint();}
   scaleControl.addEventListener('change',changeScale);termControl.addEventListener('change',()=>{selectedTerm=termControl.value;paint();});
-  fields.addEventListener('input',paint);
+  fields.addEventListener('input',()=>{canCompute=true;paint();share();});
   function editTerm(){const label=el('input',{id:'term-label',required:true,'data-testid':'term-label'}),planned=el('input',{id:'term-planned',type:'checkbox',checked:true,'data-testid':'term-planned'}),reported=numberInput('term-reported','',{max:scale.max});const form=el('form',{class:'stack'},field('Term label','term-label',label),field('Planned term','term-planned',planned),field('Reported term GPA (optional for completed terms)','term-reported',reported),el('button',{type:'submit',class:'primary',text:'Save term','data-testid':'term-save'}));const modal=dialog('Add term',form);form.addEventListener('submit',async event=>{event.preventDefault();try{const saved=await store.save('terms',{label:label.value.trim(),order:terms.length+1,planned:planned.checked,scaleId:scale.id,...(!planned.checked&&reported.value!==''?{reportedGpa:Number(reported.value)}:{})});terms=await store.all('terms');selectedTerm=saved.id;termControl.append(el('option',{value:saved.id,text:saved.label,selected:true}));paint();modal.close();}catch(error){announce(error.message);}});}
   function editCourse(course={}){
     if(!terms.length){editTerm();return;}
@@ -73,5 +74,6 @@ export async function renderGpa({store,basePath,view,actions}) {
     const modal=dialog(course.id?'Edit course':'Add course',form);
     form.addEventListener('submit',async event=>{event.preventDefault();try{await store.save('courses',{...course,name:name.value.trim(),credits:Number(credits.value),termId:term.value,scaleId:scale.id,grade:earned.value||null,targetGrade:target.value,difficulty:Number(difficulty.value),locked:locked.checked,sample:false});courses=await store.all('courses');if(!selectedTerm){selectedTerm=term.value;termControl.value=selectedTerm;}modal.close();paint();}catch(error){announce(error.message);}});
   }
+  if(linked.autorun){try{const plan=planTargetGpa(planInput()),rows=rowsInScope();if(rows.length){const solved=solveCourseMix({courses:rows,needed:plan.needed,scale});courses=courses.map(row=>solved.courses.find(item=>item.id===row.id)??row);}announce('GPA calculation complete. Nothing was saved.');}catch(error){announce(error.message);}}
   paint();
 }

@@ -1,3 +1,4 @@
+import {shareLinkButton} from '../links.js';
 import {stages,applicationFields,moveApplication,updateApplication,sortApplications,followupApplications} from '../../core/tracker/index.js';
 import {el,button,field,result,announce,dialog,safeURL,download,copyJSON,localDay} from '../dom.js';
 import {tierBadge,titleCase} from '../components/match-report.js';
@@ -87,7 +88,7 @@ export async function renderTracker({store,basePath,view,actions}) {
   const boardButton=button('Board',()=>{mode='board';boardButton.setAttribute('aria-pressed','true');tableButton.setAttribute('aria-pressed','false');fragment();paint();},'tracker-board',{'aria-pressed':mode==='board'});
   const tableButton=button('Table',()=>{mode='table';boardButton.setAttribute('aria-pressed','false');tableButton.setAttribute('aria-pressed','true');fragment();paint();},'tracker-table-view',{'aria-pressed':mode==='table'});
   filterSelect.addEventListener('change',()=>{filter=filterSelect.value;fragment();paint();});
-  actions.append(el('div',{class:'segmented'},boardButton,tableButton),field('Filter stage','tracker-filter',filterSelect),button('Add job',()=>edit(),'tracker-add',{class:'primary small'}),button('Copy JSON',()=>copyJSON({jobs,applications}),'tracker-copy',{class:'small'}),button('Download JSON',()=>download('waypost-applications.json',JSON.stringify({jobs,applications},null,2)),'tracker-download',{class:'small'}));
+  actions.append(shareLinkButton('tracker',()=>({view:mode,stage:filter,...(selectedId?{selected:selectedId}:{})}),basePath),el('div',{class:'segmented'},boardButton,tableButton),field('Filter stage','tracker-filter',filterSelect),button('Add job',()=>edit(),'tracker-add',{class:'primary small'}),button('Copy JSON',()=>copyJSON({jobs,applications}),'tracker-copy',{class:'small'}),button('Download JSON',()=>download('waypost-applications.json',JSON.stringify({jobs,applications},null,2)),'tracker-download',{class:'small'}));
   const keyboard=event=>{
     if(event.ctrlKey||event.metaKey||event.altKey||event.target.closest('input,textarea,select,[contenteditable="true"],dialog'))return;
     if(event.key.toLowerCase()==='n'){event.preventDefault();edit();}

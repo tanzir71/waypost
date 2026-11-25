@@ -1,17 +1,21 @@
+import {readLink,syncLink,shareLinkButton} from '../links.js';
 import {analyzeText} from '../../core/parse/index.js';
 import {readResumeFile} from '../read-file.js';
 import {el,button,field,result,announce,download,copyJSON} from '../dom.js';
 export async function renderParse({store,basePath,view,actions}) {
   let versions=(await store.all('resumeVersions')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
-  const params=new URLSearchParams(location.hash.slice(1));
-  let version=versions.find(row=>row.id===params.get('resume'))??versions.at(-1);
+  const linked=readLink('parse');
+  let version=versions.find(row=>row.id===linked.state.resume||row.label===linked.state.resume)??versions.at(-1);
   let report=version?.parse??(version?analyzeText(version.text):null);
   const content=el('div',{class:'parse-layout'}),textPanel=el('section',{class:'parse-text-panel','aria-label':'Extracted resume text'}),rail=el('aside',{class:'checks-rail','aria-label':'Parse checks'});
   const select=el('select',{id:'parse-version','data-testid':'parse-version'});
   versions.forEach(row=>select.append(el('option',{value:row.id,text:row.label,selected:row.id===version?.id})));
   const file=el('input',{id:'parse-file',type:'file',accept:'.pdf,.docx,.txt,.json','data-testid':'parse-upload'});
   const pasted=el('textarea',{id:'parse-paste',rows:5,'data-testid':'parse-paste'});
-  const form=el('form',{'aria-label':'Check resume text',class:'stack'},field('Choose a saved resume','parse-version',select),field('Upload a resume','parse-file',file),el('details',{},el('summary',{text:'Or paste resume text','data-testid':'parse-paste-open'}),field('Resume text','parse-paste',pasted),button('Check pasted text',()=>{version=null;report=analyzeText(pasted.value);paint();},'parse-paste-check')));
+  if(linked.state.text!==undefined){pasted.value=linked.state.text;version=null;report=linked.autorun?analyzeText(pasted.value):null;}
+  const sourceState=()=>version?{resume:version.id}:{text:pasted.value};
+  pasted.addEventListener('input',()=>syncLink('parse',sourceState(),{basePath}));
+  const form=el('form',{'aria-label':'Check resume text',class:'stack'},field('Choose a saved resume','parse-version',select),field('Upload a resume','parse-file',file),el('details',{},el('summary',{text:'Or paste resume text','data-testid':'parse-paste-open'}),field('Resume text','parse-paste',pasted),button('Check pasted text',()=>{version=null;report=analyzeText(pasted.value);syncLink('parse',sourceState(),{basePath});paint();},'parse-paste-check')));
   form.addEventListener('submit',event=>event.preventDefault());
   function paint() {
     textPanel.replaceChildren();rail.replaceChildren();
@@ -35,6 +39,6 @@ export async function renderParse({store,basePath,view,actions}) {
     try {announce('Extracting text on this device…');const parsed=await readResumeFile(upload,{basePath});version=null;report=parsed.parse;paint();announce('Parse check complete. The extracted text is ready.');}
     catch(error){announce(error.message);}
   });
-  actions.append(button('Download plain text',()=>report&&download('waypost-resume.txt',report.text,'text/plain'),'parse-download'),button('Copy JSON',()=>report&&copyJSON(report),'parse-copy'),button('Download JSON',()=>report&&download('waypost-parse.json',JSON.stringify(report,null,2)),'parse-download-json'));
+  actions.append(shareLinkButton('parse',sourceState,basePath),button('Download plain text',()=>report&&download('waypost-resume.txt',report.text,'text/plain'),'parse-download'),button('Copy JSON',()=>report&&copyJSON(report),'parse-copy'),button('Download JSON',()=>report&&download('waypost-parse.json',JSON.stringify(report,null,2)),'parse-download-json'));
   content.append(textPanel,rail);view.replaceChildren(el('details',{class:'view-inputs',open:!report},el('summary',{text:'Choose or upload a resume','data-testid':'parse-source-open'}),form),content);paint();
 }

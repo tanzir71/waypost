@@ -1,0 +1,19 @@
+{
+  "id":"./","name":"Waypost","short_name":"Waypost",
+  "description":"A private toolkit for students and jobseekers.",
+  "start_url":"./app/","scope":"./","display":"standalone",
+  "theme_color":"#F5F4F0","background_color":"#F5F4F0",
+  "icons":[
+    {"src":"./assets/icons/pwa-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"./assets/icons/pwa-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"./assets/icons/pwa-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ],
+  "shortcuts":[
+    {"name":"Honest Match","url":"./app/match/","icons":[{"src":"./assets/icons/pwa-192.png","sizes":"192x192"}]},
+    {"name":"GPA planner","url":"./app/gpa/","icons":[{"src":"./assets/icons/pwa-192.png","sizes":"192x192"}]},
+    {"name":"Tracker","url":"./app/tracker/","icons":[{"src":"./assets/icons/pwa-192.png","sizes":"192x192"}]}
+  ],
+  "file_handlers":[{"action":"./app/import/","accept":{"application/pdf":[".pdf"],"application/vnd.openxmlformats-officedocument.wordprocessingml.document":[".docx"],"application/json":[".json"]}}],
+  "share_target":{"action":"./app/share/","method":"GET","enctype":"application/x-www-form-urlencoded","params":{"title":"title","text":"text","url":"url"}},
+  "launch_handler":{"client_mode":"focus-existing"}
+}

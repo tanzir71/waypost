@@ -59,7 +59,7 @@ export function validateInstitutionTable(table) {
   }
   return table;
 }
-export function convertGradeScale({scale,value,cohort=null,institution=null}) {
+export function convertGradeScale({scale,value,cohort=null,institution=null,to=null}) {
   validateScale(scale);number(value,'CGPA',0,scale.max);
   const percentage=bandPercentage(value,scale),ects=ectsGrade(cohort);
   const output=[
@@ -71,5 +71,8 @@ export function convertGradeScale({scale,value,cohort=null,institution=null}) {
   ];
   if(institution){validateInstitutionTable(institution);const row=institution.rows.find(row=>value>=row.min&&value<=row.max);output.push({system:institution.system,value:row?.value??null,method:'Institution table',confidence:'medium',note:row?`User-supplied table: ${institution.name}. Verify its source and currency.`:`No inclusive range covers ${value} in ${institution.name}.`});}
   else output.push({system:'Institution conversion',value:null,method:'Per-school mapping',confidence:'low',note:'Supply an institution table to calculate its equivalence.'});
-  return output;
+  if(!to)return output;
+  const names={'us-4':'US 4.0',percentage:'Percentage','in-10':'Indian 10-point CGPA',uk:'UK classification',ects:'ECTS grade',institution:institution?.system??'Institution conversion'};
+  if(!Array.isArray(to)||to.some(id=>!names[id]&&!output.some(row=>row.system===id)))throw new Error('Unknown destination scale.');
+  return output.filter(row=>to.some(id=>(names[id]??id)===row.system));
 }

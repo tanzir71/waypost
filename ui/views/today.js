@@ -1,5 +1,6 @@
 import {todaySummary} from '../../core/today/index.js';
-import {el,button,result,announce,copyJSON,localDay} from '../dom.js';
+import {el,button,result,announce,copyJSON,localDay,download} from '../dom.js';
+import {shareLinkButton} from '../links.js';
 import {tierBadge,titleCase} from '../components/match-report.js';
 import {exportWorkspace} from '../workspace-export.js';
 export async function renderToday({store,basePath,view,actions}) {
@@ -42,6 +43,6 @@ export async function renderToday({store,basePath,view,actions}) {
     workspace.append(el('p',{class:'muted',text:`Stored in this browser (IndexedDB${persistent?', persistent':''}). ${usage?.usage!==undefined?`${(usage.usage/1024/1024).toFixed(1)} MB used.`:'Storage estimate unavailable.'}`}));
   }catch{workspace.append(el('p',{class:'muted',text:'Stored in this browser. Storage estimates are unavailable.'}));}
   workspace.append(el('div',{class:'actions'},button('Export JSON',()=>exportWorkspace(store).catch(error=>announce(error.message)),'export-button'),...(window.WAYPOST_CONFIG.mode==='demo'?[]:[el('a',{href:`${basePath}app/setup/`,text:'Set up sync','data-testid':'today-setup'})])));right.append(workspace);
-  actions.append(el('a',{class:'button ghost small',href:`${basePath}app/import/`,text:'Import clipper file','data-testid':'today-import'}),el('a',{class:'button primary small',href:`${basePath}app/match/#import=1`,text:'Paste a job','data-testid':'today-paste'}),button('Copy JSON',()=>copyJSON(summary),'today-copy',{class:'small'}));
+  actions.append(shareLinkButton('today',()=>({}),basePath),el('a',{class:'button ghost small',href:`${basePath}app/import/`,text:'Import clipper file','data-testid':'today-import'}),el('a',{class:'button primary small',href:`${basePath}app/match/#import=1`,text:'Paste a job','data-testid':'today-paste'}),button('Copy JSON',()=>copyJSON(summary),'today-copy',{class:'small'}),button('Download JSON',()=>download('waypost-today.json',JSON.stringify(summary,null,2)),'today-download-json',{class:'ghost small'}));
   view.replaceChildren(layout);result(summary);
 }

@@ -1,10 +1,10 @@
 import {openWorkspace} from './store.js';
 import {announce,dialog,el} from './dom.js';
-import {routes,routePath} from '../core/routes.js';
+import {installPalette} from './palette.js';
+import {initializePwa} from './pwa.js';
+import {initializeAgentTools} from './agent-tools.js';
+import {setTheme} from './theme.js';
 const config = window.WAYPOST_CONFIG;
-function openTools(){dialog('Choose a tool',el('nav',{'aria-label':'All tools',class:'stack'},routes.filter(route=>route.group).map(route=>el('a',{class:'button secondary',href:config.basePath+routePath(route),text:route.label,'data-testid':`tool-menu-${route.id}`}))));}
-document.querySelector('#mobile-more').addEventListener('click',openTools);
-document.querySelector('#mobile-search').addEventListener('click',openTools);
 for(const link of document.querySelectorAll('.bottom-nav a'))if(link.pathname===location.pathname)link.setAttribute('aria-current','page');
 if (config.mode === 'demo') {
   document.querySelector('#demo-banner').hidden = false;
@@ -23,22 +23,18 @@ try {
 } catch(error) {announce(error.message);}
 const theme=document.querySelector('#app-theme');
 theme.value=document.documentElement.dataset.theme??'system';
-theme.addEventListener('change',async()=>{
-  if(theme.value==='system') delete document.documentElement.dataset.theme;
-  else document.documentElement.dataset.theme=theme.value;
-  try {localStorage.setItem('waypost:theme',theme.value);} catch { /* The theme still applies to this visit. */ }
-  if(store) {
-    try {const preferences=(await store.setting('preferences')).value;await store.setSetting('preferences',{...preferences,theme:theme.value});} catch(error) {announce(error.message);}
-  }
-});
-const views={today:()=>import('./views/today.js'),tracker:()=>import('./views/tracker.js'),import:()=>import('./views/import.js'),match:()=>import('./views/match.js'),parse:()=>import('./views/parse.js'),resumes:()=>import('./views/resumes.js'),gpa:()=>import('./views/gpa.js'),finals:()=>import('./views/finals.js'),scales:()=>import('./views/scales.js')};
+theme.addEventListener('change',()=>setTheme(theme.value,store).catch(error=>announce(error.message)));
+const views={today:()=>import('./views/today.js'),tracker:()=>import('./views/tracker.js'),import:()=>import('./views/import.js'),match:()=>import('./views/match.js'),parse:()=>import('./views/parse.js'),resumes:()=>import('./views/resumes.js'),gpa:()=>import('./views/gpa.js'),finals:()=>import('./views/finals.js'),scales:()=>import('./views/scales.js'),settings:()=>import('./views/settings.js'),agents:()=>import('./views/agents.js'),share:()=>import('./views/share.js')};
+installPalette({store,basePath:config.basePath});
+const agentStatus=store?await initializeAgentTools(store):{supported:false,tools:[]};
+initializePwa({...config,onFiles:async files=>{if(!store){announce('Allow local storage before importing opened files.');return;}const content=el('div'),modal=dialog('Review opened files',content),{renderImport}=await import('./views/import.js');await renderImport({store,basePath:config.basePath,view:content,actions:el('div'),files});modal.classList.add('file-launch-dialog');}});
 async function mount() {
   const route=document.body.dataset.route;
   if(!store||!views[route]) return;
   const module=await views[route]();
   const render=module[`render${route[0].toUpperCase()+route.slice(1)}`];
   const actions=document.querySelector('#view-actions');actions.replaceChildren();
-  await render({store,basePath:config.basePath,view:document.querySelector('#view'),actions});
+  await render({store,basePath:config.basePath,view:document.querySelector('#view'),actions,agentStatus});
 }
 try {await mount();} catch(error) {announce(`This view could not load: ${error.message}`);}
 document.querySelector('#clear-demo').addEventListener('click',async()=>{

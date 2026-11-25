@@ -3,8 +3,11 @@ import {parseImportedJobs} from '../../core/scoring.js';
 import {applicationFields} from '../../core/tracker/index.js';
 import {readResumeFile,saveOriginal} from '../read-file.js';
 import {createScorer} from '../worker-client.js';
-import {el,button,field,result,announce,safeURL} from '../dom.js';
-export async function renderImport({store,basePath,view,actions}) {
+import {el,button,field,result,announce,safeURL,copyJSON,download} from '../dom.js';
+import {shareLinkButton} from '../links.js';
+import {reviewWorkspaceImport} from '../workspace-import.js';
+export async function renderImport({store,basePath,view,actions,files=[]}) {
+  actions.append(shareLinkButton('import',()=>({paste:true}),basePath),button('Copy JSON',()=>copyJSON(JSON.parse(document.querySelector('#result-data').textContent)),'import-copy-json',{class:'small'}),button('Download JSON',()=>download('waypost-import-review.json',document.querySelector('#result-data').textContent),'import-download-json',{class:'small'}));
   let pending=[],resumeUpload=null,previewResume=null,busy=false;
   const versions=await store.all('resumeVersions'),preview=el('section',{class:'import-preview stack','aria-label':'Review import'});
   const upload=el('input',{id:'import-file',type:'file',accept:'.json,.txt,.pdf,.docx','data-testid':'import-file'}),paste=el('textarea',{id:'import-text',rows:8,'data-testid':'import-text'});
@@ -46,16 +49,19 @@ export async function renderImport({store,basePath,view,actions}) {
     preview.append(el('div',{class:'actions'},button('Save jobs',()=>save(),'import-confirm-save',{class:'primary',disabled:busy}),button('Save & score',()=>save({score:true}),'import-confirm-score',{disabled:busy||!versions.length}),button('Save to tracker',()=>save({tracker:true}),'import-confirm-tracker',{disabled:busy})),...(!versions.length?[el('p',{class:'muted',text:'Add a resume in Resumes before using Save & score.'})]:[]));
     result({pendingJobs:pending});
   }
-  upload.addEventListener('change',async()=>{
-    const file=upload.files[0];if(!file)return;
+  async function readFile(file){
+    if(!file)return;
     try {message.textContent='Reading on this device…';
       if(/\.(pdf|docx)$/i.test(file.name)){previewResume=await readResumeFile(file,{basePath});resumeUpload=file;pending=[];paint();}
-      else {if(file.size>5*1024*1024)throw new Error('Use an export smaller than 5 MB.');const text=await file.text();if(file.name.toLowerCase().endsWith('.json')){const value=JSON.parse(text);if(value.basics){previewResume=await readResumeFile(file,{basePath});resumeUpload=file;pending=[];paint();}else review(value,'file');}else review({jobs:parseImportedJobs(text,'file')},'file');}
+      else {if(file.size>50*1024*1024)throw new Error('Use a workspace smaller than 50 MB, or a job export smaller than 5 MB.');const text=await file.text();if(file.name.toLowerCase().endsWith('.json')){const value=JSON.parse(text);if(value.format==='waypost-workspace'){await reviewWorkspaceImport(store,value);return;}if(file.size>5*1024*1024)throw new Error('Use a job export smaller than 5 MB.');if(value.basics){previewResume=await readResumeFile(file,{basePath});resumeUpload=file;pending=[];paint();}else review(value,'file');}else {if(file.size>5*1024*1024)throw new Error('Use a job export smaller than 5 MB.');review({jobs:parseImportedJobs(text,'file')},'file');}}
       message.textContent='Ready to review.';
     }catch(error){message.textContent=error.message;}
-  });
+  }
+  upload.addEventListener('change',()=>readFile(upload.files[0]));
   view.replaceChildren(form,preview,message);paint();
   const payload=new URLSearchParams(location.hash.slice(1)).get('job');
   if(payload)try{review(decodeJobExport(payload));}catch(error){message.textContent=`Import not saved: ${error.message}`;}
+  if(files.length){const select=el('select',{id:'opened-file','data-testid':'opened-file'},files.map((file,index)=>el('option',{value:index,text:file.name})));select.addEventListener('change',()=>readFile(files[Number(select.value)]));form.prepend(field('Opened files','opened-file',select));await readFile(files[0]);}
+  if(new URLSearchParams(location.hash.slice(1)).get('paste')==='1'){form.querySelector('details').open=true;paste.focus();}
 }
 async function createScorerOnce(versions,jobs){const scorer=createScorer();try{return await scorer.score(versions,jobs);}finally{scorer.close();}}

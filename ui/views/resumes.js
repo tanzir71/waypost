@@ -1,3 +1,4 @@
+import {readLink,syncLink,shareLinkButton} from '../links.js';
 import {diffText,medianTier,matchingEffect} from '../../core/diff/index.js';
 import {responseRates} from '../../core/tracker/index.js';
 import {analyzeText,jsonResumeFromText} from '../../core/parse/index.js';
@@ -7,8 +8,9 @@ import {tierBadge,titleCase} from '../components/match-report.js';
 export async function renderResumes({store,basePath,view,actions}) {
   let versions=(await store.all('resumeVersions')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));
   const reports=await store.all('matchReports'),applications=await store.all('applications');
-  let selected=versions.find(row=>row.id===new URLSearchParams(location.hash.slice(1)).get('resume'))??versions.at(-1);
-  let mode='side';
+  const linked=readLink('resumes');
+  let selected=versions.find(row=>row.id===linked.state.resume||row.label===linked.state.resume)??versions.at(-1);
+  let mode=linked.state.mode==='inline'?'inline':'side';
   const list=el('aside',{class:'resume-list','aria-label':'Resume versions'}),main=el('section',{class:'resume-detail'});
   const layout=el('div',{class:'resumes-layout'},list,main);
   async function reload(id) {versions=(await store.all('resumeVersions')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));selected=versions.find(row=>row.id===id)??versions.at(-1);paint();}
@@ -45,6 +47,7 @@ export async function renderResumes({store,basePath,view,actions}) {
     node.append(text);return node;
   }
   function paint() {
+    if(selected)syncLink('resumes',{resume:selected.id,mode},{basePath});
     list.replaceChildren();main.replaceChildren();
     for(const version of [...versions].reverse()) {
       const median=medianTier(reports.filter(report=>report.resumeVersionId===version.id)),usage=status(version);
@@ -71,6 +74,6 @@ export async function renderResumes({store,basePath,view,actions}) {
   }
   const upload=el('input',{id:'resume-file',type:'file',accept:'.pdf,.docx,.txt,.json','data-testid':'resume-import',onchange:event=>uploadFile(event.target.files[0])});
   const uploader=el('details',{class:'view-inputs'},el('summary',{text:'Import PDF, DOCX, TXT or JSON Resume','data-testid':'resume-import-expand'}),field('Resume file','resume-file',upload));
-  actions.append(button('Import resume',()=>{uploader.open=true;upload.focus();},'resume-import-open',{class:'ghost'}),button('New version',()=>newVersion(),'resume-new',{class:'primary'}));
+  actions.append(shareLinkButton('resumes',()=>({resume:selected?.id??'',mode}),basePath),button('Copy JSON',async()=>{try{await navigator.clipboard.writeText(document.querySelector('#result-data').textContent);announce('Resume result JSON copied.');}catch{announce('Use Download JSON to save the result.');}},'resumes-copy-json',{class:'ghost'}),button('Download JSON',()=>download('waypost-resume-result.json',document.querySelector('#result-data').textContent),'resumes-download-json',{class:'ghost'}),button('Import resume',()=>{uploader.open=true;upload.focus();},'resume-import-open',{class:'ghost'}),button('New version',()=>newVersion(),'resume-new',{class:'primary'}));
   view.replaceChildren(uploader,layout);paint();
 }

@@ -2,7 +2,7 @@ import {readFile} from 'node:fs/promises';
 import {files} from './files.mjs';
 export const root=new URL('../',import.meta.url);
 export async function extensionFiles() {
-  const sources=(await files(root)).filter(path=>/^(core\/(?:match|import|links)\/|core\/scoring\.js$|core\/store\/schema\.js$|schemas\/(?:workspace|job-export)\.json$|data\/aliases\.json$|data\/skills\/|assets\/fonts\/|assets\/icons\/logo(?:-dark)?\.svg$|ui\/(?:tokens|base|match)\.css$|ui\/dom\.js$|ui\/components\/match-report\.js$)/.test(path));
+  const sources=(await files(root)).filter(path=>/^(core\/(?:match|import)\/|core\/links\/index\.js$|core\/scoring\.js$|core\/store\/schema\.js$|schemas\/(?:workspace|job-export)\.json$|data\/aliases\.json$|data\/skills\/|assets\/fonts\/|assets\/icons\/logo(?:-dark)?\.svg$|ui\/(?:tokens|base|match)\.css$|ui\/dom\.js$|ui\/components\/match-report\.js$)/.test(path));
   const result=[];
   for(const path of sources) {
     const original=await readFile(new URL(path,root));

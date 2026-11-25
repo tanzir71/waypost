@@ -21,7 +21,7 @@ test('study views compute shared fixtures, persist results and categories, and e
     await renderGpa({store,basePath:'/waypost/',...dom});assert.equal(dom.readResult().plan.neededDisplay,3.78);assert.equal(dom.readResult().mix.average.toFixed(2),'3.81');assert.equal(dom.find('course-row').length,5);accessible(dom);
     await dom.find('gpa-solve')[0].fire('click');assert.equal((await store.setting('gpa-result')).value.neededDisplay,3.78);assert.ok(dom.readResult().mix.average>=3.78);
   }finally{dom.restore();}
-  const course=(await store.all('courses')).find(row=>row.categories);dom=fakeDOM(`/waypost/app/finals/#course=${course.id}`);
+  const course=(await store.all('courses')).find(row=>row.categories);dom=fakeDOM(`/waypost/app/finals/#course=${course.id}&autorun=1`);
   try{
     await renderFinals({store,basePath:'/waypost/',...dom});const needed=dom.readResult().neededDisplay;assert.equal(needed,74.3); // Solver upgraded the linked Algorithms target to A+.
     assert.equal(dom.find('final-ladder-row').length,10);accessible(dom);

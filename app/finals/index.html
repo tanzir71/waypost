@@ -6,6 +6,10 @@
   <title>Final needed — Waypost</title>
   <meta name="description" content="Calculate the final exam result needed for every grade.">
   <link rel="icon" href="../../assets/icons/logo.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../../assets/icons/pwa-192.png">
+  <meta name="theme-color" content="#F5F4F0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0C0C0E" media="(prefers-color-scheme: dark)">
   <link rel="stylesheet" href="../../ui/tokens.css">
   <link rel="stylesheet" href="../../ui/base.css">
   <link rel="stylesheet" href="../../ui/match.css">
@@ -41,11 +45,12 @@
       <div class="actions"><button type="button" id="clear-demo" data-testid="clear-demo">Clear sample data</button><a href="https://github.com/tanzir71/waypost/archive/refs/heads/main.zip" data-testid="download-source">Download zip</a><a href="https://github.com/tanzir71/waypost/fork" data-testid="fork-repository">Fork</a></div>
     </div>
     <main id="content">
+      <div id="pwa-notices"></div>
       <header class="view-header"><div><h1>Final needed</h1><p class="muted">Calculate the final exam result needed for every grade.</p></div><div id="view-actions" class="actions"></div></header>
       <div id="view"><section class="empty-state"><p class="eyebrow">Coming soon</p><h2>Your next step starts here.</h2><p>This tool is being built. Follow the milestone progress to see what's ready.</p><a class="button secondary" href="https://github.com/tanzir71/waypost/blob/main/PROGRESS.md" data-testid="view-progress">View progress</a></section></div>
       <p id="announcement" role="status" aria-live="polite"></p>
     </main>
-    <footer class="app-footer"><a href="https://tanziro.com" data-testid="footer-credit">Made by tanziro.com</a><div class="appearance-control"><label for="app-theme">Appearance</label><select id="app-theme" data-testid="theme-select"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></div></footer>
+    <footer class="app-footer"><a href="https://tanziro.com" data-testid="footer-credit">Made by tanziro.com</a><div class="appearance-control"><label for="app-theme">Appearance</label><select id="app-theme" data-testid="theme-select" data-theme-control><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></div></footer>
   </div>
   <nav class="bottom-nav" aria-label="Mobile tools">
     <a href="../../app/" data-testid="mobile-today"><img src="../../assets/icons/home.svg" width="20" height="20" alt="" aria-hidden="true"><span>Today</span></a>
