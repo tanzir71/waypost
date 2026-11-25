@@ -1,0 +1,4 @@
+{
+  "pdfjs": { "package": "pdfjs-dist", "version": "6.5.438", "license": "Apache-2.0", "source": "https://github.com/mozilla/pdf.js", "registry": "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-6.5.438.tgz" },
+  "mammoth": { "package": "mammoth", "version": "1.13.0", "license": "BSD-2-Clause", "source": "https://github.com/mwilliamson/mammoth.js", "registry": "https://registry.npmjs.org/mammoth/-/mammoth-1.13.0.tgz" }
+}

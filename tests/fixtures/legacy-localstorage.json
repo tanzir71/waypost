@@ -1,0 +1,6 @@
+{
+  "resumes": [{"id":"legacy-resume","name":"Backend CV","text":"Alex Morgan\nEXPERIENCE\nEngineer 2020–2025\nBuilt Go services with PostgreSQL databases."}],
+  "jobs": [{"id":"legacy-job","title":"Backend Engineer","text":"Backend Engineer\nRequired: Go services; PostgreSQL databases","source":"pasted"}],
+  "results": [{"jobId":"legacy-job","bestResumeId":"legacy-resume","bestScore":72,"matches":[]}],
+  "clusters": [], "lastRunAt":"2026-05-20T12:00:00.000Z"
+}

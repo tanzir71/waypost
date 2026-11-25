@@ -6,7 +6,7 @@ Live demo: https://tanzir71.github.io/waypost/
 |---|---|---|---|
 | M0 Rename, scaffold, Pages | done | m0 | / and /app/ |
 | M1 Landing | done | m1 | / |
-| M2 Match, parse, resumes | pending | | |
+| M2 Match, parse, resumes | in progress | | /app/match/, /app/parse/, /app/resumes/ |
 | M3 Today, tracker, clipper | pending | | |
 | M4 Study tools | pending | | |
 | M5 PWA, agents, settings | pending | | |

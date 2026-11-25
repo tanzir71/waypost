@@ -1,0 +1,11 @@
+{
+  "source": "ATS-Scoring frame 8:1188: Strong, 9 of 11 required, 3 of 4 preferred",
+  "resume": {
+    "id": "northwind-v3", "label": "v3 · Backend", "parentId": "northwind-v2",
+    "text": "Ayesha Rahman\nayesha@example.test · London\nSUMMARY\nBackend engineer building payment systems in Go.\nEXPERIENCE\nNorthwind · Backend Engineer · 2019–2025\n• Moved billing to Go services, building distributed systems; cut infrastructure cost 22%.\n• Sharded Postgres to 4 TB, p95 latency down 38%.\n• Supported production services.\n• Designed REST API contracts for 14 services.\n• Automated testing and continuous integration for billing services.\n• Used Git for code reviews and collaborative delivery.\n• Led system design reviews and wrote architecture documentation.\n• Led 9 incident reviews and security reviews for payment services.\nEDUCATION\nBSc Computer Science\nLEADERSHIP\n• Mentored 4 engineers through promotion.\nPROJECTS\n• Built Docker containers and Kubernetes deployments for a ledger service."
+  },
+  "job": {
+    "id": "northwind-job", "title": "Senior Backend Engineer", "company": "Northwind", "location": "London, hybrid", "source": "clipper",
+    "text": "Senior Backend Engineer\nRequired:\n5+ years building distributed systems in Go or Rust\nPostgreSQL at scale\nOn-call ownership for production services\nExperience with event streaming (Kafka or Pulsar)\nDesign REST API contracts\nAutomated testing\nContinuous integration\nGit code reviews\nSystem design reviews\nArchitecture documentation\nIncident reviews and security reviews\nPreferred:\nMentoring engineers\nTerraform\nDocker containers\nKubernetes deployments"
+  }
+}

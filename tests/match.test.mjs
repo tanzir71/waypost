@@ -42,3 +42,12 @@ test('empty job has no invented evidence and stuffing is flagged',()=>{
   const report=matchResume({text:'EXPERIENCE\nGo Go Go Go Go Go'},{text:'Required: Go'});
   assert.ok(report.stuffingWarnings.length);
 });
+test('application questions about authorization and minimum years remain separate knockouts',()=>{
+  const job={text:'Required:\nGo\nAre you authorized to work in the UK?\nDo you have 5 years of experience?'};
+  const report=matchResume({text:'EXPERIENCE\nBuilt Go services.'},job,{now:'2026-11-25'});
+  assert.equal(report.required.length,1);assert.equal(report.knockouts.length,2);
+});
+test('a skill list cannot borrow unrelated context to become a met requirement',()=>{
+  const report=matchResume({text:'SKILLS\nPostgreSQL distributed systems\nEXPERIENCE\nBuilt systems.'},{text:'Required:\nPostgreSQL distributed systems'});
+  assert.equal(report.required[0].status,'partial');
+});

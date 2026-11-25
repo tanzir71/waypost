@@ -157,9 +157,9 @@ function formatImportedJobText({ title, company, url, body }) {
   return body ? `${header.join('\n')}\n\n${body}` : header.join('\n');
 }
 
-export function scoreResumeAgainstJob(resume, job) {
-  const resumeAttributes = new Set(extractAttributes(resume.text));
-  const jobAttributes = extractAttributes(job.text);
+export function scoreResumeAgainstJob(resume, job, prepared = {}) {
+  const resumeAttributes = prepared.resumeAttributes ?? new Set(extractAttributes(resume.text));
+  const jobAttributes = prepared.jobAttributes ?? extractAttributes(job.text);
   const matchedAttributes = jobAttributes.filter((attribute) => resumeAttributes.has(attribute));
   const missingAttributes = jobAttributes.filter((attribute) => !resumeAttributes.has(attribute));
   const coverage = jobAttributes.length === 0 ? 0 : matchedAttributes.length / jobAttributes.length;
