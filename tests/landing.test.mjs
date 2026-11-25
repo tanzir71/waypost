@@ -52,8 +52,9 @@ test('landing advertises only shipped tools and includes dated comparison source
   }
   assert.match(html,/type="module" src="\.\/ui\/landing\.js"/);
   assert.match(html,/Live demo — runs in this page/);
-  assert.match(html,/id="hero-file"[^>]*accept="\.txt,text\/plain"/);
-  for(const card of html.matchAll(/<a class="tool-card[^\"]*"[^>]*>([\s\S]*?)<\/a>/g)) assert.match(card[1],/>Soon</);
+  assert.match(html,/id="hero-file"[^>]*accept="\.pdf,\.docx,\.txt,\.json"/);
+  const shipped=['tool-match','tool-parse','tool-resumes'];
+  for(const card of html.matchAll(/<a class="tool-card[^\"]*"([^>]*)>([\s\S]*?)<\/a>/g)) assert.match(card[2],shipped.some(id=>card[1].includes(id))?/>MVP</:/>Soon</);
   const structured=[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(match=>JSON.parse(match[1]));
   assert.equal(structured.find(item=>item['@type']==='SoftwareApplication').offers.price,'0');
   assert.equal(structured.find(item=>item['@type']==='FAQPage').mainEntity.length,3);

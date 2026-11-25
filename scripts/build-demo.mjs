@@ -13,7 +13,7 @@ const jobs=[fixture.job,...[['ledgerline','Platform Engineer','Ledgerline'],['ar
   {id:'orchard',title:'Full Stack Developer',company:'Orchard',source:'paste',text:'Full Stack Developer\nRequired:\nJavaScript\nTypeScript\nReact\nPostgreSQL\nPreferred:\nGo'},
   {id:'harbor',title:'Product Designer',company:'Harbor',source:'paste',text:'Product Designer\nRequired:\nUser research\nDesign systems\nAccessibility\nPreferred:\nProject management'},
   {id:'atlas',title:'Data Analyst',company:'Atlas',source:'paste',text:'Data Analyst\nRequired:\nPython\nSQL\nData analysis\nPreferred:\nMachine learning'}
-].map(job=>({...job,createdAt:'2026-11-21T12:00:00.000Z',updatedAt:'2026-11-21T12:00:00.000Z'}));
+].map((job,seedOrder)=>({...job,seedOrder,createdAt:'2026-11-21T12:00:00.000Z',updatedAt:'2026-11-21T12:00:00.000Z'}));
 const matchReports=scoreBatch(resumeVersions,jobs,{now:'2026-11-25'}).map((report,i)=>({...report,id:`sample-report-${i}`,createdAt:'2026-11-25T00:00:00.000Z',updatedAt:'2026-11-25T00:00:00.000Z'}));
 await writeFile(new URL('data/workspace-demo.json',root),JSON.stringify({resumeVersions,jobs,matchReports},null,2)+'\n');
 console.log('Generated sample workspace: 12 jobs, 3 versions, 36 evidence reports.');

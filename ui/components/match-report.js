@@ -26,9 +26,11 @@ export function requirementRow(row,basePath) {
   evidence.className='evidence';
   evidence.textContent=row.evidence ? `“${row.evidence.line}” — ${titleCase(row.evidence.section.toLowerCase())}, line ${row.evidence.lineIndex}` : row.note;
   body.append(requirement,evidence);
+  for(const supporting of row.supportingEvidence??[]) body.append(Object.assign(document.createElement('p'),{className:'evidence',textContent:`Also: “${supporting.line}” — ${titleCase(supporting.section.toLowerCase())}, line ${supporting.lineIndex}`}));
   if(row.status==='partial' && row.evidence) {
     const note=document.createElement('p');note.className='evidence';note.textContent=row.note;body.append(note);
   }
+  if(row.status==='missing' && row.clusterPrevalence) body.append(Object.assign(document.createElement('p'),{className:'evidence',textContent:`Appears in ${row.clusterPrevalence.count} of ${row.clusterPrevalence.of} similar jobs. Add only if true.`}));
   const kind=document.createElement('span');kind.className='kind-tag';kind.textContent=titleCase(row.kind);
   article.append(indicator,body,kind);
   return article;

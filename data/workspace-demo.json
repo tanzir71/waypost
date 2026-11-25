@@ -587,6 +587,7 @@
       "location": "London, hybrid",
       "source": "clipper",
       "text": "Senior Backend Engineer\nRequired:\n5+ years building distributed systems in Go or Rust\nPostgreSQL at scale\nOn-call ownership for production services\nExperience with event streaming (Kafka or Pulsar)\nDesign REST API contracts\nAutomated testing\nContinuous integration\nGit code reviews\nSystem design reviews\nArchitecture documentation\nIncident reviews and security reviews\nPreferred:\nMentoring engineers\nTerraform\nDocker containers\nKubernetes deployments",
+      "seedOrder": 0,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -597,6 +598,7 @@
       "location": "London, hybrid",
       "source": "clipper",
       "text": "Platform Engineer\nRequired:\n5+ years building distributed systems in Go or Rust\nPostgreSQL at scale\nOn-call ownership for production services\nExperience with event streaming (Kafka or Pulsar)\nDesign REST API contracts\nAutomated testing\nContinuous integration\nGit code reviews\nSystem design reviews\nArchitecture documentation\nIncident reviews and security reviews\nPreferred:\nMentoring engineers\nTerraform\nDocker containers\nKubernetes deployments",
+      "seedOrder": 1,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -607,6 +609,7 @@
       "location": "London, hybrid",
       "source": "clipper",
       "text": "Backend Engineer II\nRequired:\n5+ years building distributed systems in Go or Rust\nPostgreSQL at scale\nOn-call ownership for production services\nExperience with event streaming (Kafka or Pulsar)\nDesign REST API contracts\nAutomated testing\nContinuous integration\nGit code reviews\nSystem design reviews\nArchitecture documentation\nIncident reviews and security reviews\nPreferred:\nMentoring engineers\nTerraform\nDocker containers\nKubernetes deployments",
+      "seedOrder": 2,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -617,6 +620,7 @@
       "location": "London, hybrid",
       "source": "clipper",
       "text": "Software Engineer, Data\nRequired:\n5+ years building distributed systems in Go or Rust\nPostgreSQL at scale\nOn-call ownership for production services\nExperience with event streaming (Kafka or Pulsar)\nDesign REST API contracts\nAutomated testing\nContinuous integration\nGit code reviews\nSystem design reviews\nArchitecture documentation\nIncident reviews and security reviews\nPreferred:\nMentoring engineers\nTerraform\nDocker containers\nKubernetes deployments",
+      "seedOrder": 3,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -627,6 +631,7 @@
       "location": "London, hybrid",
       "source": "clipper",
       "text": "SRE\nRequired:\n5+ years building distributed systems in Go or Rust\nPostgreSQL at scale\nOn-call ownership for production services\nExperience with event streaming (Kafka or Pulsar)\nDesign REST API contracts\nAutomated testing\nContinuous integration\nGit code reviews\nSystem design reviews\nArchitecture documentation\nIncident reviews and security reviews\nPreferred:\nMentoring engineers\nTerraform\nDocker containers\nKubernetes deployments",
+      "seedOrder": 4,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -637,6 +642,7 @@
       "location": "London, hybrid",
       "source": "clipper",
       "text": "Backend Engineer\nRequired:\n5+ years building distributed systems in Go or Rust\nPostgreSQL at scale\nOn-call ownership for production services\nExperience with event streaming (Kafka or Pulsar)\nDesign REST API contracts\nAutomated testing\nContinuous integration\nGit code reviews\nSystem design reviews\nArchitecture documentation\nIncident reviews and security reviews\nPreferred:\nMentoring engineers\nInfrastructure documentation\nDocker containers\nKubernetes deployments",
+      "seedOrder": 5,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -647,6 +653,7 @@
       "location": "London, hybrid",
       "source": "clipper",
       "text": "Payments Engineer\nRequired:\n5+ years building distributed systems in Go or Rust\nPostgreSQL at scale\nOn-call ownership for production services\nExperience with event streaming (message queues)\nDesign REST API contracts\nAutomated testing\nContinuous integration\nGit code reviews\nSystem design reviews\nArchitecture documentation\nIncident reviews and security reviews\nPreferred:\nMentoring engineers\nInfrastructure documentation\nDocker containers\nKubernetes deployments",
+      "seedOrder": 6,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -657,6 +664,7 @@
       "location": "London, hybrid",
       "source": "clipper",
       "text": "Senior Software Engineer\nRequired:\n5+ years building distributed systems in Go or Rust\nPostgreSQL at scale\nOn-call ownership for production services\nExperience with event streaming (message queues)\nDesign REST API contracts\nAutomated testing\nContinuous integration\nGit code reviews\nSystem design reviews\nArchitecture documentation\nIncident reviews and security reviews\nPreferred:\nMentoring engineers\nInfrastructure documentation\nDocker containers\nKubernetes deployments",
+      "seedOrder": 7,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -666,6 +674,7 @@
       "company": "Halcyon",
       "source": "paste",
       "text": "Graduate SWE\nRequired:\nGit\nREST API\nTesting\nPreferred:\nGo",
+      "seedOrder": 8,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -675,6 +684,7 @@
       "company": "Orchard",
       "source": "paste",
       "text": "Full Stack Developer\nRequired:\nJavaScript\nTypeScript\nReact\nPostgreSQL\nPreferred:\nGo",
+      "seedOrder": 9,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -684,6 +694,7 @@
       "company": "Harbor",
       "source": "paste",
       "text": "Product Designer\nRequired:\nUser research\nDesign systems\nAccessibility\nPreferred:\nProject management",
+      "seedOrder": 10,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     },
@@ -693,6 +704,7 @@
       "company": "Atlas",
       "source": "paste",
       "text": "Data Analyst\nRequired:\nPython\nSQL\nData analysis\nPreferred:\nMachine learning",
+      "seedOrder": 11,
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     }

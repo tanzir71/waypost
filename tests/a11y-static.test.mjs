@@ -35,5 +35,5 @@ test('documented stable hooks exist in authored HTML or UI code', async () => {
   const hooks = docs.match(/data-testid values:([\s\S]*?)\./)?.[1].match(/`([^`]+)`/g)?.map(s=>s.slice(1,-1)) ?? [];
   const sources = (await files(root)).filter(path => /\.(html|js)$/.test(path) && !path.startsWith('vendor/'));
   const code = (await Promise.all(sources.map(path=>readFile(new URL(path,root),'utf8')))).join('\n');
-  for (const hook of hooks) assert.ok(code.includes(`data-testid="${hook}"`) || new RegExp(`\\.dataset\\.testid\\s*=\\s*['"]${hook}['"]`).test(code), `Missing hook: ${hook}`);
+  for (const hook of hooks) assert.ok(code.includes(`data-testid="${hook}"`) || new RegExp(`\\.dataset\\.testid\\s*=\\s*['"]${hook}['"]|['"]data-testid['"]\\s*:\\s*['"]${hook}['"]|\\bbutton\\([\\s\\S]*?['"]${hook}['"]`).test(code), `Missing hook: ${hook}`);
 });

@@ -5,11 +5,29 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 
 ## Build status
 
-M1: the landing page has a working matching demo using core/match/index.js.
-Paste the job description, select a sample or upload a .txt resume, then use
-Match. Results include exact resume evidence and can be copied or downloaded as
-JSON. PDF and DOCX uploads arrive in M2. Tool routes are placeholders until their
-milestone ships. Read PROGRESS.md; do not assume a placeholder computed a result.
+M2: Honest Match, Parse check and Resumes are available. Other tool routes are
+placeholders until their milestone ships. The landing demo uses the same core.
+Read PROGRESS.md; do not assume a placeholder computed a result.
+
+## Matching and resumes
+
+- app/resumes/: import a PDF, DOCX, TXT or JSON Resume, or create a text version.
+  Versions stay in IndexedDB; original uploads use OPFS where available. Select a
+  version to read a line and word diff and its effect on common scored jobs.
+- app/match/: Import jobs accepts pasted descriptions separated by ---, plus TXT
+  and JSON Clipper exports. Score N jobs runs every active resume × job in a
+  module worker. Tier filters show counts. Select a job and resume version to
+  expose the full evidence report in #result-data. Knockout answers are explicit;
+  no answer is inferred from the resume. Failed knockouts cap the tier at Partial.
+- app/parse/: choose a saved resume or upload a file. The text is shown in reading
+  order with section labels and issue highlights. Download plain text saves the
+  exact extracted text. Font/Unicode checks disclose when metadata is unavailable.
+- Saved selection links: app/match/#job=JOB_UUID&resume=VERSION_UUID,
+  app/parse/#resume=VERSION_UUID and app/resumes/#resume=VERSION_UUID.
+  The full input/autorun deep-link grammar is added in M5.
+- JSON copy/download is available for reports. Matching evidence is original
+  resume text and line positions, with additional supporting lines when needed.
+  Cluster gaps include count and total jobs; application questions remain separate.
 
 ## Routes
 
@@ -25,9 +43,13 @@ Every tool page has a JSON script #result-data, initially null. The landing
 demo updates it on each match. Native controls have accessible names.
 data-testid values: `result-data`, `open-search`, `clear-demo`, `footer-credit`,
 `hero-jd`, `hero-resume`, `hero-upload`, `score-button`, `requirement-row`,
-`copy-json`, `download-json`. Requirement rows have data-status met/partial/missing.
+`copy-json`, `download-json`, `job-row`, `resume-tab`, `resume-version`,
+`parse-line`, `parse-check`, `diff-row`. Requirement rows have data-status met/partial/missing.
 Navigation uses nav-<route>. Read the JSON for all requirements; the hero shows
 representative rows. No employer hiring outcome is predicted by the tier.
+Every actionable native control also has its own test hook. Native names are the
+preferred way to operate the UI. Add to tracker asks for in-page confirmation.
+That application record is saved locally; the tracker view ships in M3.
 
 ## Documentation
 

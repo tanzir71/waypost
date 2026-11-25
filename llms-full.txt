@@ -10,11 +10,29 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 
 ## Build status
 
-M1: the landing page has a working matching demo using core/match/index.js.
-Paste the job description, select a sample or upload a .txt resume, then use
-Match. Results include exact resume evidence and can be copied or downloaded as
-JSON. PDF and DOCX uploads arrive in M2. Tool routes are placeholders until their
-milestone ships. Read PROGRESS.md; do not assume a placeholder computed a result.
+M2: Honest Match, Parse check and Resumes are available. Other tool routes are
+placeholders until their milestone ships. The landing demo uses the same core.
+Read PROGRESS.md; do not assume a placeholder computed a result.
+
+## Matching and resumes
+
+- app/resumes/: import a PDF, DOCX, TXT or JSON Resume, or create a text version.
+  Versions stay in IndexedDB; original uploads use OPFS where available. Select a
+  version to read a line and word diff and its effect on common scored jobs.
+- app/match/: Import jobs accepts pasted descriptions separated by ---, plus TXT
+  and JSON Clipper exports. Score N jobs runs every active resume × job in a
+  module worker. Tier filters show counts. Select a job and resume version to
+  expose the full evidence report in #result-data. Knockout answers are explicit;
+  no answer is inferred from the resume. Failed knockouts cap the tier at Partial.
+- app/parse/: choose a saved resume or upload a file. The text is shown in reading
+  order with section labels and issue highlights. Download plain text saves the
+  exact extracted text. Font/Unicode checks disclose when metadata is unavailable.
+- Saved selection links: app/match/#job=JOB_UUID&resume=VERSION_UUID,
+  app/parse/#resume=VERSION_UUID and app/resumes/#resume=VERSION_UUID.
+  The full input/autorun deep-link grammar is added in M5.
+- JSON copy/download is available for reports. Matching evidence is original
+  resume text and line positions, with additional supporting lines when needed.
+  Cluster gaps include count and total jobs; application questions remain separate.
 
 ## Routes
 
@@ -30,9 +48,13 @@ Every tool page has a JSON script #result-data, initially null. The landing
 demo updates it on each match. Native controls have accessible names.
 data-testid values: `result-data`, `open-search`, `clear-demo`, `footer-credit`,
 `hero-jd`, `hero-resume`, `hero-upload`, `score-button`, `requirement-row`,
-`copy-json`, `download-json`. Requirement rows have data-status met/partial/missing.
+`copy-json`, `download-json`, `job-row`, `resume-tab`, `resume-version`,
+`parse-line`, `parse-check`, `diff-row`. Requirement rows have data-status met/partial/missing.
 Navigation uses nav-<route>. Read the JSON for all requirements; the hero shows
 representative rows. No employer hiring outcome is predicted by the tier.
+Every actionable native control also has its own test hook. Native names are the
+preferred way to operate the UI. Add to tracker asks for in-page confirmation.
+That application record is saved locally; the tracker view ships in M3.
 
 ## Documentation
 
@@ -55,18 +77,36 @@ private workspace. MIT licensed. Made by [tanziro.com](https://tanziro.com).
 
 ## Current release
 
-M1 includes the desktop and mobile landing page and a real, local matching demo.
-Paste a job description, use the sample or upload a plain text resume, then match
-to see requirement evidence and export JSON. Choose Light, Dark, or System in
-the footer. Other app tools are explicitly marked Coming soon until implemented.
-PDF and DOCX imports arrive with M2. Pricing sources are dated in
-data/competitors.json. The original scoring and clipper helpers remain tested.
+M2 ships [Honest Match](https://tanzir71.github.io/waypost/app/match/),
+[Parse check](https://tanzir71.github.io/waypost/app/parse/), and
+[Resumes](https://tanzir71.github.io/waypost/app/resumes/), alongside the landing
+demo. Paste or bulk-import jobs, compare every saved resume in a worker, and
+inspect exact evidence, knockout questions and gaps across similar jobs.
+
+Import PDF, DOCX, plain text or JSON Resume files. Parse check shows reading
+order, sections and flagged lines, with an exact plain-text download. Resume
+versions include side-by-side and inline diffs, word highlights, median match
+tiers, and an effect comparison over common scored jobs. The landing demo also
+accepts these file formats. PDF.js and Mammoth load only when needed, from
+vendor/ on this origin; licenses and a SHA-256 file manifest are included.
+
+Workspace records live in IndexedDB (`waypost`, version 1); original uploads live
+in OPFS where supported. If original-file storage is unavailable, the app says
+so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
+recomputing evidence reports and keeping the original localStorage backup.
+Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
+personal records. Light, Dark and System appearance are available in the footer.
+Study, tracking and supporting tools remain Coming soon until their milestones.
+Pricing sources are dated in data/competitors.json.
 
 The shared match engine uses BM25 evidence retrieval, skill aliases, Porter
 stemming, dated tenure with overlap merging, and separate knockout questions.
 Required coverage determines the match with a conservative preferred bonus of
 at most 0.02 (below the handover's 0.05 cap). Keyword coverage is secondary.
-The hero fixture reproduces Good: four met, one partial, one missing.
+The hero fixture reproduces Good: four met, one partial, one missing. The Northwind
+fixture reproduces Strong: nine of eleven required and three of four preferred
+met. The 50-jobs × 5-versions benchmark must finish below 300 ms in Node.
+The vocabulary includes an attributed O*NET® subset; see data/skills/LICENSE.md.
 
 ## Run and verify
 
@@ -91,7 +131,10 @@ npm dependencies, CDNs, analytics, or GitHub Actions. Static Pages deploys the
 root of main directly, including .nojekyll. HANDOVER.md defines M0–M7.
 
 Fonts and their OFL licenses live in assets/fonts/. Figma design tokens are
-copied unchanged from handover/tokens.css to ui/tokens.css.
+copied unchanged from handover/tokens.css to ui/tokens.css. `npm run check` also
+checks JavaScript syntax, pinned parser integrity, static accessibility, local
+asset references and route synchronization. Tests use Node and contract fakes;
+no browser automation, network, npm installs or owner QA is required.
 
 
 --- HANDOVER.md ---

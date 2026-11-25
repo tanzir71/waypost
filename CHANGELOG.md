@@ -1,5 +1,19 @@
 # Changelog
 
+## M2 — 2026-11-25
+
+- Shipped the Honest Match workspace with worker scoring, bulk import, tier
+  filters, resume tabs, requirement evidence, peer gaps and knockout handling.
+- Shipped Parse check and Resumes: local PDF/DOCX/TXT/JSON Resume imports,
+  reading-order and content checks, exact text export, line and word diffs,
+  common-job effects and resume usage counts.
+- Added IndexedDB workspace storage, UUIDv7 metadata, one-time demo seeding,
+  backed-up legacy migration, persistence requests and OPFS original uploads.
+- Vendored and integrity-pinned PDF.js and Mammoth, with local supporting files
+  and licenses. Added an attributed O*NET® skill-label subset.
+- Northwind and hero fixtures pass. All 44 tests and static checks pass; the
+  250-report benchmark remains below 300 ms.
+
 ## M1 — 2026-11-25
 
 - Built the landing page from the desktop and mobile Figma frames, with light,

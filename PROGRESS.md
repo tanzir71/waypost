@@ -6,7 +6,7 @@ Live demo: https://tanzir71.github.io/waypost/
 |---|---|---|---|
 | M0 Rename, scaffold, Pages | done | m0 | / and /app/ |
 | M1 Landing | done | m1 | / |
-| M2 Match, parse, resumes | in progress | | /app/match/, /app/parse/, /app/resumes/ |
+| M2 Match, parse, resumes | done | m2 | /app/match/, /app/parse/, /app/resumes/ |
 | M3 Today, tracker, clipper | pending | | |
 | M4 Study tools | pending | | |
 | M5 PWA, agents, settings | pending | | |
@@ -45,6 +45,34 @@ Live demo: https://tanzir71.github.io/waypost/
   references at /waypost/, route synchronization, no-external-resource scan,
   JavaScript syntax and git whitespace checks. No browser or owner QA required.
 - Pages URL: https://tanzir71.github.io/waypost/
+
+## M2
+
+- Added the complete Honest Match workspace: bulk import, tier filters, per-resume
+  tabs, required/preferred evidence, checks, peer gaps, explicit knockout answers,
+  JSON exports, letter handoff and confirmed tracker saves. Scoring runs in a
+  module worker with prepared resume/job indexes and the same pure core as the hero.
+- Northwind fixture passes: Strong, 9/11 required and 3/4 preferred met, six dated
+  years. The 50 jobs × 5 versions benchmark runs below the 300 ms gate.
+- Parse check shows exact extracted text, sections, reading-order warnings, contact
+  placement, dates, glyphs, Unicode quality, length and quantified bullets. Font
+  embedding is labelled unverified when the parser does not expose that metadata.
+- Resumes supports PDF, DOCX, TXT and JSON Resume imports; editable text versions;
+  side-by-side/inline line and word diffs; common-job matching effects; default
+  resume selection; and truthful sent/reply counts from application history.
+- Added IndexedDB v1, UUIDv7 record metadata, atomic one-time demo seeding and
+  legacy migration, tombstones, change records, persistence requests, OPFS originals
+  where supported, and a clear storage-failure message. Legacy scores are archived
+  and recomputed as evidence reports; the localStorage original and backup remain.
+- Vendored PDF.js 6.5.438 and Mammoth 1.13.0 with supporting local resources,
+  licenses, version records and SHA-256 integrity checks. Parsers load on upload.
+- Added an attributed O*NET® 31.0 Software Skills label subset under CC BY 4.0.
+- Updated the landing widget's uploads, shipped tool labels, docs, privacy,
+  appearance control and route pages. No external runtime requests were added.
+- Validation: 44 Node tests (including storage/parser contract fakes), route and
+  base-path checks, static accessibility, no-external-resource scan, JavaScript
+  syntax and vendor integrity. All pass without browser automation or owner QA.
+- Pages URLs: /app/match/, /app/parse/, /app/resumes/ under the live demo root.
 
 ## Owner decisions (non-blocking)
 

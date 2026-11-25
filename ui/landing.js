@@ -1,5 +1,6 @@
 import { matchResume,summarizeReport } from '../core/match/index.js';
 import { renderMatchReport } from './components/match-report.js';
+import { readResumeFile } from './read-file.js';
 
 const basePath=window.WAYPOST_CONFIG.basePath;
 const form=document.querySelector('#hero-match');
@@ -13,7 +14,7 @@ function compute() {
   const text=input.value.trim();
   if(!text) { input.setCustomValidity('Paste a job description to match.'); input.reportValidity(); return; }
   input.setCustomValidity('');
-  lastReport=matchResume(resume,{id:'hero-job',title:text.split('\n')[0],text});
+  lastReport=matchResume(resume,{id:'hero-job',title:text.split('\n')[0],text},{now:new Date().toISOString().slice(0,10)});
   document.querySelector('#result-data').textContent=JSON.stringify(lastReport);
   renderMatchReport(document.querySelector('#hero-result'),lastReport,basePath,{preview:true});
   const counts=summarizeReport(lastReport);
@@ -40,10 +41,10 @@ upload.addEventListener('change',async()=>{
   try {
     const file=upload.files[0];
     if(!file) return;
-    if(file.size>2*1024*1024) throw new Error('Use a text resume smaller than 2 MB.');
-    const text=await file.text();
-    if(!text.trim()) throw new Error('The resume is empty. Choose a text file with your resume content.');
-    resume={id:'uploaded-hero-resume',label:file.name,text};
+    announce.textContent='Extracting the resume on this device…';
+    const parsed=await readResumeFile(file,{basePath});
+    if(!parsed.text.trim()) throw new Error('No readable text was extracted. Choose another file or use a text resume.');
+    resume={id:'uploaded-hero-resume',label:file.name,text:parsed.text,parse:parsed.parse};
     submit.disabled=false;
     const option=select.querySelector('[value="upload"]');option.textContent=file.name;
     announce.textContent=`${file.name} is ready. Select Match to compare.`;

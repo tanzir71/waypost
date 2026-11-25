@@ -37,4 +37,12 @@ table { width: 100%; border-collapse: collapse; text-align: left; font: var(--wp
 th, td { padding: 12px; }
 th { font-weight: 500; color: var(--wp-ink-2); }
 tbody tr { border-top: 1px solid var(--wp-line); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.section-title { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.section-title p { margin-top: 4px; font: var(--wp-body-s); }
+dialog { border: 0; border-radius: var(--wp-radius-lg); background: var(--wp-surface); color: var(--wp-ink); width: min(640px, calc(100% - 32px)); max-height: calc(100dvh - 48px); padding: 24px; }
+dialog::backdrop { background: var(--wp-inverse); opacity: .5; }
+.dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+summary { cursor: pointer; font: var(--wp-label-m); }
+details > summary { margin-bottom: 12px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
