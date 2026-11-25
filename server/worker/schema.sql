@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS vaults (
  wrapped_keys TEXT NOT NULL, key_version INTEGER NOT NULL DEFAULT 1,
  cursor INTEGER NOT NULL DEFAULT 0, size_bytes INTEGER NOT NULL DEFAULT 0,
  max_bytes INTEGER NOT NULL DEFAULT 209715200, created_at TEXT NOT NULL,
- applied_rotation TEXT, CHECK(size_bytes >= 0 AND size_bytes <= max_bytes)
+ applied_rotation TEXT, calendar_version INTEGER NOT NULL DEFAULT 0, calendar_mutation TEXT,
+ CHECK(size_bytes >= 0 AND size_bytes <= max_bytes)
 );
 CREATE TABLE IF NOT EXISTS changes (
  vault_id TEXT NOT NULL REFERENCES vaults(vault_id) ON DELETE CASCADE,
@@ -15,6 +16,11 @@ CREATE TABLE IF NOT EXISTS changes (
 );
 CREATE INDEX IF NOT EXISTS changes_cursor ON changes(vault_id,seq);
 CREATE TABLE IF NOT EXISTS rate_limits (bucket TEXT PRIMARY KEY, window INTEGER NOT NULL, count INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS calendar_feeds (
+ vault_id TEXT PRIMARY KEY REFERENCES vaults(vault_id) ON DELETE CASCADE,
+ token_hash TEXT NOT NULL UNIQUE, nonce TEXT NOT NULL, version INTEGER NOT NULL,
+ ics TEXT NOT NULL, content_hash TEXT NOT NULL, updated_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS rotations (
  vault_id TEXT PRIMARY KEY REFERENCES vaults(vault_id) ON DELETE CASCADE,
  rotation_id TEXT NOT NULL UNIQUE, base_cursor INTEGER NOT NULL, key_version INTEGER NOT NULL,

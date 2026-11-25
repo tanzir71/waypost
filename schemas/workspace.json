@@ -153,7 +153,8 @@
         "grade": { "type": ["string", "null"], "description": "Earned letter, null if in progress" },
         "targetGrade": { "type": ["string", "null"] }, "locked": { "type": "boolean" }, "difficulty": { "type": "integer", "minimum": 1, "maximum": 3, "default": 1 },
         "retakeOf": { "type": ["string", "null"] },
-        "categories": { "type": "array", "items": { "type": "object", "properties": { "name": { "type": "string" }, "weight": { "type": "number" }, "score": { "type": ["number", "null"] } } } }
+          "examDate": { "type": ["string", "null"], "format": "date" }, "publish": { "type": "boolean", "default": false },
+          "categories": { "type": "array", "items": { "type": "object", "properties": { "name": { "type": "string" }, "weight": { "type": "number" }, "score": { "type": ["number", "null"] } } } }
       }
     },
     "scale": {

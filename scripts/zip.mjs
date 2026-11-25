@@ -4,7 +4,7 @@ import {files} from './files.mjs';
 const root=new URL('../',import.meta.url);
 const runtime=/^(?:app|agents|assets|core|ui|data|schemas|vendor|privacy)\//;
 const top=new Set(['index.html','config.js','favicon.svg','manifest.webmanifest','sw.js','precache.js','robots.txt','.nojekyll','.htaccess','README.md','PROGRESS.md','CHANGELOG.md','LICENSE','llms.txt','llms-full.txt','HANDOVER.md']);
-const server=new Set(['server/README.md','server/php/sync.php','server/php/library.php','server/php/config.sample.php','server/php/.htaccess','server/worker/index.js','server/worker/repository.js','server/worker/schema.sql','server/worker/wrangler.toml.sample']);
+const server=new Set(['server/README.md','server/php/sync.php','server/php/ics.php','server/php/library.php','server/php/calendar-library.php','server/php/config.sample.php','server/php/.htaccess','server/worker/index.js','server/worker/calendar.js','server/worker/repository.js','server/worker/schema.sql','server/worker/migrations/002-calendar.sql','server/worker/wrangler.toml.sample']);
 export const unsafePath=path=>/(?:^|\/)(?:config\.php|\.env[^/]*|\.dev\.vars|wrangler\.toml)$|\.(?:sqlite(?:-.*)?|db|log|bak)$|(?:^|\/)\.git(?:\/|$)/i.test(path)||path.includes('..')||path.includes('\\');
 export async function deploymentFiles(){return (await files(root)).filter(path=>(runtime.test(path)||top.has(path)||server.has(path))&&!path.endsWith('/_shell.html')).filter(path=>{if(unsafePath(path))throw new Error(`Private deployment file refused: ${path}`);return true;}).sort();}
 const table=Uint32Array.from({length:256},(_,n)=>{for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;return n>>>0;});

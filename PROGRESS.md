@@ -11,7 +11,7 @@ Live demo: https://tanzir71.github.io/waypost/
 | M4 Study tools | done | m4 | /app/gpa/, /app/finals/, /app/scales/ |
 | M5 PWA, agents, settings | done | m5 | /app/settings/, /app/agents/, /agents/, /app/share/ |
 | M6 Encrypted sync | done | m6 | /app/setup/, /downloads/waypost-self-host.zip |
-| M7 Offers and supporting tools | in progress | | /app/offers/ |
+| M7 Offers and supporting tools | in progress | | /app/offers/, /app/deadlines/ |
 
 ## M0
 
@@ -228,8 +228,24 @@ Live demo: https://tanzir71.github.io/waypost/
   native view tests exercise real create/edit/delete and imported city values.
 - All 106 Node tests and release checks pass for the offer feature, including
   all earlier arithmetic fixtures, PHP lint and current extension/cache/ZIP builds.
-- Deadlines/ICS, Letters/Stories, Contacts, optional AI and the final full-spec
-  audit remain active work. No M7 tag has been created.
+- Added the Figma month calendar and ten-day agenda, native CRUD, linked source
+  dates, optional saved final dates and real offline ICS downloads. Today also
+  includes offer/final deadlines. Core fixtures cover weekday/year/leap handling,
+  stable UIDs, exclusive all-day ends, exact RFC snapshot and UTF-8 byte folding.
+- Added explicit calendar publication on both backends with a title/date-only
+  format, random-nonce-derived bearer URL, public HTTPS reads and authenticated
+  versioned publish/update/revoke. All synced devices can refresh an opted-in
+  feed. URL credentials stay out of backups, private links and result JSON.
+  Old confirmations and updates cannot resurrect a revoked feed; recovery and
+  vault deletion revoke feeds atomically. The UI discloses plaintext/cached-copy
+  behavior and preserves the distinction between disconnecting and revoking.
+- PHP upgrades existing vaults under a database lock; D1 has a one-time migration.
+  Tests execute both upgrades against real SQLite and preserve actual encrypted
+  history. All 121 tests and release checks pass, including multi-device feed
+  updates, open-view refresh, native publication/revocation acknowledgement,
+  no demo network calls, asset callsites, PHP lint and exact deployment ZIP.
+- Letters/Stories, Contacts, optional AI and the final full-spec audit remain
+  active work. No M7 tag has been created.
 
 ## Deployment status
 

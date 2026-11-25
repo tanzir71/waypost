@@ -261,6 +261,35 @@ main { padding: 32px; flex: 1; }
 .offer-note { display: flex; align-items: start; gap: 8px; font: var(--wp-body-s); color: var(--wp-ink-2); }
 .offer-note img { flex-shrink: 0; margin-top: 2px; }
 .offer-exports { margin-top: 16px; }
+.calendar-layout { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 16px; align-items: start; }
+.calendar-layout > div, .calendar-layout aside { min-width: 0; }
+.calendar-layout .card { padding: 20px; }
+.calendar-heading { align-items: center; gap: 8px; }
+.calendar-heading .actions { margin-left: auto; gap: 4px; }
+.calendar-grid { min-width: 560px; table-layout: fixed; border-collapse: separate; border-spacing: 6px; margin: 10px -6px -6px; width: calc(100% + 12px); }
+.calendar-grid th { font: var(--wp-label-s); color: var(--wp-ink-3); text-transform: uppercase; padding: 0 0 4px; }
+.calendar-grid tr { border: 0; }
+.calendar-grid td { height: 92px; vertical-align: top; padding: 8px; background: var(--wp-surface); border-radius: var(--wp-radius-sm); overflow: hidden; }
+.calendar-grid .outside-month { background: none; color: var(--wp-ink-3); }
+.calendar-day-number { font: var(--wp-mono-s); padding: 0; min-height: 18px; justify-content: start; color: inherit; }
+.current-day .calendar-day-number { color: var(--wp-accent); font-weight: 600; }
+.calendar-event { min-height: 20px; display: block; width: 100%; margin-top: 4px; padding: 2px 4px; border-radius: var(--wp-radius-sm); text-align: left; font: var(--wp-body-s); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: var(--wp-accent-soft); color: var(--wp-accent); }
+.calendar-event.event-exam { background: var(--wp-tier-limited-soft); color: var(--wp-tier-limited); }
+.calendar-event.event-interview, .calendar-event.event-scholarship { background: var(--wp-tier-partial-soft); color: var(--wp-tier-partial); }
+.calendar-agenda h2, .calendar-feed h2 { font: var(--wp-h3); }
+.calendar-agenda-row { display: flex; align-items: start; gap: 10px; padding-top: 16px; }
+.calendar-agenda-row > img { flex-shrink: 0; margin-top: 2px; }
+.calendar-agenda-title, .calendar-entry-title { font: var(--wp-label-m); padding: 0; min-height: 20px; text-align: left; justify-content: start; }
+.calendar-agenda-row p, .calendar-feed p { font: var(--wp-body-s); }
+.calendar-agenda-row p { margin-top: 4px; }
+.calendar-entries { display: grid; gap: 12px; }
+.calendar-entries > article { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.calendar-entries p { margin-top: 4px; font: var(--wp-body-s); }
+.calendar-exports { margin-top: 16px; }
+:root[data-theme="dark"] .calendar-agenda-row > img, :root[data-theme="dark"] .calendar-heading img, :root[data-theme="dark"] .offer-note img { filter: brightness(1.8); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) .calendar-agenda-row > img, :root:not([data-theme]) .calendar-heading img, :root:not([data-theme]) .offer-note img { filter: brightness(1.8); } }
+@media (max-width: 1200px) { .calendar-layout { grid-template-columns: minmax(0,1fr); } .calendar-layout aside { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; } }
+@media (max-width: 700px) { .calendar-layout aside { grid-template-columns: 1fr; } .calendar-heading { flex-wrap: wrap; } .calendar-entries > article { flex-direction: column; gap: 4px; } }
 @media (max-width: 1200px) { .offer-layout { grid-template-columns: minmax(0,1fr); } .offer-layout aside { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; } }
 @media (max-width: 700px) { .offer-layout aside { grid-template-columns: 1fr; } }
 body[data-route="setup"] { display: block; }

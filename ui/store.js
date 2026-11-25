@@ -116,6 +116,7 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
         // active sample jobs, so it never gets silently populated again.
         if(await setting('demo-cleared'))return;
         const supplementOffers=async()=>{if(await setting('demo-supplements-offers')||!(await all('jobs')).some(row=>row.sample))return;const additions=(seed.offers??[]).map(row=>record({...row,id:uuidv7(),seedId:row.id,sample:true}));await putMany({offers:additions,settings:[record({key:'demo-supplements-offers',value:true})]},{meaningful:false,guardSetting:'demo-supplements-offers'});};
+        const supplementCalendar=async()=>{if(await setting('demo-supplements-calendar')||!(await all('jobs')).some(row=>row.sample))return;const existing=await all('deadlines',{deleted:true}),courses=await all('courses'),additions={deadlines:(seed.deadlines??[]).filter(row=>!existing.some(saved=>saved.seedId===row.id)).map(row=>record({...row,id:uuidv7(),seedId:row.id,sample:true})),courses:[],settings:[record({key:'demo-supplements-calendar',value:true})]};for(const sample of seed.courses??[]){const previous=courses.find(row=>row.sample&&row.seedId===sample.id);if(previous&&!previous.examDate&&sample.examDate)additions.courses.push(record({...previous,examDate:sample.examDate}));}await putMany(additions,{meaningful:false,guardSetting:'demo-supplements-calendar'});};
         const supplementStudy=async()=>{
           if(await setting('demo-supplements-m4'))return;
           if(!(await all('jobs')).some(row=>row.sample))return;
@@ -123,7 +124,7 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
           const additions={terms:(seed.terms??[]).map(term=>record({...term,id:mapping.get(term.id),seedId:term.id,sample:true})),courses:(seed.courses??[]).map(course=>record({...course,id:uuidv7(),termId:mapping.get(course.termId),seedId:course.id,sample:true})),settings:[record({key:'demo-supplements-m4',value:true})]};
           await putMany(additions,{meaningful:false,guardSetting:'demo-supplements-m4'});
         };
-        if(await setting('demo-supplements-m3')){await supplementStudy();await supplementOffers();return;}
+        if(await setting('demo-supplements-m3')){await supplementStudy();await supplementOffers();await supplementCalendar();return;}
         const existingJobs=(await all('jobs')).filter(row=>row.sample),existingVersions=(await all('resumeVersions')).filter(row=>row.sample);
         if(!existingJobs.length)return;
         const mapping=new Map();
@@ -133,17 +134,17 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
         for(const app of seed.applications??[]) if(mapping.has(app.jobId))additions.applications.push(record({...app,id:uuidv7(),seedId:app.id,jobId:mapping.get(app.jobId),resumeVersionId:mapping.get(app.resumeVersionId)??null,sample:true}));
         for(const deadline of seed.deadlines??[]) additions.deadlines.push(record({...deadline,id:uuidv7(),seedId:deadline.id,sample:true}));
         additions.settings=[record({key:'demo-supplements-m3',value:true})];
-        await putMany(additions,{meaningful:false,guardSetting:'demo-supplements-m3'});await supplementStudy();await supplementOffers();return;
+        await putMany(additions,{meaningful:false,guardSetting:'demo-supplements-m3'});await supplementStudy();await supplementOffers();await supplementCalendar();return;
       }
       const mapping=new Map();
       for(const rows of Object.values(seed)) if(Array.isArray(rows)) for(const row of rows) if(row.id) mapping.set(row.id,uuidv7());
       const records={};
-      const references=['parentId','jobId','resumeVersionId','termId','retakeOf','clusterId'];
+      const references=['parentId','jobId','resumeVersionId','termId','retakeOf','clusterId','linkedId'];
       for(const [type,rows] of Object.entries(seed)) {
         if(!stores.includes(type)||!Array.isArray(rows)) continue;
         records[type]=rows.map(row=>{const copy={...row,id:mapping.get(row.id),seedId:row.id,sample:true};for(const key of references)if(mapping.has(copy[key]))copy[key]=mapping.get(copy[key]);return record(copy);});
       }
-      records.settings=[record({key:'demo-seeded',value:true}),record({key:'demo-supplements-m3',value:true}),record({key:'demo-supplements-m4',value:true}),record({key:'demo-supplements-offers',value:true})];
+      records.settings=[record({key:'demo-seeded',value:true}),record({key:'demo-supplements-m3',value:true}),record({key:'demo-supplements-m4',value:true}),record({key:'demo-supplements-offers',value:true}),record({key:'demo-supplements-calendar',value:true})];
       await putMany(records,{meaningful:false,guardSetting:'demo-seeded'});
     }
   };

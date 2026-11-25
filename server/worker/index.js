@@ -1,9 +1,11 @@
 import {SyncRepository,RepositoryError} from './repository.js';
 import {validateEnvelope,validateVault,unbase64,requireUUID,keyVersion,MAX_REQUEST_BYTES,MAX_BATCH_RECORDS,bytesLength} from '../../core/sync/protocol.js';
 import {digest} from '../../core/sync/crypto.js';
+import {handleCalendarFeed} from './calendar.js';
 const response=(value,status=200,extra={})=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',...extra}});
 async function body(request){if(Number(request.headers.get('content-length'))>MAX_REQUEST_BYTES)throw new RepositoryError('request_limit','Request exceeds 5 MB.',413);const reader=request.body?.getReader();let size=0,text='';if(reader){const decoder=new TextDecoder();for(;;){const item=await reader.read();if(item.done)break;size+=item.value.length;if(size>MAX_REQUEST_BYTES){await reader.cancel();throw new RepositoryError('request_limit','Request exceeds 5 MB.',413);}text+=decoder.decode(item.value,{stream:true});}text+=decoder.decode();}if(!text)return {};try{return JSON.parse(text);}catch{throw new RepositoryError('invalid_json','Expected a JSON body.',400);}}
 export async function handleRequest(request,env){
+  if(/\/api\/ics(?:\/|$)/.test(new URL(request.url).pathname))return handleCalendarFeed(request,env);
   const url=new URL(request.url),path=url.pathname.replace(/^.*\/api\/sync/,'')||'/',repo=new SyncRepository(env);
   try{
     if(url.protocol!=='https:')return response({error:'HTTPS is required.',code:'https_required'},426);
@@ -20,6 +22,9 @@ export async function handleRequest(request,env){
     const id=requireUUID(request.headers.get('x-waypost-vault')),version=keyVersion(Number(request.headers.get('x-waypost-key-version'))),vault=await repo.getVault(id);
     if(!vault||!await repo.verifyToken(token,vault.auth_hash))return response({error:'Vault authentication failed. Unlock the vault again.',code:'unauthorized'},401);
     if(version!==vault.key_version)return response({error:'Vault keys changed. Unlock again.',code:'key_version_changed'},409);
+    if(path==='/calendar'&&request.method==='GET')return response(await repo.calendarStatus(id));
+    if(path==='/calendar'&&['POST','PUT'].includes(request.method))return response(await repo.saveCalendar(vault,token,await body(request),{create:request.method==='POST'}));
+    if(path==='/calendar'&&request.method==='DELETE')return response(await repo.revokeCalendar(vault,(await body(request)).expectedVersion));
     if(path==='/changes'&&request.method==='GET'){const since=Number(url.searchParams.get('since')??0);if(!Number.isSafeInteger(since)||since<0)throw new RepositoryError('cursor','Invalid cursor.',400);return response(await repo.list(vault,since));}
     if((path==='/changes'||path==='/vault/rotation/changes')&&request.method==='POST'){const input=await body(request);if(!Array.isArray(input.changes)||input.changes.length>MAX_BATCH_RECORDS)throw new RepositoryError('batch_limit',`Use at most ${MAX_BATCH_RECORDS} records per batch.`,413);input.changes.forEach(validateEnvelope);const unique=new Set(input.changes.map(row=>row.type+':'+row.id));if(unique.size!==input.changes.length)throw new RepositoryError('duplicate','Duplicate record in batch.',400);
       let rotationId=null;if(path.includes('/rotation/')){rotationId=requireUUID(input.rotationId);const pending=await repo.rotation(id);if(!pending||pending.rotation_id!==rotationId)throw new RepositoryError('rotation_missing','Pending key rotation not found.');}

@@ -7,8 +7,16 @@
   user-supplied ratings. Required offer fixtures and native record flows pass.
 - Added portable/synced offer priorities and private input links that calculate
   only on request. All 106 tests and release checks pass for this feature.
-- Corrected the Setup card surface and stale landing sync labels. Calendar,
-  writing/contact tools and optional AI remain in progress; no M7 tag yet.
+- Added the month calendar, ten-day agenda, shared-source deadlines, linked
+  final dates and offline RFC 5545 downloads. Publishing requires a separate
+  plaintext acknowledgement and supports multi-device updates and revocation.
+- Added guarded calendar APIs to both backends, in-place PHP upgrade and D1
+  migration. Recovery/deletion revoke feeds; stale updates/confirmations cannot
+  republish them. All 121 tests and release checks pass, including actual
+  SQLite upgrade preservation and calendar view/controller contracts.
+- Corrected the Setup card surface, stale landing labels and missing Figma
+  info/chevron assets. Writing/contact tools and optional AI remain in progress;
+  no M7 tag yet.
 
 ## M6 — 2026-11-25
 

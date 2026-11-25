@@ -153,4 +153,51 @@ npm run check
 GitHub Pages serves the static demo and downloadable package; it cannot execute
 PHP or Workers. A production sync deployment is optional and requires its own
 same-origin server configuration. Calendar publication is a separate plaintext
-opt-in in M7; the sync server never interprets encrypted deadlines.
+opt-in; the sync server never interprets encrypted deadlines.
+
+## Calendar subscriptions (optional plaintext)
+
+Deadlines combines saved entries, Tracker next steps, offer decision dates and
+dated course finals. Downloading `.ics` works locally, including offline. No
+calendar is published by default, and selecting **Include in feed** alone does
+not create a public feed. With sync connected, **Subscribe (sync on)** previews
+the selected titles/dates and requires acknowledgement before publication.
+
+Publication is the explicit exception to encrypted storage. Only canonical
+all-day events (title, date, stable UID and standard timestamps) are accepted;
+descriptions, URLs, attendees and other calendar properties are rejected. The
+limit is 1000 selected events / 256 KB. The server stores that plaintext ICS
+and a hash of its URL token in SQLite/D1. Anyone with the URL can read it.
+Public reads use HTTPS and `text/calendar`, with `no-store` and no CORS grants.
+Both public and authenticated calendar requests are excluded from the PWA cache.
+
+The token is HMAC-SHA256 with the derived vault authentication key over a fresh
+random 32-byte nonce and vault/key-version context. Authenticated calendar
+metadata shares the nonce, so any unlocked device can derive the same URL and
+refresh selected entries after encrypted sync. The token and URL never enter
+workspace exports, private input links, application logs or result JSON. The
+hosting server may record feed paths/queries in its access logs. Only per-entry
+inclusion flags are synced/exported with records. `config.js`'s optional
+`icsUrl` overrides the same-origin feed script/base path; cross-origin overrides
+are rejected. Defaults are `server/php/ics.php?token=…` and `/api/ics/TOKEN.ics`.
+
+| Authenticated sync route | Effect |
+| --- | --- |
+| GET `/calendar` | Published flag, epoch version, nonce and content hash; no token |
+| POST `/calendar` | `{nonce,token,ics,expectedVersion}` explicitly publishes/replaces a URL |
+| PUT `/calendar` | `{token,ics,version}` updates an existing matching feed only |
+| DELETE `/calendar` | `{expectedVersion}` revokes the URL and advances the epoch |
+
+Creation/revocation use atomic version guards. Confirmation is tied to the
+preview's version and content hash. Stale automatic updates or old confirmations
+cannot recreate a revoked feed or overwrite a newer publishing decision. Key
+recovery and vault deletion revoke feeds as part of the same database commit.
+Disconnecting sync leaves an existing feed online; revoke it in Deadlines first
+when access should end. Calendar apps can retain already downloaded copies.
+
+For an existing M6 **D1** deployment, apply
+`server/worker/migrations/002-calendar.sql` once before deploying this Worker.
+Fresh deployments use the complete `schema.sql`. Setup reports an outdated D1
+schema as needing attention. **PHP** adds the calendar columns/tables in place
+under a database lock on first access, preserving existing encrypted rows.
+Both upgrade paths have real SQLite preservation tests.

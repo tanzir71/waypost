@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace Waypost;
+require_once __DIR__.'/calendar-library.php';
 
 final class ApiError extends \RuntimeException {
     public string $kind; public int $status;
@@ -65,6 +66,8 @@ final class Server {
         if (!$this->deployment['outside']||!$this->deployment['writable']) fail('not_configured','Configure a writable data directory outside the web root.',503);
         $this->db=new \PDO('sqlite:'.$this->deployment['config']['database'],null,null,[\PDO::ATTR_ERRMODE=>\PDO::ERRMODE_EXCEPTION,\PDO::ATTR_DEFAULT_FETCH_MODE=>\PDO::FETCH_ASSOC]);
         $this->db->exec('PRAGMA busy_timeout=5000'); $this->db->exec(file_get_contents(__DIR__.'/../worker/schema.sql'));
+        $columns=$this->db->query('PRAGMA table_info(vaults)')->fetchAll();$names=array_column($columns,'name');
+        if(!in_array('calendar_version',$names,true)||!in_array('calendar_mutation',$names,true)){$this->db->exec('BEGIN IMMEDIATE');try{$names=array_column($this->db->query('PRAGMA table_info(vaults)')->fetchAll(),'name');foreach(['calendar_version'=>'INTEGER NOT NULL DEFAULT 0','calendar_mutation'=>'TEXT'] as $name=>$definition)if(!in_array($name,$names,true))$this->db->exec('ALTER TABLE vaults ADD COLUMN '.$name.' '.$definition);$this->db->exec('COMMIT');}catch(\Throwable $error){$this->db->exec('ROLLBACK');throw $error;}}
         return $this->db;
     }
     private function query(string $sql,array $args=[]): \PDOStatement { $statement=$this->db()->prepare($sql); $statement->execute($args); return $statement; }
@@ -72,6 +75,18 @@ final class Server {
     private function transaction(callable $action): mixed {
         $db=$this->db(); $db->exec('BEGIN IMMEDIATE');
         try { $value=$action(); $db->exec('COMMIT'); return $value; } catch (\Throwable $error) { $db->exec('ROLLBACK'); throw $error; }
+    }
+    private function rate(string $ip,string $group,bool $sensitive=false): void {
+        $window=(int)floor(time()/60);$bucket=hash('sha256',$ip.':'.$group.':'.$window);
+        $count=$this->transaction(function()use($bucket,$window){$this->query('DELETE FROM rate_limits WHERE window < ?',[$window-60]);return $this->query('INSERT INTO rate_limits(bucket,window,count) VALUES(?,?,1) ON CONFLICT(bucket) DO UPDATE SET count=count+1 RETURNING count',[$bucket,$window])->fetchColumn();});
+        if($count>($sensitive?30:($this->deployment['config']['rate_per_minute']??600)))fail('rate_limit','Rate limit reached. Retry after one minute.',429);
+    }
+    private function calendarStatus(string $id): array {
+        $vault=$this->vault($id);if(!$vault)fail('vault_missing','Vault not found.',404);$feed=$this->query('SELECT * FROM calendar_feeds WHERE vault_id=?',[$id])->fetch();return ['version'=>(int)$vault['calendar_version'],'published'=>(bool)$feed,'updatedAt'=>$feed?$feed['updated_at']:null,'contentHash'=>$feed?$feed['content_hash']:null,'nonce'=>$feed?$feed['nonce']:null];
+    }
+    public function calendarFeed(string $token,bool $https,string $ip): array {
+        try{if(!$https)fail('https_required','HTTPS is required.',426);encoded($token,32);$this->rate($ip,'calendar');$feed=$this->query('SELECT ics FROM calendar_feeds WHERE token_hash=?',[hashBinding($token)])->fetch();return $feed?[200,$feed['ics']]:[404,'Calendar feed not found.'];}
+        catch(ApiError $error){return [$error->status===400?404:$error->status,$error->status===400?'Calendar feed not found.':$error->getMessage()];}catch(\Throwable $error){return [503,'Calendar storage is unavailable.'];}
     }
     public function handle(string $method,string $path,array $input,array $headers,array $query,string $origin,bool $https,string $ip): array {
         try {
@@ -81,9 +96,7 @@ final class Server {
                 $checks=[['id'=>'https','label'=>'HTTPS','passed'=>$https],['id'=>'php','label'=>'PHP 8.1 or newer','passed'=>PHP_VERSION_ID>=80100],['id'=>'sqlite','label'=>'PDO SQLite available','passed'=>in_array('sqlite',\PDO::getAvailableDrivers(),true)],['id'=>'outside','label'=>'Config and data outside web root','passed'=>$this->deployment['outside']],['id'=>'writable','label'=>'Data directory writable','passed'=>$this->deployment['writable']]];
                 return [200,['protocol'=>1,'provider'=>'php','ready'=>!in_array(false,array_column($checks,'passed'),true),'checks'=>$checks]];
             }
-            $window=(int)floor(time()/60); $sensitive=in_array($path,['/recover','/vault'],true); $bucket=hash('sha256',$ip.':'.($sensitive?'identity':'sync').':'.$window);
-            $count=$this->transaction(function()use($bucket,$window){$this->query('DELETE FROM rate_limits WHERE window < ?',[$window-60]);return $this->query('INSERT INTO rate_limits(bucket,window,count) VALUES(?,?,1) ON CONFLICT(bucket) DO UPDATE SET count=count+1 RETURNING count',[$bucket,$window])->fetchColumn();});
-            if ($count>($sensitive?30:($this->deployment['config']['rate_per_minute']??600))) fail('rate_limit','Rate limit reached. Retry after one minute.',429);
+            $sensitive=in_array($path,['/recover','/vault'],true);$this->rate($ip,$sensitive?'identity':'sync',$sensitive);
             if ($path==='/vault'&&$method==='GET') { $id=uuid($query['vaultId']??null);$vault=$this->vault($id);if(!$vault)fail('vault_missing','Vault not found.',404);return [200,['vaultId'=>$id,'salt'=>$vault['salt'],'keyVersion'=>(int)$vault['key_version'],'createdAt'=>$vault['created_at']]]; }
             if ($path==='/recover'&&$method==='POST') { $id=uuid($input['vaultId']??null);encoded($input['codeId']??null,16);$vault=$this->vault($id);$found=null;foreach($vault?json_decode($vault['wrapped_keys'],true):[] as $row)if($row['codeId']===$input['codeId'])$found=$row;if(!$found)fail('recovery_missing','Recovery code was not found.',404);return [200,['vaultId'=>$id,'keyVersion'=>(int)$vault['key_version'],'wrappedKey'=>$found]]; }
             if (!preg_match('/^Bearer ([A-Za-z0-9_-]+)$/D',$headers['authorization']??'',$matches)) fail('unauthorized','Vault authentication is required.',401);
@@ -96,6 +109,15 @@ final class Server {
             $id=uuid($headers['x-waypost-vault']??null);$version=filter_var($headers['x-waypost-key-version']??'',FILTER_VALIDATE_INT);$vault=$this->vault($id);
             if(!$vault||!password_verify($token,$vault['auth_hash']))fail('unauthorized','Vault authentication failed. Unlock the vault again.',401);
             if($version!==(int)$vault['key_version'])fail('key_version_changed','Vault keys changed. Unlock again.',409);
+            if($path==='/calendar'&&$method==='GET')return [200,$this->calendarStatus($id)];
+            if($path==='/calendar'&&in_array($method,['POST','PUT','DELETE'],true)){
+                $calendarVersion=$method==='PUT'?($input['version']??null):($input['expectedVersion']??null);if(!is_int($calendarVersion)||$calendarVersion<0)fail('calendar_version','Invalid calendar version.');
+                if($method!=='DELETE'){calendarText($input['ics']??null);encoded($input['token']??null,32);if($method==='POST'&&(!is_string($input['nonce']??null)||!hash_equals(calendarTokenBinding($token,$id,$version,$input['nonce']),$input['token'])))fail('calendar_input','Invalid calendar token binding.');}
+                $status=$this->transaction(function()use($method,$id,$version,$token,$input,$calendarVersion){$current=$this->vault($id);if(!$current||(int)$current['key_version']!==$version)fail('key_version_changed','Vault keys changed.',409);
+                    if((int)$current['calendar_version']!==$calendarVersion)fail('calendar_changed','Calendar publication changed. Refresh before trying again.',409);
+                    if($method==='PUT'){$updated=$this->query('UPDATE calendar_feeds SET ics=?,content_hash=?,updated_at=? WHERE vault_id=? AND token_hash=? AND version=?',[$input['ics'],hashBinding($input['ics']),gmdate('Y-m-d\TH:i:s.000\Z'),$id,hashBinding($input['token']),$calendarVersion]);if(!$updated->rowCount())fail('calendar_revoked','Calendar feed was revoked or replaced.',409);}
+                    else{$this->query('UPDATE vaults SET calendar_version=calendar_version+1,calendar_mutation=? WHERE vault_id=?',[bin2hex(random_bytes(16)),$id]);if($method==='DELETE')$this->query('DELETE FROM calendar_feeds WHERE vault_id=?',[$id]);else $this->query('INSERT INTO calendar_feeds(vault_id,token_hash,nonce,version,ics,content_hash,updated_at) VALUES(?,?,?,?,?,?,?) ON CONFLICT(vault_id) DO UPDATE SET token_hash=excluded.token_hash,nonce=excluded.nonce,version=excluded.version,ics=excluded.ics,content_hash=excluded.content_hash,updated_at=excluded.updated_at',[$id,hashBinding($input['token']),$input['nonce'],$calendarVersion+1,$input['ics'],hashBinding($input['ics']),gmdate('Y-m-d\TH:i:s.000\Z')]);}return $this->calendarStatus($id);});return [200,$status];
+            }
             if($path==='/changes'&&$method==='GET') {
                 $since=filter_var($query['since']??0,FILTER_VALIDATE_INT);if($since===false||$since<0)fail('cursor','Invalid cursor.');if($since>(int)$vault['cursor'])fail('cursor_out_of_range','Restart the read cursor.',409);
                 $rows=$this->query('SELECT * FROM changes WHERE vault_id=? AND seq>? ORDER BY seq LIMIT 50',[$id,$since])->fetchAll();$changes=[];$size=0;$last=$since;
@@ -121,7 +143,7 @@ final class Server {
                 $rotation=uuid($input['rotationId']??null);if(!is_int($input['count']??null)||$input['count']<0)fail('rotation_count','Invalid record count.');
                 $next=$this->transaction(function()use($id,$version,$rotation,$input){$pending=$this->query('SELECT * FROM rotations WHERE vault_id=? AND rotation_id=?',[$id,$rotation])->fetch();if(!$pending)fail('rotation_missing','Pending key rotation not found.',409);$current=$this->vault($id);$staged=$this->query('SELECT * FROM staged_changes WHERE vault_id=? AND rotation_id=?',[$id,$rotation])->fetchAll();$active=$this->query('SELECT type,id,updated_at,device_id FROM changes WHERE vault_id=?',[$id])->fetchAll();$same=count($staged)===count($active)&&count($staged)===$input['count'];$map=[];foreach($active as $row)$map[$row['type'].':'.$row['id']]=$row;foreach($staged as $row){$old=$map[$row['type'].':'.$row['id']]??null;if(!$old||$row['updated_at']!==$old['updated_at']||$row['device_id']!==$old['device_id'])$same=false;}
                     if((int)$current['key_version']!==$version||(int)$current['cursor']!==(int)$pending['base_cursor']||!$same)fail('concurrent_change','Vault changed during recovery. Old keys remain active; retry.',409);
-                    $this->query('UPDATE vaults SET salt=?,auth_hash=?,wrapped_keys=?,key_version=?,applied_rotation=?,cursor=cursor+1 WHERE vault_id=?',[$pending['salt'],$pending['auth_hash'],$pending['wrapped_keys'],$pending['key_version'],$rotation,$id]);$this->query('DELETE FROM changes WHERE vault_id=?',[$id]);$this->query('INSERT INTO changes(vault_id,type,id,updated_at,device_id,key_version,iv,ciphertext,r2_key,bytes) SELECT vault_id,type,id,updated_at,device_id,key_version,iv,ciphertext,r2_key,bytes FROM staged_changes WHERE vault_id=? AND rotation_id=?',[$id,$rotation]);$this->query('DELETE FROM staged_changes WHERE vault_id=?',[$id]);$this->query('DELETE FROM rotations WHERE vault_id=?',[$id]);return $this->vault($id);});
+                    $this->query('UPDATE vaults SET salt=?,auth_hash=?,wrapped_keys=?,key_version=?,applied_rotation=?,cursor=cursor+1,calendar_version=calendar_version+1,calendar_mutation=NULL WHERE vault_id=?',[$pending['salt'],$pending['auth_hash'],$pending['wrapped_keys'],$pending['key_version'],$rotation,$id]);$this->query('DELETE FROM calendar_feeds WHERE vault_id=?',[$id]);$this->query('DELETE FROM changes WHERE vault_id=?',[$id]);$this->query('INSERT INTO changes(vault_id,type,id,updated_at,device_id,key_version,iv,ciphertext,r2_key,bytes) SELECT vault_id,type,id,updated_at,device_id,key_version,iv,ciphertext,r2_key,bytes FROM staged_changes WHERE vault_id=? AND rotation_id=?',[$id,$rotation]);$this->query('DELETE FROM staged_changes WHERE vault_id=?',[$id]);$this->query('DELETE FROM rotations WHERE vault_id=?',[$id]);return $this->vault($id);});
                 return [200,['keyVersion'=>(int)$next['key_version'],'cursor'=>(int)$next['cursor']]];
             }
             if($path==='/vault/rotation'&&$method==='DELETE'){$rotation=isset($input['rotationId'])?uuid($input['rotationId']):null;$this->transaction(function()use($id,$rotation,$version){$current=$this->vault($id);if(!$current||(int)$current['key_version']!==$version)fail('key_version_changed','Vault keys changed.',409);$args=$rotation?[$id,$rotation]:[$id];$where='vault_id=?'.($rotation?' AND rotation_id=?':'');$this->query('DELETE FROM staged_changes WHERE '.$where,$args);$this->query('DELETE FROM rotations WHERE '.$where,$args);});return [200,['cancelled'=>true]];}

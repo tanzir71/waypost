@@ -22,6 +22,7 @@ class Node {
   removeEventListener(name,fn){this.listeners[name]=(this.listeners[name]??[]).filter(item=>item!==fn);}
   async fire(name,details={}){const event={preventDefault(){},target:this,currentTarget:this,...details};for(const fn of [...this.listeners[name]??[]])await fn(event);}
   reportValidity(){return true;}
+  click(){return this.fire('click');}
   showModal(){this.open=true;}close(){if(this.open){this.open=false;return this.fire('close');}}focus(){}scrollIntoView(){}
   querySelectorAll(selector){return walk(this).filter(row=>selector.split(',').some(part=>matches(row,part.trim())));}
   querySelector(selector){return this.querySelectorAll(selector)[0]??null;}

@@ -42,8 +42,8 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Offer comparison is available as the first M7 feature. Letters, contacts,
-deadlines and optional AI remain Coming soon while M7 continues.
+Offer comparison and Deadlines are available as M7 features. Letters, contacts
+and optional AI remain Coming soon while M7 continues.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -82,6 +82,21 @@ estimate includes entered benefits and target bonus and is not take-home pay.
 Fixtures reproduce £110,600 total, £105,488 adjusted and £98,600 year-1 cash.
 Offers and priorities survive exports/imports and encrypted sync. Private input
 links prefill without saving; calculation needs Compare offers or autorun=1.
+
+Deadlines has a Monday-start month calendar and a next-ten-days agenda. Saved
+entries join Tracker next steps, offer decisions and dated finals, with linked
+course target details from the shared final calculator. Add/edit/delete entries
+or save an optional exam date in Final needed. Today also includes upcoming
+offer/final dates. Static ICS downloads work offline and use RFC 5545 all-day
+events, stable UIDs, CRLF endings and UTF-8 folding at 75 octets.
+
+Calendar subscriptions require sync plus a separate publishing acknowledgement.
+Selected titles/dates become plaintext on your server, accessible to anyone with
+the revocable URL. Any unlocked synced device can keep the feed current. URL
+tokens stay out of exports and result JSON. Revocation, key recovery and vault
+deletion invalidate URLs; disconnecting sync leaves published feeds online.
+Calendar apps may keep prior copies. See [server setup and upgrade notes](server/README.md)
+for PHP's in-place migration and the one-time M6 D1 upgrade script.
 
 Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
 permissions are exactly activeTab, storage, downloads and scripting. Configure

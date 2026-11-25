@@ -1,4 +1,5 @@
 import {stages,responseRates,followupApplications} from '../tracker/index.js';
+import {calendarEvents} from '../calendar/index.js';
 const dayMs=86400000;
 export function todaySummary(records,{now,day=now.slice(0,10)}) {
   const nowMs=Date.parse(now);if(!Number.isFinite(nowMs))throw new Error('A valid current timestamp is required.');
@@ -13,7 +14,7 @@ export function todaySummary(records,{now,day=now.slice(0,10)}) {
     if(due.has(app.id)) next.push({id:`followup:${app.id}`,type:'followup',applicationId:app.id,jobId:app.jobId,title:`${app.next.label} · ${job?.company||job?.title||'Application'}`,detail:job?.title??'',at:app.next.at});
     else if(app.stage==='interview'&&app.next?.at&&app.next.at.slice(0,10)<=weekEnd)next.push({id:`interview:${app.id}`,type:'interview',applicationId:app.id,jobId:app.jobId,title:`Interview at ${job?.company??'your next company'}`,detail:app.next.label,at:app.next.at});
   }
-  for(const deadline of (records.deadlines??[]).filter(row=>!row.deleted&&row.date>=day&&row.date<=weekEnd))next.push({id:`deadline:${deadline.id}`,type:'deadline',deadlineId:deadline.id,title:deadline.title,detail:deadline.kind,at:deadline.date});
+  for(const deadline of calendarEvents({...records,applications:[]},{scales:records.scales??[]}).filter(row=>row.date>=day&&row.date<=weekEnd))next.push({id:`deadline:${deadline.id}`,type:'deadline',deadlineId:deadline.id,title:deadline.title,detail:deadline.detail||deadline.kind,at:deadline.date});
   const seen=new Set();
   for(const report of (records.matchReports??[]).filter(row=>!row.deleted&&jobs.has(row.jobId))) for(const knockout of report.knockouts??[]) {
     const answered=jobs.get(report.jobId).knockoutAnswers?.[knockout.question]??knockout.answered;

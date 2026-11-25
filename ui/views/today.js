@@ -6,7 +6,7 @@ import {exportWorkspace} from '../workspace-export.js';
 import {planTargetGpa} from '../../core/gpa/index.js';
 import {builtInScales} from '../../core/scales/index.js';
 export async function renderToday({store,basePath,view,actions}) {
-  const records=Object.fromEntries(await Promise.all(['jobs','applications','resumeVersions','matchReports','deadlines'].map(async type=>[type,await store.all(type)])));
+  const records=Object.fromEntries(await Promise.all(['jobs','applications','resumeVersions','matchReports','deadlines','offers','courses','scales'].map(async type=>[type,await store.all(type)])));records.scales=[...builtInScales(),...records.scales];
   const now=new Date(),day=localDay(now);
   const summary=todaySummary(records,{now:now.toISOString(),day});
   const lastExport=(await store.setting('last-export'))?.value;

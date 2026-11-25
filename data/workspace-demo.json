@@ -8169,7 +8169,7 @@
   "deadlines": [
     {
       "id": "sample-scholarship",
-      "title": "Scholarship essay (sample)",
+      "title": "Fulbright essay (sample)",
       "date": "2026-11-28",
       "kind": "scholarship",
       "createdAt": "2026-11-21T12:00:00.000Z",
@@ -8182,6 +8182,34 @@
       "kind": "exam",
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
+    },
+    {
+      "id": "sample-chevening",
+      "title": "Chevening essay (sample)",
+      "date": "2026-12-09",
+      "kind": "scholarship",
+      "publish": false
+    },
+    {
+      "id": "sample-kestrel",
+      "title": "Kestrel application (sample)",
+      "date": "2026-12-15",
+      "kind": "application",
+      "publish": false
+    },
+    {
+      "id": "sample-daad",
+      "title": "DAAD portal closes (sample)",
+      "date": "2026-12-18",
+      "kind": "scholarship",
+      "publish": false
+    },
+    {
+      "id": "sample-halcyon",
+      "title": "Halcyon onsite (sample)",
+      "date": "2026-12-03",
+      "kind": "interview",
+      "publish": false
     }
   ],
   "terms": [
@@ -8265,7 +8293,8 @@
           "weight": 40,
           "score": null
         }
-      ]
+      ],
+      "examDate": "2026-12-07"
     },
     {
       "id": "study-course-1",
@@ -8287,7 +8316,8 @@
       "locked": true,
       "difficulty": 1,
       "termId": "study-s6",
-      "scaleId": "bd-ugc"
+      "scaleId": "bd-ugc",
+      "examDate": "2026-12-10"
     },
     {
       "id": "study-course-3",

@@ -1,5 +1,6 @@
 * text=auto eol=lf
 *.zip binary
+*.ics binary
 *.png binary
 *.woff2 binary
 *.pdf binary
