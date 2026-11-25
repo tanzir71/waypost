@@ -1,0 +1,5 @@
+{
+  "id":"us-4","name":"US 4.0 · illustrative","max":4,"retakePolicy":"replace",
+  "source":"Illustrative plus/minus pattern; percentage cutoffs and retake policies vary by institution.",
+  "grades":[{"letter":"A","points":4,"min":93,"max":100},{"letter":"A−","points":3.7,"min":90,"max":92},{"letter":"B+","points":3.3,"min":87,"max":89},{"letter":"B","points":3,"min":83,"max":86},{"letter":"B−","points":2.7,"min":80,"max":82},{"letter":"C+","points":2.3,"min":77,"max":79},{"letter":"C","points":2,"min":73,"max":76},{"letter":"C−","points":1.7,"min":70,"max":72},{"letter":"D+","points":1.3,"min":67,"max":69},{"letter":"D","points":1,"min":60,"max":66},{"letter":"F","points":0,"min":0,"max":59}]
+}

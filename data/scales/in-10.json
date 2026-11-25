@@ -1,0 +1,5 @@
+{
+  "id":"in-10","name":"India 10-point · common pattern","max":10,"retakePolicy":"replace",
+  "source":"Common UGC India pattern, varies by university. Use your institution's published table for official applications.",
+  "grades":[{"letter":"O","points":10,"min":90,"max":100},{"letter":"A+","points":9,"min":80,"max":89},{"letter":"A","points":8,"min":70,"max":79},{"letter":"B+","points":7,"min":60,"max":69},{"letter":"B","points":6,"min":55,"max":59},{"letter":"C","points":5,"min":50,"max":54},{"letter":"P","points":4,"min":40,"max":49},{"letter":"F","points":0,"min":0,"max":39}]
+}
