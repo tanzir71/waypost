@@ -1,9 +1,13 @@
 {
-  "name": "ats-scoring",
+  "name": "waypost",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
+  "engines": { "node": ">=20" },
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --test tests/*.test.mjs && node scripts/check-routes.mjs && node scripts/check-no-external.mjs",
+    "build:routes": "node scripts/build-routes.mjs"
   }
 }

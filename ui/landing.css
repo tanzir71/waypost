@@ -1,0 +1,7 @@
+.wrap { width: min(100% - 128px, 1312px); margin-inline: auto; }
+.site-header { padding-block: 24px; display: flex; align-items: center; justify-content: space-between; }
+.placeholder-hero { display: grid; gap: 24px; padding-block: 96px; max-width: 700px; }
+.placeholder-hero h1 { font: var(--wp-display-xl); letter-spacing: var(--wp-display-xl-ls); }
+.placeholder-hero > p { font: var(--wp-body-l); }
+.site-footer { display: flex; gap: 24px; justify-content: space-between; padding-block: 32px; font: var(--wp-body-s); color: var(--wp-ink-2); }
+@media (max-width: 700px) { .wrap { width: calc(100% - 32px); } .placeholder-hero { padding-block: 64px; } .placeholder-hero h1 { font: var(--wp-display-l); } }

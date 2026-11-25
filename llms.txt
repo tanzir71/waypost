@@ -1,0 +1,30 @@
+# Waypost
+
+Waypost is a local-first toolkit for students and jobseekers. No account is
+required. Assets and computations stay on this origin in demo and PWA mode.
+
+## Build status
+
+M0 foundation is available. Tool routes are placeholders until their milestone
+ships. Read PROGRESS.md for the current status. Do not assume a placeholder
+performed a computation.
+
+## Routes
+
+Use app/ relative to the deployment root (including a /waypost/ base path).
+Tools: app/match/, app/parse/, app/resumes/, app/tracker/, app/gpa/,
+app/finals/, app/scales/, app/offers/, app/deadlines/, app/letters/,
+app/contacts/, app/agents/, app/settings/, app/setup/, app/share/, app/import/.
+Future deep links use URL fragments, never queries, for private inputs.
+
+## Results and stable hooks
+
+Every tool page has a JSON script #result-data, initially null. Native links
+have accessible names. data-testid values: `result-data`, `open-search`,
+`clear-demo`, `footer-credit`. Navigation uses nav-<route>.
+
+## Documentation
+
+- [Source](https://github.com/tanzir71/waypost)
+- [Workspace schema](schemas/workspace.json)
+- [Full docs](llms-full.txt)

@@ -1,0 +1,417 @@
+# Waypost — Codex handover (v1)
+
+Design source of truth: Figma **ATS-Scoring** → https://www.figma.com/design/kXBX0xRVlupT2UPlkLA4c2/ATS-Scoring
+Repo: currently `tanzir71/ats-scoring` (private). **Your first job in M0 is to rename it to `tanzir71/waypost` and make it public** (§12.0). Footer credit: "Made by tanziro.com".
+
+> **Before writing any code, read §12.0.** It covers the repo rename, committing and pushing after every milestone, no GitHub Actions, and no tests that need the owner.
+
+Waypost is an honest, local-first toolkit for students and jobseekers. It matches resumes to many jobs at once with per-requirement evidence. It also plans the grades a target GPA needs, tracks applications and compares offers. It runs as a website, an installable PWA, a static GitHub Pages demo, or a self-hosted app on shared hosting (PHP) or Cloudflare. Browser agents can operate it easily.
+
+Read this file top to bottom before writing code. Build in the milestones in section 12. At the end of every milestone, commit and push to `main`, so the owner can follow progress in the repo and on GitHub Pages.
+
+---
+
+## 1. Principles (non-negotiable)
+
+1. **Honest over impressive.** Report match tiers (Strong / Good / Partial / Limited) with an evidence line per requirement. Never show a bare 0–100 "ATS score". Keyword coverage % is allowed only as a labelled secondary number.
+2. **Local by default.** All data lives on the device (IndexedDB + OPFS). Nothing is sent anywhere unless the user turns on sync (end-to-end encrypted) or turns on bring-your-own-key AI (clearly labelled as sending text off-device).
+3. **Agent-legible.** Every action is a native, labelled control; every result also exists as text and as JSON (`#result-data`). State is URL-addressable.
+4. **Minimal dependencies.** Vanilla ES modules, no framework, no runtime npm deps. Vendored libs only where unavoidable (pdf.js, mammoth) — self-hosted under `/vendor/`, lazy-loaded. No third-party CDNs, no Google Fonts, no analytics by default.
+5. **Visual rules from the user.** No italics anywhere. No gradients, no glow, no borders on containers (separate by surface tone and spacing). One accent colour; semantic colour only for tiers and status. Don't overuse any single element.
+6. **Keyboard-complete.** ⌘K reaches every tool and action. Drag is never the only way (Kanban has "Move to…").
+
+---
+
+## 2. Figma map
+
+Open any node at `https://www.figma.com/design/kXBX0xRVlupT2UPlkLA4c2/ATS-Scoring?node-id=<id with - instead of :>`.
+
+| Page | Node | What |
+|---|---|---|
+| Cover | `8:2` | Name, page index, logo choice note |
+| Foundations | `8:149` | Docs board: principles, swatches Light/Dark, type |
+| Foundations | `6:2` | 49 icons (24 grid, 1.75 stroke) — use lucide equivalents, see 5.4 |
+| Foundations | `6:189` | Logo options A Signpost (used), B Route, C Flag post — user to pick; build with A |
+| Foundations | `7:18` Button · `7:31` Tier badge · `7:32` Tag · `7:34` Kbd · `7:45` Status pill · `7:46` Field · `7:67` Nav item | Core components |
+| Foundations | `7:96` Requirement row · `7:97` Tool card · `7:108` Tracker card · `7:116` Course row · `7:128` App sidebar | Product components |
+| Landing | `8:362` | Desktop 1440: Nav `8:363`, Hero `8:385`, Tools `8:470`, Honest match `8:666`, Study band (dark) `8:747`, Comparison `8:835`, For agents `9:232`, Run it anywhere `9:283`, Footer (dark) `9:333` |
+| Landing | `9:376` | Mobile 390 |
+| App · Desktop | `8:907` 01 Today · `8:1188` 02 Honest Match · `9:987` 03 Parse check · `9:1249` 04 Resumes · `10:732` 05 Tracker · `10:1008` 06 GPA planner · `12:1136` 07 Final needed · `12:1376` 08 Scale converter · `13:1417` 09 Offers · `13:1697` 10 Deadlines · `14:1690` 11 Command palette · `14:1909` 12 Settings | 1440×900 app screens |
+| App · Mobile + PWA | `10:1340` M1 Today · `10:1449` M2 Match · `10:1542` M3 GPA · `10:1650` M4 Share target · `10:1686` M5 Install + offline · `10:1766` M6 Dark | 390×844 |
+| Modes · Extension · Agents | `10:1845` Deploy modes · `10:1945` GitHub Pages demo banner · `10:1969` Extension popup · `10:2027` On-page chip · `12:1655` 13 Agents · `12:1934` 14 /setup (sync) | |
+
+Dark mode: every Figma frame can be previewed in Dark by switching the `Waypost / Color` variable mode. In code, use `[data-theme="dark"]` plus `prefers-color-scheme` (see `handover/tokens.css`).
+
+---
+
+## 3. Repository layout (target)
+
+Keep the existing scoring logic and extension. Move them into the structure below. Do not delete history.
+
+```
+/                         landing (index.html), JSON-LD, links to /app/
+/app/                     app shell; each tool is a folder with its own index.html (see 4.2)
+/app/_shell.html          template the route pages are stamped from
+/core/                    PURE logic, no DOM: match/, parse/, gpa/, finals/, scales/, offers/, ics/, store/schema
+/ui/                      DOM code: components (vanilla custom elements or plain functions), views per tool
+/assets/fonts/            Geist, Geist Mono, Newsreader (woff2, OFL) — self-hosted
+/assets/icons/            logo + PWA icons (from Figma Logo A)
+/vendor/                  pdf.js (+ worker), mammoth — pinned, self-hosted, lazy-loaded
+/data/                    skills aliases, ESCO/O*NET subsets (with LICENSE notes), scales/*.json, demo seed
+/schemas/                 workspace.json (JSON Schema), job-export.json (extension format)
+/server/php/              sync.php, ics.php, .htaccess, config.sample.php
+/server/worker/           Cloudflare Worker (sync + ics), wrangler.toml.sample, schema.sql
+/extension/               MV3 "Waypost Clipper"
+/scripts/                 build-routes.mjs, check-routes.mjs, make-zip.mjs (zero deps, Node 20+)
+/tests/                   node --test only: core unit tests, fixtures/, static checks (no browsers)
+config.js                 the only file that differs per deployment (section 4.1)
+llms.txt, llms-full.txt   agent docs (draft in handover/llms.txt)
+manifest.webmanifest, sw.js
+.nojekyll                 GitHub Pages serves files as-is
+.gitattributes            * text=auto eol=lf (see §12.0)
+PROGRESS.md               milestone checklist, updated in every milestone commit
+CHANGELOG.md              one entry per milestone
+HANDOVER.md, AGENTS.md, handover/   keep these committed; they are the spec
+```
+
+Generated route pages are committed, so deployment never needs a build. There is no CI and there are no GitHub Actions. Run `npm run check` locally before every commit (§13). It verifies the route pages match the template, among other checks.
+
+---
+
+## 4. Modes, config and routing
+
+### 4.1 config.js
+
+The committed `config.js` uses `mode: "auto"`. On `*.github.io` this resolves to `demo`; anywhere else it resolves to `pwa`. `basePath` is derived from the URL of `config.js` itself (`new URL('.', document.currentScript.src)`). This means the same committed files work on GitHub Pages (`https://tanzir71.github.io/waypost/`), on any shared host and on Cloudflare without edits. Self-hosters change `mode` and `syncUrl` only when they turn sync on.
+
+```js
+window.WAYPOST_CONFIG = {
+  mode: "auto",         // "auto" | "demo" | "pwa" | "php" | "cloudflare"
+  basePath: null,       // null = auto-detect; or e.g. "/waypost/"
+  syncUrl: null,        // "/server/php/sync.php" | "/api/sync"
+  icsUrl: null,         // "/server/php/ics.php" | "/api/ics"
+  ai: { provider: null } // null | "chrome-builtin" | "byok"
+};
+```
+
+| Mode | Status pill | Behaviour |
+|---|---|---|
+| demo (GitHub Pages) | `Status=Demo` | Seed sample data on first visit; show the demo banner (Figma `10:1945`) with Clear sample data / Download zip / Fork; sync UI hidden; all tools fully work |
+| pwa | `Status=Local` | Default. Register service worker, install prompt (rules in 9) |
+| php / cloudflare | `Status=Local` until connected, then `Status=Synced` | Settings → Sync enabled; `/setup` flow |
+
+All asset and link paths are relative or prefixed with `basePath`.
+
+### 4.2 Routes
+
+Folder per tool so static hosts (GitHub Pages, cPanel) serve them without rewrite rules:
+
+`/app/` (Today) · `/app/match/` · `/app/parse/` · `/app/resumes/` · `/app/tracker/` · `/app/letters/` · `/app/offers/` · `/app/contacts/` · `/app/gpa/` · `/app/finals/` · `/app/scales/` · `/app/deadlines/` · `/app/agents/` · `/app/settings/` · `/app/setup/` · `/app/share/` (PWA share target) · `/app/import/` (extension handoff)
+
+Each `index.html` is stamped from `_shell.html` with `<body data-route="gpa">` and a route-specific `<title>`, `<meta description>` and JSON-LD. Navigation between tools is ordinary links (fast — everything is cached by the SW).
+
+### 4.3 Deep-link grammar (agents + sharing)
+
+- Parameters go in the **fragment**, never the query: `/app/gpa/#current=3.42&credits=64&target=3.6&remaining=64&autorun=1`. Fragments are not sent to servers.
+- `autorun=1` runs the tool after prefill. Without it, fields are prefilled only.
+- Every tool view keeps its fragment in sync with its inputs (`history.replaceState`) and offers "Share link".
+- Large inputs (JD text): `#jd=<base64url>` up to ~32 KB; above that, show "Paste instead".
+- Documented in `llms.txt` with one example per tool.
+
+---
+
+## 5. Design system
+
+### 5.1 Tokens
+`handover/tokens.css` is generated from the Figma variables (`Waypost / Color` Light+Dark, `Waypost / Size`). Copy it to `/ui/tokens.css`. Code syntax in Figma already maps each variable to `var(--wp-*)`.
+
+### 5.2 Type
+- Geist (UI), Geist Mono (all numbers, scores, GPAs, code; enable `font-variant-numeric: tabular-nums`), Newsreader Regular (display headings on landing only — never inside the app chrome). All OFL; self-host woff2 with `font-display: swap`.
+- Styles (size/line-height/letter-spacing): Display/XL 76/80/-2.5% · Display/L 52/58/-2% · Display/M 36/42/-1.5% · H1 28/34/-1.5% SemiBold · H2 20/26/-1% SemiBold · H3 16/22/-0.5% Medium · Body/L 17/26 · Body/M 15/22 · Body/S 13/18 · Label/M 13/16 Medium · Label/S 11/14 Medium uppercase +2% · Mono/M 13/18 · Mono/S 11/14 · Mono/Num-L 40/44 Medium · Mono/Num-M 24/28 Medium.
+- No italics anywhere (including `<em>` — style it as Medium weight instead).
+
+### 5.3 Components (Figma → code)
+| Component | Spec |
+|---|---|
+| Button `7:18` | Kind Primary/Secondary/Ghost/Inverse × Size M (40px, r10, px16) / S (32px, r8, px12). One Primary per view. Focus: 2px `--wp-accent` outline, offset 2px. |
+| Tier badge `7:31` | Pill, soft fill + dot + label in tier colour. Text always present (colour is never the only signal). |
+| Requirement row `7:96` | Status Met/Partial/Missing. Indicator, requirement (Body/M), evidence (Mono/S, quoted resume line + location), kind tag (Required/Preferred). `data-testid="requirement-row" data-status`. |
+| Tool card `7:97` | Icon box, stage tag, name, one-line description. |
+| Tracker card `7:108` | Company, role, resume version, tier, next step. Has a "Move to…" menu button. `data-testid="tracker-card" data-stage`. |
+| Course row `7:116` | Course, credits, current grade, → target grade (accent), lock toggle. Lock = pinned for the solver. |
+| Field `7:46` | Label above; filled box (no border); value + suffix in Geist Mono. Real `<label for>`. |
+| Status pill `7:45` | Local / Synced / Demo. Always visible bottom of sidebar (desktop) and top bar (mobile). |
+| Nav item `7:67` + App sidebar `7:128` | 248px sidebar; groups Job search / Study; Agents + Settings at bottom. Collapses to icons under 1100px; becomes bottom tab bar (Today, Match, Tracker, GPA, More) on mobile. |
+| Kbd `7:34` | Shortcut hint. |
+
+### 5.4 Icons
+Use lucide (ISC) SVGs inlined at build or as a sprite; Figma names map to: home→house, target→target, scan→scan-text, layers→layers, kanban→kanban-square, grad→graduation-cap, calculator→calculator, convert→arrow-left-right, offers→scale, calendar→calendar, users→users, mail→mail, message→message-square, sliders→sliders-horizontal, bot→bot, search, command, plus, upload, download, check, x, arrow-right, lock, device→monitor, branch→git-branch, cloud, server, chevron-down/right, book→book-open, link, copy, moon, bell, trend→trending-up, shield, more→ellipsis, filter, cpu, share, puzzle, clock, folder, alert→triangle-alert, info, eye, star, compare→arrow-down-up. Stroke 1.75, round caps, `currentColor`. Decorative icons get `aria-hidden="true"`.
+
+### 5.5 Layout
+App: sidebar on `--wp-bg`; main content is a `--wp-surface` panel inset 8px with radius 16. Cards inside main use `--wp-bg`. Header: H1 + Body/S subline + actions right. Landing max content width 1312 (64px gutters).
+
+---
+
+## 6. Screens (behaviour + acceptance)
+
+Each screen: match the Figma frame. Each list below is acceptance criteria.
+
+### 01 Today `8:907`
+- Next up: follow-ups due (from tracker `nextAt`), deadlines ≤ 7 days, interviews, unanswered knockouts. Each row has one action button.
+- Pipeline counts per stage (last 30 days) + response rate per resume version (replies / sent).
+- Study card mirrors GPA planner result; Workspace card shows storage use, Export JSON, Set up sync.
+
+### 02 Honest Match `8:1188` (core feature)
+- Left: jobs from bulk import / clipper / paste, filter chips by tier with counts. Selected job highlights.
+- Centre: job header + tier; resume version tabs, each with its own tier dot; Required group then Preferred group of Requirement rows with "n of m met".
+- Right rail: Checks (coverage, title, years, quantified, parse, keyword coverage %), "Across N similar jobs" (cluster gaps with prevalence bars), knockout panel, actions (Draft letter from this report, Add to tracker).
+- "Score N jobs" runs all versions × all jobs in a Web Worker; announce "Scoring complete: N jobs, best match Strong" in an `aria-live="polite"` region.
+- `#result-data` contains the full report JSON for the selected job (schema in `/schemas/workspace.json#/$defs/matchReport`). "Copy JSON" copies it.
+- Algorithm: section 7.1.
+
+### 03 Parse check `9:987`
+- Shows extracted plain text in reading order with a section gutter (CONTACT, SUMMARY, EXPERIENCE, …). Lines with issues get partial/limited soft backgrounds + legend.
+- Checks: reading order (multi-column detection from pdf.js text item x-positions), contact in body (not only header/footer zones), standard headings, date format consistency, symbols/ratings as text (★, ●, progress glyphs, icon fonts / private-use Unicode), fonts embedded/Unicode maps (pdf.js reports missing ToUnicode → garbled text heuristic), length vs experience, quantified bullets.
+- "Download plain text" saves exactly what is shown.
+
+### 04 Resumes `9:1249`
+- Versions list (JSON Resume schema + raw text + original file in OPFS), median tier across scored jobs, "sent to n · replies".
+- Diff v(n-1) → v(n): side-by-side and inline, line-level with word highlights. Added = strong-soft, removed = limited-soft, markers +/−.
+- "Effect on matching" callout compares median tier before/after.
+
+### 05 Tracker `10:732`
+- Board (Saved, Applied, Screen, Interview, Offer, collapsed Closed) and Table view (sortable, real `<table>`).
+- Keyboard: `N` new job, `M` move selected card; every card has Move to… menu. Drag is progressive enhancement.
+- Card fields: company, role, link, resume version used, tier, next step + date, contacts, notes, history log.
+
+### 06 GPA planner `10:1008` — 7.2
+- Inputs: current CGPA, credits completed, target CGPA, credits remaining, scale. Result panel shows needed average + reachable/unreachable + formula with the actual numbers.
+- "This semester / Whole degree" least-effort mix of course rows with locks. Trend bars per term with "Show table" (a real table twin).
+- What-if retake (replace vs average policy from scale settings). Editable grade scale table.
+
+### 07 Final needed `12:1136` — 7.3
+- Categories table (weight, score, contribution), validation (weights = 100%), result for the linked target, ladder for every cut-off in the active scale.
+
+### 08 Scale converter `12:1376` — 7.4
+- From scale + value + optional institution table; result cards with value, method tag and confidence pill; permanent disclaimer.
+
+### 09 Offers `13:1417`
+- Rows: base, bonus, equity/yr (with vesting note), signing, benefits value, year-1 total, cost-of-living index (user-supplied/CSV import), adjusted total, commute. Best value per row in strong colour. Bars for adjusted total. Weighted "what matters to you" scores (sliders, sum 100%). "Not financial advice" note.
+
+### 10 Deadlines `13:1697`
+- Month grid + agenda (next 10 days). Sources: tracker dates, scholarship/exam entries, finals. Download `.ics` (static). Subscribe URL only when sync is on and the user opts in to publishing (see 8.4).
+
+### 11 Command palette `14:1690`
+- ⌘K / Ctrl+K. `role="dialog"`, labelled input, `role="listbox"` results grouped Tools / Actions / Jump to. Parses simple intents ("plan gpa 3.6" → GPA planner with target prefilled). Every command maps to a URL.
+
+### 12 Settings `14:1909`
+- Storage (persist status, quota, Export / Import / Save to a folder via File System Access API where supported), Sync (Local only / PHP / Cloudflare + endpoint + Connect), Optional AI (Off / Chrome built-in / BYOK with off-device warning), Appearance (Light / Dark / System), Keyboard, About.
+
+### 13 Agents `12:1655` and 14 /setup `12:1934`
+- Agents: deep-link builder, WebMCP tool list with live registration status, stable hooks table, etiquette. 14 /setup: section 8.
+
+### Landing `8:362` / `9:376`
+- The hero demo card is a REAL working widget using `/core/match` (paste JD, pick sample or uploaded resume, Match). Not a screenshot.
+- Comparison table prices: show "as of <build date>" and keep the values in `/data/competitors.json` so they're easy to update. Re-verify before publishing.
+- Tool cards link to each tool; stage tags (MVP / v1 / Later) reflect what's shipped — hide or mark "Soon" for unbuilt ones.
+- JSON-LD: `SoftwareApplication` (offers price 0, isAccessibleForFree, applicationCategory EducationalApplication + BusinessApplication), `FAQPage` for myth-vs-fact.
+
+### Mobile + PWA (`10:1340`–`10:1766`)
+- Bottom tab bar; top bar with logo, title, status pill, search (opens palette as full-screen sheet).
+- M4 share target: manifest `share_target` GET `/app/share/?title&text&url` → bottom sheet prefilled; "Save & score" / "Save to tracker".
+- M5: offline banner when `navigator.onLine` is false; install card after second visit (never first), iOS shows Add to Home Screen instructions.
+
+---
+
+## 7. Core logic (pure functions in /core, unit-tested)
+
+### 7.1 Honest Match (`core/match`)
+Reuse and extend `src/scoring.js` (`parseImportedJobs`, `extractAttributes`, `clusterJobs`, `suggestMissingAttributes` stay; `scoreResumeAgainstJob` becomes the secondary "keyword coverage").
+
+1. **Requirement extraction**: split JD into lines/bullets. Classify each as required/preferred by section heading ("Requirements", "Must have", "Qualifications" → required; "Nice to have", "Preferred", "Bonus", "Plus" → preferred) and cue words ("must", "required", "x+ years" → required). Drop boilerplate (EEO statements, benefits) using a small stop-section list.
+2. **Normalisation**: lowercase, Snowball/Porter stemmer (port ~150 lines, no dependency), alias map (`/data/aliases.json`, start from the current map + js/ts/k8s/postgres/pg etc.), phrase list, ESCO/O*NET skill labels subset for multi-word skill detection (`/data/skills/*.json`, include licence/attribution; do NOT bundle Lightcast).
+3. **Evidence search**: index resume lines (bullets/sentences with section + line number). For each requirement, score lines with BM25 (k1 1.2, b 0.75) over requirement key terms; best line = evidence.
+4. **Status**: Met if ≥ 80% of the requirement's key terms (hard skills weighted ×2) are covered by the best one or two lines AND numeric constraints pass; Partial if 40–80%, or the term is present without supporting context (e.g. skill listed only in Skills, or years below ask); Missing otherwise. Missing rows say what's absent and how often it appears in the cluster; never invent text.
+5. **Years**: parse `(\d+)\+?\s*(years|yrs)` in requirements; compute tenure from dated roles (merge overlaps); compare.
+6. **Title alignment**: token Jaccard between JD title and most recent titles with seniority aliases.
+7. **Quantified impact**: share of bullets containing digits, %, currency, or time units.
+8. **Knockouts**: detect application-question patterns (work authorization / sponsorship, clearance, location requirement, degree required, minimum years) and surface as "Knockout to answer" — never scored.
+9. **Stuffing guard**: warn when a term's frequency in the resume is > 3× its JD frequency and ≥ 5, or hidden-text heuristics hit.
+10. **Tier**: requiredScore = (met + 0.5 × partial) / required. Strong ≥ 0.85, Good ≥ 0.65, Partial ≥ 0.4, else Limited. Preferred adds at most +0.05. Any failed knockout caps at Partial with a reason.
+11. Output `matchReport` JSON: `{ jobId, resumeVersionId, tier, required:[…], preferred:[…], checks:{coverage,title,years,quantified,parse,keywordCoverage}, knockouts:[…], clusterGaps:[{term,count,of}] }`.
+
+Performance: 50 jobs × 5 versions under 300 ms on a mid laptop (run in a Worker).
+
+### 7.2 GPA planner (`core/gpa`)
+- needed = (T × (C + R) − G × C) ÷ R. Reachable if needed ≤ scale max; if not, report the maximum achievable CGPA.
+- Least-effort mix: start unlocked courses at the lowest passing grade; repeatedly raise the course with the best (Δpoints × credits) ÷ effort until the weighted average ≥ needed (effort = 1 by default; optional per-course difficulty 1–3). Ties → larger credits first. Deterministic.
+- Retake what-if: policy `replace | average | both-count` from the scale config.
+- Scales: `/data/scales/*.json` with `{ id, name, max, grades:[{letter, points, min, max}], retakePolicy }`. Ship: Bangladesh UGC uniform (A+ 4.00 80–100, A 3.75 75–79, A− 3.50 70–74, B+ 3.25 65–69, B 3.00 60–64, B− 2.75 55–59, C+ 2.50 50–54, C 2.25 45–49, D 2.00 40–44, F 0 <40), US 4.0 (A 4.0 … F 0, plus A− 3.7, B+ 3.3, …), Indian 10-point (O 10, A+ 9, A 8, B+ 7, B 6, C 5, P 4, F 0 — label as "common UGC India pattern, varies by university"), custom.
+- Fixture used in Figma: current 3.42 @ 64 cr, target 3.60, remaining 64 → needed 3.78; semester mix A, A, A+ (locked), A, A (1.5 cr) → 3.81.
+
+### 7.3 Final needed (`core/finals`)
+needed = (cutoff − Σ wᵢsᵢ) ÷ w_final. Messages: ≤ 0 → "already secured"; > 100 → "not reachable — max is X". Fixture: 20%·92, 10%·85, 30%·78, final 40% → A (75) needs 61.8; A+ 74.3; A− 49.3; B+ 36.8; max 90.3.
+
+### 7.4 Scale converter (`core/scales`)
+Each result `{ system, value, method, confidence: high|medium|low, note }`. Methods: same-ceiling direct, band interpolation via the source scale's percentage bands, linear rescale, percentage → UK bands (low confidence), ECTS only if the user supplies a cohort distribution (percentile → A 10%, B 25%, C 30%, D 25%, E 10%), institution table (user-editable, exportable). Fixture: UGC 3.62 → ≈72.4%, ≈9.05/10, 2:1 (estimate).
+
+### 7.5 Offers, ICS
+- Offers: year-1 total = base + bonus + equity/yr + signing + benefits; adjusted = total ÷ (index/100); year-1 cash excludes unvested equity before cliff.
+- ICS: RFC 5545 all-day `VEVENT`s, stable UIDs (`<recordId>@waypost`), `DTSTAMP`, CRLF line endings, line folding at 75 octets.
+
+---
+
+## 8. Data, storage and sync
+
+### 8.1 Storage
+- IndexedDB database `waypost` v1 (use a tiny promise wrapper, no library). Stores: `resumes`, `resumeVersions`, `jobs`, `matchReports`, `applications`, `contacts`, `letters`, `stories`, `offers`, `terms`, `courses`, `scales`, `deadlines`, `settings`, `changes`.
+- Every record: `id` (UUIDv7), `createdAt`, `updatedAt`, `deviceId`, `deleted` (tombstone). Schema: `handover/workspace.schema.json` → publish at `/schemas/workspace.json`.
+- Call `navigator.storage.persist()` on first meaningful save; show result in Settings.
+- Original uploads in OPFS (`/originals/<id>`).
+- **Migration**: on first run, if `localStorage['ats-scoring:v1']` exists, import resumes/jobs/results into IndexedDB, keep a backup copy under `ats-scoring:v1:migrated`, show a one-time toast.
+- Export/Import whole workspace as JSON (validates against schema). "Save to a folder" via File System Access API where available.
+
+### 8.2 Sync protocol (same for PHP and Worker)
+- Client derives `masterKey` from passphrase with PBKDF2-SHA256 (600k iterations, 16-byte salt) → HKDF into `encKey` (AES-GCM 256) and `authKey`.
+- Records are encrypted individually: `{ id, type, updatedAt, deviceId, iv, ciphertext }`. Server never sees plaintext or the passphrase.
+- Endpoints (JSON, HTTPS only):
+  - `POST /vault` `{ vaultId, salt, authHash, wrappedKeys:[…] }` → 201
+  - `GET /changes?since=<cursor>` → `{ changes:[…], cursor }`
+  - `POST /changes` `{ changes:[…] }` → `{ cursor }` (last-writer-wins by `updatedAt`, tie → `deviceId`)
+  - `POST /recover` `{ vaultId, codeId }` → wrapped key blob for that recovery code
+  - `DELETE /vault` → wipes everything (Settings → "Delete synced data")
+  - Auth: `Authorization: Bearer <base64url(authKey)>`; server stores `password_hash(authKey)` (PHP) / SHA-256 + pepper (Worker).
+- **Recovery codes** (the user prefers these over reset flows): 8 codes shown once at setup (Figma `12:1934`). Each code wraps a copy of `masterKey`; wrapped blobs live server-side. Recovery = code → unwrap → set new passphrase → re-wrap. No email, no third-party auth.
+- Limits: 5 MB per request, 200 MB per vault (configurable), simple per-IP rate limit table.
+
+### 8.3 PHP target (`/server/php`)
+- PHP 8.1+, PDO SQLite. `config.php` (copied from sample) points to a DB path OUTSIDE `public_html`. `.htaccess`: force HTTPS, deny `*.sqlite|*.db|config.php`, CORS same-origin only, cache headers for static assets.
+- `/app/setup/` runs server checks (PHP version, PDO SQLite, writable data dir outside web root, HTTPS) before vault creation.
+- Must survive redeploys: the DB and config live outside the uploaded folder, so re-uploading the zip never wipes data.
+
+### 8.4 Cloudflare target (`/server/worker`)
+- Pages serves static files; Worker routes `/api/sync/*` and `/api/ics/*`. D1: `vaults`, `changes(meta)`, `rate_limits`; R2 for ciphertext blobs > 64 KB. `schema.sql` + `wrangler.toml.sample`.
+- ICS subscription is the one plaintext exception: the user opts in to "Publish calendar feed", the client uploads a plaintext ICS of deadline titles + dates under a random revocable token. Off by default; explained in the UI.
+
+---
+
+## 9. PWA
+
+- `manifest.webmanifest`: name "Waypost", short_name "Waypost", start_url `./app/`, scope `./`, display `standalone`, theme/background from tokens (light + dark via `media`), icons from Logo A (192, 512, maskable), `shortcuts` (Match, GPA planner, Tracker), `file_handlers` (`.pdf`, `.docx`, `.json` → `/app/import/`), `share_target` (GET `/app/share/` with `title`, `text`, `url`), `launch_handler: { client_mode: "focus-existing" }`.
+- `sw.js`: versioned precache of shell, routes, fonts, core, ui; runtime cache for `/vendor/*` and optional models; offline fallback; update toast ("New version ready — Reload").
+- Install prompt: capture `beforeinstallprompt`, show the M5 card after the second visit only.
+
+---
+
+## 10. Agent readability (ship in M5, keep in every later milestone)
+
+- Native elements first (`button`, `a`, `form`, `label`, `fieldset/legend`, `table/th scope`). ARIA only for dynamic widgets (tabs, dialog, listbox, live region).
+- Accessible names say the action ("Score 12 jobs", not "Go").
+- One `h1` per view, landmarks `header`/`nav[aria-label]`/`main`.
+- Stable hooks: `data-testid` on every actionable element and result row (map in Agents screen `12:1655`; publish in llms.txt). Never derive IDs from render order.
+- `#result-data` `<script type="application/json">` updated on every compute.
+- Charts always paired with a table twin.
+- WebMCP: feature-detect `document.modelContext`, fall back to `navigator.modelContext`. Register: `score_resume_against_jobs`, `plan_target_gpa`, `final_needed`, `convert_grade_scale`, `add_application` (confirms in-page before writing), `export_workspace`. Each tool = JSON Schema input + execute calling the same `/core` function the UI uses.
+- Publish `/llms.txt` (draft: `handover/llms.txt`) and `/llms-full.txt` (concatenated docs), `/schemas/workspace.json`, `/agents/` human page.
+- A static check (`tests/a11y-static.test.mjs`, no dependencies) parses every HTML file and template. It asserts that each `button`/`a` has an accessible name, each input has a label, there is one `h1` per page, every tool page has `#result-data`, and every `data-testid` listed in llms.txt exists. If the check can't find something, an agent probably can't either.
+
+---
+
+## 11. Extension — "Waypost Clipper" (Figma `10:1969`, `10:2027`)
+
+- Rename to Waypost Clipper; keep MV3. Permissions: `activeTab`, `storage`, `downloads`, `scripting`. Remove the always-on `content_scripts` for all URLs — inject `content.js` with `chrome.scripting.executeScript` on click instead.
+- Popup: This page (title, company, url, description word count, detected ATS layout), quick tier vs default resume (uses the same `/core/match`, bundled), Send to Waypost / Save for later, captured-by-date list with checkboxes, Export TXT / JSON (existing format stays supported).
+- **Send to Waypost**: open `<appUrl>/app/import/#job=<base64url(json)>` (fragment — never hits a server, no extra permissions). App validates against `/schemas/job-export.json`, shows a confirm sheet, then saves. App URL configurable in extension options (default: the GitHub Pages demo).
+- On-page chip (opt-in per site): request `optional_host_permissions` for that origin at runtime; show the floating chip with tier + Send. Off by default.
+
+---
+
+## 12. Milestones, git and progress
+
+### 12.0 Repo, git and automation rules (read first)
+
+**Rename the repo and make it public (first task in M0)**
+1. From the repo folder run `gh repo rename waypost --yes`. This renames `tanzir71/ats-scoring` to `tanzir71/waypost` and updates `origin`.
+2. Run `gh repo edit tanzir71/waypost --visibility public --accept-visibility-change-consequences --description "Honest, local-first toolkit for students and jobseekers: evidence-based resume matching, GPA planning, application tracking. Runs in your browser." --homepage "https://tanzir71.github.io/waypost/" --add-topic resume,ats,gpa,job-search,pwa,local-first,webmcp`.
+3. Check that `git remote -v` points at `https://github.com/tanzir71/waypost.git`. If it doesn't, run `git remote set-url origin https://github.com/tanzir71/waypost.git`.
+4. Before publishing, scan the history for secrets: `git log --all -p | grep -inE "(api[_-]?key|secret|token|password|ghp_|sk-[a-z0-9]{10,}|BEGIN .*PRIVATE)"`. The scan was clean on 25 Nov 2026 (2 commits). If it finds anything, don't change visibility. Record the finding in PROGRESS.md and carry on with the build.
+5. If `gh` is missing or not authenticated, don't stop and don't ask. Keep building and pushing to the current remote, and put "Rename + public pending: gh not authenticated" at the top of PROGRESS.md. GitHub redirects the old URL after a rename, so nothing breaks either way.
+
+**Normalise line endings (before the first commit).** Every file currently shows as modified, but `git diff --ignore-cr-at-eol` is empty, so the changes are line endings only. Add a `.gitattributes` containing `* text=auto eol=lf`, `*.png binary`, `*.woff2 binary` and `*.pdf binary`. Then run `git add --renormalize .` and commit that on its own as `chore: normalise line endings`.
+
+**Commit and push cadence (so the owner can follow progress)**
+- Work directly on `main`. Don't open pull requests, because they would wait on the owner.
+- Commit after every logical step, with small conventional messages such as `feat(match): requirement extraction`. Push after each finished screen or feature, and always at the end of a milestone.
+- End each milestone with a commit titled `M<n>: <summary>`. It must update `PROGRESS.md` (tick the checklist, note what changed and which Pages URLs to look at) and add a `CHANGELOG.md` entry. Then run `git tag -a m<n> -m "M<n>: <summary>"` and `git push origin main --follow-tags`.
+- Never force-push, rewrite pushed history, or delete branches or tags. If a push is rejected, run `git pull --rebase`, resolve conflicts keeping both sides' intent, and push again. Never discard commits made by the owner.
+- Never commit secrets. `config.php`, `.dev.vars` and real `wrangler.toml` files are gitignored; commit only the `*.sample` versions.
+- The handover files (`HANDOVER.md`, `AGENTS.md`, `handover/`) go in the M0 commit and stay in the repo.
+
+**GitHub Pages without GitHub Actions**
+- Don't create `.github/workflows/*`. Don't run `gh workflow` or `gh run`, and don't choose "GitHub Actions" as the Pages source.
+- Turn Pages on once, deploying from a branch: `gh api -X POST repos/tanzir71/waypost/pages -f "source[branch]=main" -f "source[path]=/"`. If Pages already exists, use `-X PUT` with the same fields. After that, GitHub publishes `main` on every push with its own branch deployment, so there's nothing for us to run. If the call fails (for example because the repo is still private), note it in PROGRESS.md and continue.
+- Demo URL: https://tanzir71.github.io/waypost/. Demo mode is detected automatically (§4.1). Add a `.nojekyll` file.
+
+**No owner involvement**
+- No manual QA steps, approval gates, pull requests to merge or questions mid-milestone. Don't write "please check X" anywhere.
+- When something needs the owner (logo choice, domain, sync server credentials, AI keys), use the documented default and list it under "Owner decisions (non-blocking)" in PROGRESS.md.
+- All verification is `npm run check` (§13), which needs no browser, no network, no installs and no accounts.
+
+`PROGRESS.md` starts like this:
+
+```
+# Waypost progress
+Live demo: https://tanzir71.github.io/waypost/
+
+| Milestone | Status | Tag | Look at |
+|---|---|---|---|
+| M0 Rename, scaffold, Pages | done | m0 | / and /app/ |
+| M1 Landing | in progress | | |
+...
+
+## Owner decisions (non-blocking)
+- Logo: using A · Signpost (Figma 6:189 has B and C)
+```
+
+### 12.1 Milestones
+
+Each milestone is complete only when `npm run check` passes and the milestone commit and tag are pushed.
+
+| # | Scope | Done when (automated only) |
+|---|---|---|
+| M0 | Repo rename + public + Pages from branch (§12.0); line-ending normalisation; folder layout; `tokens.css`; self-hosted fonts; `config.js` with auto mode; demo seed data; placeholder landing and app shell; `llms.txt` v0; MIT LICENSE; PROGRESS.md; CHANGELOG.md; `npm run check` script | `check` passes; tag `m0` pushed |
+| M1 | Landing desktop + mobile per `8:362` / `9:376`, with the real hero demo widget | No-external-URL scan and static a11y check pass for `index.html`; a unit test reproduces the hero demo result (tier and counts in `8:385`) from a committed fixture |
+| M2 | App shell (sidebar, header, status pill, theme); IndexedDB store + localStorage migration; Honest Match (7.1); Parse check; Resumes with diff; pdf.js + mammoth vendored | Unit tests reproduce the Northwind report in `8:1188` (Strong, 9 of 11 required) from `tests/fixtures/`; scoring 50 jobs × 5 versions takes < 300 ms in Node; migration tested with a localStorage fixture |
+| M3 | Today; Tracker (board + table + Move to…); extension upgrade + `/app/import/` handoff | Unit tests for job-export schema validation, `#job=` encode/decode round-trip and tracker stage moves; a static test confirms the extension manifest permissions are exactly `activeTab`, `storage`, `downloads`, `scripting`, with no `content_scripts` on all URLs |
+| M4 | GPA planner, Final needed, Scale converter + scale data | Figma fixtures pass: 3.78 needed; 3.81 mix; 61.8 / 74.3 / 49.3 / 36.8 / max 90.3; 72.4% and 9.05 |
+| M5 | PWA (manifest, SW, file handlers, share target, install card, offline banner); Command palette; Agents layer (deep links, `#result-data`, WebMCP, Agents screen); Settings | Static tests: manifest has the required fields (`share_target`, `file_handlers`, `shortcuts`, icons 192/512/maskable); the SW precache list covers every route and asset; WebMCP registration tested against a fake `modelContext`; the deep-link parser round-trips for every tool; a11y static check passes on all pages |
+| M6 | Sync: PHP + Worker, `/setup` checks, encryption, recovery codes, deploy zip (`scripts/make-zip.mjs`) | WebCrypto round-trip and recovery-code unwrap tests (Node 20); last-writer-wins merge tests; Worker handler tested in Node with in-memory D1/R2 fakes; `php -l` on every PHP file if `php` is on PATH (otherwise skipped with a log line); zip contents test (has `config.sample.php`, no secrets, no `.sqlite`) |
+| M7 | Offers; Deadlines + ICS (download, opt-in publish); Letters & outreach; Story bank; Contacts; optional AI (Chrome built-in + BYOK) with diff-accept UX | ICS output matches an RFC 5545 snapshot; offer maths fixtures (110,600 / 105,488 / 98,600 year-1 cash); AI providers tested with fakes; a settings-defaults test asserts AI is off |
+| Later | Credit planner, Time budget, LinkedIn/portfolio checkers, localisation (Bangla first), MCP server package reusing `/core` | — |
+
+---
+
+## 13. Testing (automated only)
+
+- `npm run check` runs `node --test tests/`, `node scripts/check-routes.mjs`, `node scripts/check-no-external.mjs` and the static a11y test.
+  - `check-no-external` scans HTML, JS and CSS for `http(s)://` URLs outside an allowlist: `github.com/tanzir71/waypost`, `tanziro.com`, `schema.org` in JSON-LD, and documentation links.
+- Zero npm dependencies; requires Node 20+ only.
+- Out of scope: Playwright, headless browsers, Lighthouse, manual QA, and anything that needs the owner's machine, accounts, approvals or network access. Compare against the Figma frames yourself while building; visual match is not a gating test.
+- Keep the existing tests passing. Update `tests/static-pages.test.mjs` for the new titles and paths.
+
+## 14. Non-goals
+
+- Auto-apply bots
+- Live interview "copilots"
+- Scraping logged-in LinkedIn pages
+- Analytics or telemetry by default
+- Third-party CDNs or fonts
+- Accounts or OAuth providers
+- GitHub Actions workflows or any CI on GitHub
+- PR-based flows that wait for the owner
+
+## 15. Open items for the owner (don't block on these)
+
+- Logo: comps use A · Signpost. Swap the asset if B or C is picked.
+- Name check: "Waypost" is close to WayUp (student job board) in sound. Always write the full word. Run a trademark/domain check before buying a domain.
+- Hosting of the live app (e.g. under tanziro.com and listed in its Tools Index, like Tack and Loft) — the build is base-path aware, so either works.

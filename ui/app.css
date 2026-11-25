@@ -1,0 +1,42 @@
+body { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100dvh; }
+.sidebar { padding: 16px 12px; display: flex; flex-direction: column; gap: 12px; position: sticky; top: 0; height: 100dvh; overflow-y: auto; }
+.sidebar .brand { padding: 8px 10px 16px; }
+.sidebar nav { flex: 1; }
+.nav-group { padding: 18px 10px 6px; }
+.nav-item { min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--wp-radius-md); font: var(--wp-label-m); text-decoration: none; color: var(--wp-ink-2); }
+.nav-item[aria-current="page"] { background: var(--wp-accent-soft); color: var(--wp-accent); }
+.nav-item:hover { background: var(--wp-surface-2); }
+.nav-item img { flex-shrink: 0; }
+.nav-item kbd { margin-left: auto; }
+.search-trigger { background: var(--wp-surface-2); }
+.app-main { min-width: 0; background: var(--wp-surface); border-radius: var(--wp-radius-lg); margin: 8px 8px 8px 0; display: flex; flex-direction: column; }
+main { padding: 32px; flex: 1; }
+.view-header { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 32px; }
+.view-header p { font: var(--wp-body-s); margin-top: 8px; }
+.app-footer { padding: 16px 32px; font: var(--wp-body-s); color: var(--wp-ink-3); }
+.app-footer a { text-decoration: none; }
+.demo-banner { padding: 16px 24px; border-radius: var(--wp-radius-lg) var(--wp-radius-lg) 0 0; background: var(--wp-accent-soft); color: var(--wp-ink-2); display: flex; gap: 16px; justify-content: space-between; align-items: center; font: var(--wp-body-s); }
+.demo-banner button { background: var(--wp-surface); }
+.mobile-header, .bottom-nav { display: none; }
+#announcement:empty { display: none; }
+#announcement { padding-top: 16px; color: var(--wp-ink-2); font: var(--wp-body-s); }
+@media (min-width: 701px) and (max-width: 1099px) {
+  body { grid-template-columns: 72px minmax(0, 1fr); }
+  .sidebar { padding: 16px 12px; }
+  .sidebar .brand span, .nav-item span, .nav-item kbd, .nav-group { display: none; }
+  .sidebar .brand { padding: 8px 12px 16px; }
+  .sidebar .status-pill { font-size: 0; width: 30px; padding: 10px; }
+  .nav-item { justify-content: center; margin-bottom: 4px; }
+}
+@media (max-width: 700px) {
+  body { display: block; }
+  .sidebar { display: none; }
+  .app-main { margin: 0 0 64px; min-height: calc(100dvh - 64px); border-radius: 0; }
+  main { padding: 24px 16px; }
+  .mobile-header { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--wp-bg); }
+  .bottom-nav { position: fixed; inset: auto 0 0; min-height: 64px; display: flex; align-items: center; justify-content: space-around; background: var(--wp-bg); padding-bottom: env(safe-area-inset-bottom); }
+  .bottom-nav a { font: var(--wp-label-m); padding: 16px 8px; text-decoration: none; }
+  .demo-banner { flex-direction: column; align-items: start; border-radius: 0; }
+  .empty-state { padding: 24px; }
+  .app-footer { padding: 16px; }
+}

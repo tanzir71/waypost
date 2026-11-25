@@ -1,0 +1,51 @@
+# Waypost
+
+> Waypost is an open-source, local-first toolkit for students and jobseekers. It matches resumes to many job descriptions with per-requirement evidence, plans the grades needed for a target GPA, works out the score needed on a final exam, converts grade scales, tracks applications and compares offers. All computation runs in the browser. No account is needed, and no data leaves the device unless the user turns on encrypted sync.
+
+Waypost is designed to be operated by browser agents and MCP clients. Every tool can be reached by URL. Inputs are prefilled from the URL fragment, and every result is mirrored as JSON in `<script id="result-data" type="application/json">`.
+
+## Tools and deep links
+
+Parameters go in the fragment (after `#`), so they are never sent to a server. Add `autorun=1` to run the tool immediately.
+
+- [GPA target planner](/app/gpa/#current=3.42&credits=64&target=3.6&remaining=64&autorun=1): `current`, `credits`, `target`, `remaining`, optional `scale` (`bd-ugc`, `us-4`, `in-10`, or a custom id), `locked` (`COURSE:GRADE,…`).
+- [Final exam needed](/app/finals/#w=20,10,30,40&s=92,85,78&target=A&scale=bd-ugc&autorun=1): `w` are weights in %, with the final last. `s` are the scores so far. `target` is a letter or a percentage.
+- [Scale converter](/app/scales/#from=bd-ugc&value=3.62&autorun=1): `from`, `value`, optional `to` (comma list).
+- [Honest Match](/app/match/#jd=BASE64URL&resume=v3&autorun=1): `jd` is base64url text (up to ~32 KB). `resume` is a resume version id or label. If you omit `jd`, the tool scores all saved jobs.
+- [Tracker](/app/tracker/#add=1&title=Backend%20Engineer&company=Northwind&url=https%3A%2F%2F…): this opens a prefilled "Add job" form, and the user confirms it.
+- [Parse check](/app/parse/): upload a PDF or DOCX. The tool shows the text as a parser reads it.
+- [Offers](/app/offers/), [Deadlines](/app/deadlines/), [Resumes](/app/resumes/), [Settings](/app/settings/)
+
+## Results
+
+- The `#result-data` element holds the latest result of the current tool as JSON. The shapes are defined in [/schemas/workspace.json](/schemas/workspace.json).
+- "Copy JSON" and "Download JSON" buttons exist on every tool view.
+- Match results use tiers (`strong`, `good`, `partial`, `limited`) with evidence per requirement. There is no 0–100 "ATS score". `keywordCoverage` is a secondary number.
+
+## WebMCP tools (when the browser supports it)
+
+Registered with `document.modelContext` (falls back to `navigator.modelContext`). The tools call the same functions as the UI.
+
+- `score_resume_against_jobs` (read): input is `{ resumeVersionId? | resumeText?, jobIds? | jdText? }`. Returns `matchReport[]`.
+- `plan_target_gpa` (read): input is `{ current, credits, target, remaining, scale?, locked? }`. Returns `{ needed, reachable, maxAchievable, mix[] }`.
+- `final_needed` (read): input is `{ categories:[{weight, score?}], target, scale? }`. Returns `{ needed, perGrade[] }`.
+- `convert_grade_scale` (read): input is `{ from, value, to?, table? }`. Returns `[{ system, value, method, confidence, note }]`.
+- `add_application` (write): asks the user to confirm in the page. Input is `{ title, company, url?, stage?, resumeVersionId? }`.
+- `export_workspace` (read): returns the workspace JSON.
+
+## Stable selectors
+
+`data-testid` values: `job-row` (`data-job-id`, `data-tier`), `requirement-row` (`data-status`: `met|partial|missing`), `score-button`, `result-data`, `tracker-card` (`data-stage`, `data-job-id`), `move-to-menu`, `gpa-input-current`, `gpa-input-credits`, `gpa-input-target`, `gpa-input-remaining`, `export-button`, `command-menu`.
+
+## Etiquette
+
+- Writes always ask for confirmation inside the page.
+- Charts always have a table twin. Prefer reading the table or `#result-data`.
+- A live region announces when a computation finishes, for example "Scoring complete: 12 jobs".
+
+## Optional
+
+- [Full docs for agents](/llms-full.txt)
+- [Workspace JSON Schema](/schemas/workspace.json)
+- [Source code (MIT)](https://github.com/tanzir71/waypost)
+- [Privacy](/privacy/): explains local-only storage, opt-in encrypted sync, and opt-in AI that sends text off-device.

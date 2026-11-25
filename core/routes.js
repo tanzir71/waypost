@@ -1,0 +1,20 @@
+export const routes = [
+  { id: 'today', path: '', label: 'Today', icon: 'home', group: 'Job search', description: 'Your next steps, applications, and study plans in one private workspace.' },
+  { id: 'match', label: 'Honest Match', icon: 'target', group: 'Job search', description: 'Compare resumes with job requirements and see the evidence behind every match.' },
+  { id: 'parse', label: 'Parse check', icon: 'scan', group: 'Job search', description: 'Read your resume the way a parser does and find formatting issues.' },
+  { id: 'resumes', label: 'Resumes', icon: 'layers', group: 'Job search', description: 'Keep resume versions and compare the changes that matter.' },
+  { id: 'tracker', label: 'Tracker', icon: 'kanban', group: 'Job search', description: 'Track applications and follow-ups from saved job to offer.' },
+  { id: 'letters', label: 'Letters', icon: 'mail', group: 'Job search', description: 'Draft letters and outreach from evidence you choose.' },
+  { id: 'offers', label: 'Offers', icon: 'offers', group: 'Job search', description: 'Compare compensation and the things that matter to you.' },
+  { id: 'contacts', label: 'Contacts', icon: 'users', group: 'Job search', description: 'Keep track of people, conversations, and reminders.' },
+  { id: 'gpa', label: 'GPA planner', icon: 'grad', group: 'Study', description: 'Work out the grades your target GPA needs.' },
+  { id: 'finals', label: 'Final needed', icon: 'calculator', group: 'Study', description: 'Calculate the final exam result needed for every grade.' },
+  { id: 'scales', label: 'Scale converter', icon: 'convert', group: 'Study', description: 'Compare grade systems with clearly labelled methods and confidence.' },
+  { id: 'deadlines', label: 'Deadlines', icon: 'calendar', group: 'Study', description: 'See application and study deadlines together.' },
+  { id: 'agents', label: 'Agents', icon: 'bot', group: 'Workspace', description: 'Stable controls, deep links, and tools for browser agents.' },
+  { id: 'settings', label: 'Settings', icon: 'sliders', group: 'Workspace', description: 'Manage storage, appearance, and optional connections.' },
+  { id: 'setup', label: 'Set up sync', description: 'Connect your own encrypted sync server with recovery codes.' },
+  { id: 'share', label: 'Save shared job', description: 'Review a shared job before saving it to your workspace.' },
+  { id: 'import', label: 'Import', description: 'Review an import from Waypost Clipper or a local file.' },
+];
+export function routePath(route) { return `app/${route.path ?? `${route.id}/`}`; }

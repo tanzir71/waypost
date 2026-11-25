@@ -4,3 +4,9 @@ node_modules/
 dist/
 .DS_Store
 Thumbs.db
+server/php/config.php
+.dev.vars
+server/worker/wrangler.toml
+*.sqlite
+*.sqlite-*
+*.db

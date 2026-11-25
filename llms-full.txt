@@ -1,0 +1,10 @@
+# Waypost agent documentation
+
+M0: foundation only. Generated tool pages expose native navigation and a
+#result-data JSON element. Tools that have not shipped say Coming soon.
+The exact target behavior is documented in HANDOVER.md sections 4, 7 and 10.
+Current shipped behavior and deployment status are in PROGRESS.md.
+
+Deployment root: URL of config.js. Never assume the app is hosted at /.
+Demo mode: automatically selected on *.github.io. Sync and AI are off.
+Workspace JSON Schema: schemas/workspace.json.

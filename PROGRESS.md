@@ -1,0 +1,34 @@
+# Waypost progress
+
+Live demo: https://tanzir71.github.io/waypost/
+
+| Milestone | Status | Tag | Look at |
+|---|---|---|---|
+| M0 Rename, scaffold, Pages | done | m0 | / and /app/ |
+| M1 Landing | pending | | |
+| M2 Match, parse, resumes | pending | | |
+| M3 Today, tracker, clipper | pending | | |
+| M4 Study tools | pending | | |
+| M5 PWA, agents, settings | pending | | |
+| M6 Encrypted sync | pending | | |
+| M7 Offers and supporting tools | pending | | |
+
+## M0
+
+- History scan found no secret-pattern matches in the two original commits.
+- Renamed tanzir71/ats-scoring to tanzir71/waypost and made it public.
+- Configured GitHub Pages to publish main from / with no Actions workflow.
+- Committed line-ending normalization independently.
+- Added 17 committed route pages, auto-mode config, local fonts and licenses,
+  Figma tokens and icons, demo seed, schema, MIT license, and offline local checks.
+- Tool routes currently show Coming soon. The landing page is a placeholder.
+- Validation: 16 Node tests pass, route pages match the shell, and the runtime
+  source scan finds no external URLs. Removed the retired UI's PDF CDN loader;
+  M2 will replace it with self-hosted parsers. Original scoring tests still pass.
+- Following HANDOVER.md §12.0's direct-main workflow; AGENTS.md's PR instruction
+  conflicts with the task's explicit handover implementation workflow.
+
+## Owner decisions (non-blocking)
+
+- Logo: using A · Signpost.
+- Custom domain, deployed sync credentials, and optional AI keys can be added later.
