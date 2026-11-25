@@ -10,7 +10,10 @@ private workspace. MIT licensed. Made by [tanziro.com](https://tanziro.com).
 
 ## Current release
 
-M2 ships [Honest Match](https://tanzir71.github.io/waypost/app/match/),
+M3 adds [Today](https://tanzir71.github.io/waypost/app/),
+[Tracker](https://tanzir71.github.io/waypost/app/tracker/),
+and [reviewed imports](https://tanzir71.github.io/waypost/app/import/) to
+[Honest Match](https://tanzir71.github.io/waypost/app/match/),
 [Parse check](https://tanzir71.github.io/waypost/app/parse/), and
 [Resumes](https://tanzir71.github.io/waypost/app/resumes/), alongside the landing
 demo. Paste or bulk-import jobs, compare every saved resume in a worker, and
@@ -29,8 +32,21 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Study, tracking and supporting tools remain Coming soon until their milestones.
+Study and supporting tools remain Coming soon until their milestones.
 Pricing sources are dated in data/competitors.json.
+
+Today derives next actions, recent pipeline counts and per-resume reply rates
+from your records. Tracker has a board, a sortable table, native Move to controls,
+N for a new job and M to move the selected card. Keep the resume used, notes,
+contacts, next step/date and stage history with each application. Export JSON
+from Today saves the workspace without credentials or internal keys.
+
+Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
+permissions are exactly activeTab, storage, downloads and scripting. Configure
+the app URL and a local default resume in Options. Send to Waypost opens a private
+fragment import for review and confirmation. TXT/JSON date exports remain
+compatible. Optional site chips need per-origin opt-in and permission; no content
+script runs on every site by default. See extension/README.md.
 
 The shared match engine uses BM25 evidence retrieval, skill aliases, Porter
 stemming, dated tenure with overlap merging, and separate knockout questions.
@@ -59,7 +75,9 @@ remain off. Later milestones add offline installation and optional sync.
 ## Develop and deploy
 
 Edit app/_shell.html, then run `node scripts/build-routes.mjs` and commit the
-generated pages. Pure business logic belongs in core/. No frameworks, runtime
+generated pages. After changing shared core, schema, tokens or bundled assets,
+run `node scripts/build-extension.mjs`; its committed bundle is checked against
+the canonical sources and uses the same matching engine. Pure logic belongs in core/. No frameworks, runtime
 npm dependencies, CDNs, analytics, or GitHub Actions. Static Pages deploys the
 root of main directly, including .nojekyll. HANDOVER.md defines M0–M7.
 

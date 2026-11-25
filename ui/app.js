@@ -1,6 +1,11 @@
 import {openWorkspace} from './store.js';
-import {announce} from './dom.js';
+import {announce,dialog,el} from './dom.js';
+import {routes,routePath} from '../core/routes.js';
 const config = window.WAYPOST_CONFIG;
+function openTools(){dialog('Choose a tool',el('nav',{'aria-label':'All tools',class:'stack'},routes.filter(route=>route.group).map(route=>el('a',{class:'button secondary',href:config.basePath+routePath(route),text:route.label,'data-testid':`tool-menu-${route.id}`}))));}
+document.querySelector('#mobile-more').addEventListener('click',openTools);
+document.querySelector('#mobile-search').addEventListener('click',openTools);
+for(const link of document.querySelectorAll('.bottom-nav a'))if(link.pathname===location.pathname)link.setAttribute('aria-current','page');
 if (config.mode === 'demo') {
   document.querySelector('#demo-banner').hidden = false;
   document.querySelectorAll('[data-status-pill]').forEach(node => { node.textContent = 'Demo'; });

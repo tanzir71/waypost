@@ -16,5 +16,7 @@ export async function extensionFiles() {
   }
   result.push({path:'extension/bundled/NOTICE.md',data:Buffer.from('Generated from the canonical core/, data/, schemas/, ui/ and assets/ sources.\nRun node scripts/build-extension.mjs after changing these sources.\nJSON imports are translated to JS modules for extension service workers.\nSee bundled/data/skills/LICENSE.md and bundled/assets/fonts/ for attribution.\n')});
   result.push({path:'extension/defaults.js',data:Buffer.from(`// Generated from defaults.json.\nexport default ${JSON.stringify(JSON.parse(await readFile(new URL('extension/defaults.json',root),'utf8')))};\n`)});
+  const logo=await readFile(new URL('assets/icons/logo.svg',root));
+  result.push({path:'extension/brand.js',data:Buffer.from(`// Generated from the local Figma logo; no page-origin asset request.\nexport default "data:image/svg+xml;base64,${logo.toString('base64')}";\n`)});
   return result;
 }

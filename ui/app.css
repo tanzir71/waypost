@@ -170,7 +170,19 @@ main { padding: 32px; flex: 1; }
   .resume-list > p { display: none; }
   .diff-side { grid-template-columns: 1fr; }
   .today-layout { grid-template-columns: 1fr; }
+  .today-layout > div, .today-layout > aside { display: contents; }
+  .today-next { order: 1; }
+  .today-study { order: 2; }
+  .today-best { order: 3; }
+  .today-pipeline { order: 4; }
+  .today-workspace { order: 5; }
+  body[data-route="today"] .view-header h1 { font: var(--wp-body-s); color: var(--wp-ink-3); }
+  .mobile-header .status-pill { margin-left: auto; }
+  .bottom-nav a, .bottom-nav button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 8px; font: var(--wp-label-s); text-transform: uppercase; }
+  .bottom-nav [aria-current="page"] { color: var(--wp-accent); }
   .today-layout .card { padding: 16px; }
+  body[data-route="today"] .app-main { background: var(--wp-bg); }
+  body[data-route="today"] .today-layout .card { background: var(--wp-surface); }
   .tracker-column { flex-basis: 240px; }
   .next-row { gap: 8px; }
   .next-icon { display: none; }

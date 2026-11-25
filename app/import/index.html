@@ -35,7 +35,7 @@
     <p class="status-pill" data-status-pill>Local · not synced</p>
   </aside>
   <div class="app-main">
-    <header class="mobile-header"><a class="brand" href="../../" data-testid="mobile-home"><img src="../../assets/icons/logo.svg" width="22" height="22" alt="" aria-hidden="true">Waypost</a><span class="status-pill" data-status-pill>Local</span></header>
+    <header class="mobile-header"><a class="brand" href="../../" aria-label="Waypost home" data-testid="mobile-home"><img src="../../assets/icons/logo.svg" width="20" height="20" alt="" aria-hidden="true"><span>Import</span></a><span class="status-pill" data-status-pill>Local</span><button type="button" id="mobile-search" class="ghost small" aria-label="Find a tool" data-testid="mobile-search"><img src="../../assets/icons/search.svg" width="20" height="20" alt="" aria-hidden="true"></button></header>
     <div class="demo-banner" id="demo-banner" hidden>
       <span><strong>You're exploring the demo.</strong> Sample data stays in this browser.</span>
       <div class="actions"><button type="button" id="clear-demo" data-testid="clear-demo">Clear sample data</button><a href="https://github.com/tanzir71/waypost/archive/refs/heads/main.zip" data-testid="download-source">Download zip</a><a href="https://github.com/tanzir71/waypost/fork" data-testid="fork-repository">Fork</a></div>
@@ -47,7 +47,13 @@
     </main>
     <footer class="app-footer"><a href="https://tanziro.com" data-testid="footer-credit">Made by tanziro.com</a><div class="appearance-control"><label for="app-theme">Appearance</label><select id="app-theme" data-testid="theme-select"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></div></footer>
   </div>
-  <nav class="bottom-nav" aria-label="Mobile tools"><a href="../../app/" data-testid="mobile-today">Today</a><a href="../../app/match/" data-testid="mobile-match">Match</a><a href="../../app/tracker/" data-testid="mobile-tracker">Tracker</a><a href="../../app/gpa/" data-testid="mobile-gpa">GPA</a><a href="../../app/agents/" data-testid="mobile-more">More</a></nav>
+  <nav class="bottom-nav" aria-label="Mobile tools">
+    <a href="../../app/" data-testid="mobile-today"><img src="../../assets/icons/home.svg" width="20" height="20" alt="" aria-hidden="true"><span>Today</span></a>
+    <a href="../../app/match/" data-testid="mobile-match"><img src="../../assets/icons/target.svg" width="20" height="20" alt="" aria-hidden="true"><span>Match</span></a>
+    <a href="../../app/tracker/" data-testid="mobile-tracker"><img src="../../assets/icons/kanban.svg" width="20" height="20" alt="" aria-hidden="true"><span>Tracker</span></a>
+    <a href="../../app/gpa/" data-testid="mobile-gpa"><img src="../../assets/icons/grad.svg" width="20" height="20" alt="" aria-hidden="true"><span>GPA</span></a>
+    <button type="button" id="mobile-more" class="ghost" data-testid="mobile-more"><img src="../../assets/icons/more.svg" width="20" height="20" alt="" aria-hidden="true"><span>More</span></button>
+  </nav>
   <script id="result-data" data-testid="result-data" type="application/json">null</script>
   <script type="module" src="../../ui/app.js"></script>
 </body>

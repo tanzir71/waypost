@@ -1,6 +1,7 @@
 import {normalizeCapturedJob,toWaypostExport} from './job-data.js';
 import {matchResume} from '../bundled/core/match/index.js';
 import {handoffURL} from '../bundled/core/import/index.js';
+import logo from '../brand.js';
 export async function captureTab(api,tab) {
   if(!tab?.id||!/^https?:/i.test(tab.url??''))throw new Error('Open an HTTP or HTTPS job page before reading it.');
   await api.scripting.executeScript({target:{tabId:tab.id},files:['content.js']});
@@ -16,5 +17,5 @@ export function quickMatch(job,options) {
 export function sendURL(jobs,options) {return handoffURL(options.appUrl,toWaypostExport(jobs,new Date()));}
 export async function showChip(api,tab,job,options) {
   const report=quickMatch(job,options),url=sendURL([job],options);
-  return api.tabs.sendMessage(tab.id,{type:'WAYPOST_SHOW_CHIP',tier:report?.tier??null,url});
+  return api.tabs.sendMessage(tab.id,{type:'WAYPOST_SHOW_CHIP',tier:report?.tier??null,url,logo,counts:report?{met:report.required.filter(row=>row.status==='met').length,total:report.required.length}:null,label:options.resumeLabel});
 }

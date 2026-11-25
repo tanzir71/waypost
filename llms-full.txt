@@ -10,7 +10,7 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 
 ## Build status
 
-M2: Honest Match, Parse check and Resumes are available. Other tool routes are
+M3: Today, Tracker, import review, Honest Match, Parse check and Resumes are available. Other tool routes are
 placeholders until their milestone ships. The landing demo uses the same core.
 Read PROGRESS.md; do not assume a placeholder computed a result.
 
@@ -42,6 +42,26 @@ app/finals/, app/scales/, app/offers/, app/deadlines/, app/letters/,
 app/contacts/, app/agents/, app/settings/, app/setup/, app/share/, app/import/.
 Future deep links use URL fragments, never queries, for private inputs.
 
+## Tracker, Today and imports
+
+- app/: next actions, pipeline in the last 30 days, per-resume replies/sent,
+  recent best matches, storage estimate and credential-free workspace export.
+- app/tracker/#view=board or #view=table: native board/table controls, sortable
+  columns, stage filter, application details and history. Every card has a labelled
+  Move to select. N opens a new job; M focuses the selected card's stage control.
+- app/tracker/#add=1&title=Backend&company=Northwind opens a prefilled form.
+  The application is written only after Save application. Selection links use
+  #selected=APPLICATION_UUID&edit=1.
+- app/import/#job=BASE64URL validates a Clipper envelope against
+  schemas/job-export.json, then shows a review panel. Save jobs, Save & score, or
+  Save to tracker confirms the selected writes. No import is saved automatically.
+  File imports accept Clipper TXT/JSON exports and resume files. Plain-text jobs
+  can also be pasted. Private fragment payloads are limited to about 32 KB;
+  oversized captures use JSON export/import or paste instead.
+- The Clipper's matching bundle is generated from the same core. Read this page
+  injects the capture script on click. Site chips are off by default and require
+  per-origin permission plus an explicit opt-in.
+
 ## Results and stable hooks
 
 Every tool page has a JSON script #result-data, initially null. The landing
@@ -49,12 +69,14 @@ demo updates it on each match. Native controls have accessible names.
 data-testid values: `result-data`, `open-search`, `clear-demo`, `footer-credit`,
 `hero-jd`, `hero-resume`, `hero-upload`, `score-button`, `requirement-row`,
 `copy-json`, `download-json`, `job-row`, `resume-tab`, `resume-version`,
-`parse-line`, `parse-check`, `diff-row`. Requirement rows have data-status met/partial/missing.
+`parse-line`, `parse-check`, `diff-row`, `tracker-card`, `move-to-menu`,
+`next-up-row`, `pipeline-row`, `response-rate-row`, `export-button`,
+`import-job-row`, `import-confirm-save`. Requirement rows have data-status met/partial/missing.
 Navigation uses nav-<route>. Read the JSON for all requirements; the hero shows
 representative rows. No employer hiring outcome is predicted by the tier.
 Every actionable native control also has its own test hook. Native names are the
 preferred way to operate the UI. Add to tracker asks for in-page confirmation.
-That application record is saved locally; the tracker view ships in M3.
+That application record is saved locally and can be edited in Tracker.
 
 ## Documentation
 
@@ -77,7 +99,10 @@ private workspace. MIT licensed. Made by [tanziro.com](https://tanziro.com).
 
 ## Current release
 
-M2 ships [Honest Match](https://tanzir71.github.io/waypost/app/match/),
+M3 adds [Today](https://tanzir71.github.io/waypost/app/),
+[Tracker](https://tanzir71.github.io/waypost/app/tracker/),
+and [reviewed imports](https://tanzir71.github.io/waypost/app/import/) to
+[Honest Match](https://tanzir71.github.io/waypost/app/match/),
 [Parse check](https://tanzir71.github.io/waypost/app/parse/), and
 [Resumes](https://tanzir71.github.io/waypost/app/resumes/), alongside the landing
 demo. Paste or bulk-import jobs, compare every saved resume in a worker, and
@@ -96,8 +121,21 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Study, tracking and supporting tools remain Coming soon until their milestones.
+Study and supporting tools remain Coming soon until their milestones.
 Pricing sources are dated in data/competitors.json.
+
+Today derives next actions, recent pipeline counts and per-resume reply rates
+from your records. Tracker has a board, a sortable table, native Move to controls,
+N for a new job and M to move the selected card. Keep the resume used, notes,
+contacts, next step/date and stage history with each application. Export JSON
+from Today saves the workspace without credentials or internal keys.
+
+Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
+permissions are exactly activeTab, storage, downloads and scripting. Configure
+the app URL and a local default resume in Options. Send to Waypost opens a private
+fragment import for review and confirmation. TXT/JSON date exports remain
+compatible. Optional site chips need per-origin opt-in and permission; no content
+script runs on every site by default. See extension/README.md.
 
 The shared match engine uses BM25 evidence retrieval, skill aliases, Porter
 stemming, dated tenure with overlap merging, and separate knockout questions.
@@ -126,7 +164,9 @@ remain off. Later milestones add offline installation and optional sync.
 ## Develop and deploy
 
 Edit app/_shell.html, then run `node scripts/build-routes.mjs` and commit the
-generated pages. Pure business logic belongs in core/. No frameworks, runtime
+generated pages. After changing shared core, schema, tokens or bundled assets,
+run `node scripts/build-extension.mjs`; its committed bundle is checked against
+the canonical sources and uses the same matching engine. Pure logic belongs in core/. No frameworks, runtime
 npm dependencies, CDNs, analytics, or GitHub Actions. Static Pages deploys the
 root of main directly, including .nojekyll. HANDOVER.md defines M0–M7.
 

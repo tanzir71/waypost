@@ -6,8 +6,8 @@ Live demo: https://tanzir71.github.io/waypost/
 |---|---|---|---|
 | M0 Rename, scaffold, Pages | done | m0 | / and /app/ |
 | M1 Landing | done | m1 | / |
-| M2 Match, parse, resumes | done | m2 | /app/match/, /app/parse/, /app/resumes/ |
-| M3 Today, tracker, clipper | in progress | | /app/, /app/tracker/, /app/import/ |
+| M2 Match, parse, resumes | implemented; Pages pending | m2 | /app/match/, /app/parse/, /app/resumes/ |
+| M3 Today, tracker, clipper | implemented; Pages pending | m3 | /app/, /app/tracker/, /app/import/ |
 | M4 Study tools | pending | | |
 | M5 PWA, agents, settings | pending | | |
 | M6 Encrypted sync | pending | | |
@@ -73,6 +73,43 @@ Live demo: https://tanzir71.github.io/waypost/
   base-path checks, static accessibility, no-external-resource scan, JavaScript
   syntax and vendor integrity. All pass without browser automation or owner QA.
 - Pages URLs: /app/match/, /app/parse/, /app/resumes/ under the live demo root.
+
+## M3
+
+- Added Today with due follow-ups, interviews, near deadlines, unique unanswered
+  knockouts, recent pipeline counts, shared per-resume reply rates, recent best
+  matches, local storage estimate and credential-free workspace JSON export.
+- Added Tracker board and sortable native table, all six stages with Closed
+  collapsed, native Move to selects, N/M shortcuts, editable role/company/link,
+  resume used, next step/date, notes, contacts and append-only stage history.
+- Added reviewed imports for private #job links, Clipper TXT/JSON exports, pasted
+  descriptions and resume files. Save jobs, Save & score and Save to tracker
+  require an explicit in-page action. UTF-8 payloads round-trip; large links use
+  file export/import without truncating job text.
+- Upgraded Waypost Clipper to MV3 version 2. Required permissions are exactly
+  activeTab, storage, downloads and scripting. Removed all-URL content scripts.
+  Capture injects on click; default resume and deployment URL are set in Options.
+  Optional site chips require both per-origin opt-in and a granted permission.
+- The extension's committed bundle is generated from the app's canonical core,
+  schemas, data, styles and local assets; matcher parity and bundle sync are tested.
+  JSON data modules support extension service workers without import assertions.
+- Preserved capture date TXT/JSON formats and description paragraph structure.
+  Added safe URL validation, schema bounds, sample dependency protection, one-time
+  M3 examples for existing demos, mobile tool navigation and Figma-aligned cards.
+- Validation: 56 Node tests pass, including extension API/service-worker fakes,
+  schema validation, UTF-8 private links, stage transitions, response rates, Today
+  aggregation and migration. Static a11y, routes, syntax, same-origin resources,
+  vendor integrity and extension bundle checks also pass. No owner QA required.
+
+## Deployment status
+
+- Pages is still configured for main from / with .nojekyll and no workflows.
+- M1 is the last independently verified live release.
+- The M2 builds were reported errored by the Pages API with only “Page build
+  failed.” The M3 feature build is running. Source, tags and all local release
+  checks are available; newer live deployment remains unverified.
+- Continue checking the Pages build API while implementing the remaining
+  milestones. No Actions workflows, force pushes or owner approval are needed.
 
 ## Owner decisions (non-blocking)
 

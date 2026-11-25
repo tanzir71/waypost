@@ -12,6 +12,7 @@ import {normalizeCapturedJob,toWaypostExport} from '../core/import/clipper.js';
 import {captureTab} from '../extension/src/capture.js';
 import {memoryIndexedDB,memoryLocalStorage} from './helpers/memory-indexeddb.mjs';
 import {openWorkspace} from '../ui/store.js';
+import {sampleRemovalPlan} from '../core/store/samples.js';
 const now='2026-11-25T12:00:00.000Z';
 const job={id:'job',title:'Backend Engineer — বাংলা',company:'Northwind',text:'Requirements:\nGo services\nPreferred:\nPostgreSQL',url:'https://example.test/jobs/1'};
 test('job exports validate legacy envelopes, single captures, bounds and safe links',()=>{
@@ -82,4 +83,22 @@ test('M2 demos receive M3 examples once and cleared samples never reappear',asyn
   await store.setSetting('demo-seeded',true);await store.seed(seed);await store.seed(seed);assert.equal((await store.all('applications')).length,12);
   const jobs=await store.all('jobs');for(const app of await store.all('applications'))assert.ok(jobs.some(row=>row.id===app.jobId));
   await store.clearSamples();await store.seed(seed);assert.equal((await store.all('applications')).length,0);store.close();
+});
+test('clearing samples protects dependencies of personal records and can clear untouched demo stages',()=>{
+  const sampleJob={id:'sample-job',sample:true},sampleResume={id:'sample-resume',sample:true};
+  const plan=sampleRemovalPlan({jobs:[sampleJob,{id:'unused',sample:true}],resumeVersions:[sampleResume],applications:[{id:'own',jobId:'sample-job',resumeVersionId:'sample-resume',sample:false},{id:'demo',jobId:'unused',sample:true}]});
+  assert.deepEqual(plan.jobs.map(row=>row.id),['unused']);assert.deepEqual(plan.resumeVersions,[]);assert.deepEqual(plan.applications.map(row=>row.id),['demo']);
+});
+test('the chip service worker injects only after both per-origin opt-in and permission',async()=>{
+  let listener,enabled=false,granted=false,injections=0;const messages=[];
+  const previous=globalThis.chrome;
+  globalThis.chrome={tabs:{onUpdated:{addListener:fn=>{listener=fn;}},sendMessage:async(id,message)=>{messages.push(message.type);return message.type==='WAYPOST_CAPTURE_JOB'?{title:'Engineer',description:'Required:\nGo services',company:'Northwind'}:{shown:true};}},storage:{local:{get:async()=>({options:{appUrl:'https://example.test/waypost/',chipOrigins:enabled?['https://jobs.example.test']:[],resumeText:''}})}},permissions:{contains:async()=>granted},scripting:{executeScript:async()=>{injections++;}}};
+  try {
+    await import('../extension/background.js?contract-test');
+    const tab={id:12,url:'https://jobs.example.test/job'};
+    await listener(12,{status:'complete'},tab);assert.equal(injections,0);
+    enabled=true;await listener(12,{status:'complete'},tab);assert.equal(injections,0);
+    granted=true;await listener(12,{status:'complete'},tab);assert.equal(injections,1);assert.deepEqual(messages,['WAYPOST_CAPTURE_JOB','WAYPOST_SHOW_CHIP']);
+    await listener(12,{status:'complete'},{id:12,url:'https://different.example.test/job'});assert.equal(injections,1);
+  }finally{globalThis.chrome=previous;}
 });

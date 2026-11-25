@@ -10,7 +10,7 @@ export async function renderTracker({store,basePath,view,actions}) {
   const titleFor=app=>{const job=jobs.find(row=>row.id===app.jobId);return `${job?.title??'Saved role'} at ${job?.company||'company not provided'}`;};
   const fragment=()=>history.replaceState(null,'',`#view=${mode}&stage=${filter}${selectedId?`&selected=${encodeURIComponent(selectedId)}`:''}`);
   async function reload(){jobs=await store.all('jobs');applications=await store.all('applications');paint();}
-  async function move(app,stage){try{const next=moveApplication(app,stage,new Date().toISOString());await store.save('applications',{...next,sample:false});selectedId=app.id;await reload();fragment();document.getElementById(`move-${app.id}`)?.focus();announce(`${titleFor(next)} moved to ${titleCase(stage)}.`);}catch(error){announce(error.message);}}
+  async function move(app,stage){try{const next=moveApplication(app,stage,new Date().toISOString());await store.save('applications',next);selectedId=app.id;await reload();fragment();document.getElementById(`move-${app.id}`)?.focus();announce(`${titleFor(next)} moved to ${titleCase(stage)}.`);}catch(error){announce(error.message);}}
   function moveMenu(app) {
     const id=`move-${app.id}`;
     const select=el('select',{id,'data-testid':'move-to-menu','aria-label':`Move ${titleFor(app)} to a stage`},stages.map(stage=>el('option',{value:stage,text:`Move to ${titleCase(stage)}`,selected:stage===app.stage})));

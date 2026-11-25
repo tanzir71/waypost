@@ -1,5 +1,17 @@
 # Changelog
 
+## M3 — 2026-11-25
+
+- Shipped Today, application board/table tracking, stage history, next steps,
+  per-resume response rates, workspace export and reviewed Clipper/file imports.
+- Upgraded Waypost Clipper to MV3 v2 with click-only capture, local resume quick
+  matches, private fragment handoffs, compatible TXT/JSON exports and optional
+  per-origin chips. No always-on all-URL content script remains.
+- Added schema validation, UTF-8 link encoding, protected sample dependencies,
+  mobile navigation, and a generated extension bundle using the same core.
+- All 56 tests and release checks pass. GitHub Pages reported generic M2 build
+  failures; the newer build is pending, so live deployment is not yet verified.
+
 ## M2 — 2026-11-25
 
 - Shipped the Honest Match workspace with worker scoring, bulk import, tier

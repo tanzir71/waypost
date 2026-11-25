@@ -1,5 +1,6 @@
 import { stores,assertRecord,settingsDefaults } from '../core/store/schema.js';
 import { migrateLegacy } from '../core/store/migration.js';
+import { sampleRemovalPlan } from '../core/store/samples.js';
 
 export function uuidv7(now=Date.now()) {
   const bytes=crypto.getRandomValues(new Uint8Array(16));
@@ -89,8 +90,8 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
     async save(type,data) {const row=record(data);await putMany({[type]:[row]});return row;},
     async remove(type,id) {const previous=await get(type,id);if(previous) await putMany({[type]:[record({...previous,deleted:true})]});},
     async clearSamples() {
-      const records={};
-      for(const type of stores.filter(type=>!['settings','changes'].includes(type))) records[type]=(await all(type)).filter(row=>row.sample).map(row=>record({...row,deleted:true}));
+      const active=Object.fromEntries(await Promise.all(stores.filter(type=>!['settings','changes'].includes(type)).map(async type=>[type,await all(type)])));
+      const records=Object.fromEntries(Object.entries(sampleRemovalPlan(active)).map(([type,rows])=>[type,rows.map(row=>record({...row,deleted:true}))]));
       await putMany(records,{meaningful:false});await setSetting('demo-seeded',true);
     },
     async seed(seed) {
