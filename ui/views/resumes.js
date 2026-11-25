@@ -9,7 +9,7 @@ export async function renderResumes({store,basePath,view,actions}) {
   let versions=(await store.all('resumeVersions')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));
   const reports=await store.all('matchReports'),applications=await store.all('applications');
   const linked=readLink('resumes');
-  let selected=versions.find(row=>row.id===linked.state.resume||row.label===linked.state.resume)??versions.at(-1);
+  let selected=versions.find(row=>row.id===linked.state.resume||row.label===linked.state.resume)??(!linked.state.resume&&!linked.invalid?versions.at(-1):null);
   let mode=linked.state.mode==='inline'?'inline':'side';
   const list=el('aside',{class:'resume-list','aria-label':'Resume versions'}),main=el('section',{class:'resume-detail'});
   const layout=el('div',{class:'resumes-layout'},list,main);

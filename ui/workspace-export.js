@@ -14,7 +14,7 @@ export async function exportWorkspace(store) {
 }
 export async function saveWorkspaceFolder(store,{showDirectoryPicker=window.showDirectoryPicker}={}) {
   if(!showDirectoryPicker)throw new Error('Folder backups are unavailable in this browser. Use Export JSON.');
-  const directory=await showDirectoryPicker({mode:'readwrite'}),workspace=await readWorkspace(store),filename=`waypost-${workspace.exportedAt.replace(/[:.]/g,'-')}.json`;
+  const directory=await showDirectoryPicker.call(window,{mode:'readwrite'}),workspace=await readWorkspace(store),filename=`waypost-${workspace.exportedAt.replace(/[:.]/g,'-')}.json`;
   const file=await directory.getFileHandle(filename,{create:true}),stream=await file.createWritable();try{await stream.write(JSON.stringify(workspace,null,2));await stream.close();}catch(error){await stream.abort?.();throw error;}
   await store.setSetting('last-export',workspace.exportedAt);announce(`Saved ${filename} in the chosen folder. Original uploads are not included.`);return workspace;
 }

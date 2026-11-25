@@ -10,7 +10,7 @@ export async function saveStudy(store,key,value) {
 }
 export async function scaleOptions(store) {return [...builtInScales(),...await store.all('scales')];}
 export function studyActions(actions,{getValue,getLink,compute,label='Calculate',testid='calculate-button'}) {
-  actions.append(button('Share link',async()=>{try{await navigator.clipboard.writeText(getLink());announce('Private input link copied. Review its contents before sharing.');}catch{announce('Clipboard unavailable. Copy this page’s address after calculating.');}},'share-link',{class:'ghost small'}),button('Copy JSON',()=>getValue()&&import('./dom.js').then(({copyJSON})=>copyJSON(getValue())),'copy-json',{class:'small'}),button('Download JSON',()=>getValue()&&download('waypost-study-result.json',JSON.stringify(getValue(),null,2)),'download-json',{class:'ghost small'}));
+  actions.append(button('Share link',async()=>{try{const href=getLink();if(!href)return;await navigator.clipboard.writeText(href);announce('Private input link copied. Review its contents before sharing.');}catch{announce('Clipboard unavailable. Copy this page’s address after calculating.');}},'share-link',{class:'ghost small'}),button('Copy JSON',()=>getValue()&&import('./dom.js').then(({copyJSON})=>copyJSON(getValue())),'copy-json',{class:'small'}),button('Download JSON',()=>getValue()&&download('waypost-study-result.json',JSON.stringify(getValue(),null,2)),'download-json',{class:'ghost small'}));
   if(compute)actions.append(button(label,compute,testid,{class:'primary small'}));
 }
 export function editScale({store,scale,onSave}) {

@@ -20,6 +20,6 @@ self.addEventListener('fetch',event=>{
     const cache=await caches.open(policy.strategy==='runtime'?runtimeCache:shellCache),cached=await cache.match(policy.key);
     if(cached)return cached;
     try{const request=policy.strategy==='precache'?new Request(policy.key,{cache:'no-cache',credentials:'same-origin',referrerPolicy:'no-referrer'}):event.request;const response=await fetch(request);if(response.ok&&response.type!=='opaque')await cache.put(policy.key,response.clone());return response;}
-    catch(error){if(event.request.mode==='navigate'){const fallback=await (await caches.open(shellCache)).match(new URL('app/index.html',scope));if(fallback)return fallback;}throw error;}
+    catch(error){if(event.request.mode==='navigate'){const fallback=await (await caches.open(shellCache)).match(new URL('app/index.html',scope));if(fallback)return Response.redirect(new URL('app/',scope),302);}throw error;}
   })());
 });

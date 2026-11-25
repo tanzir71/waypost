@@ -1,5 +1,17 @@
 # Changelog
 
+## M5 — 2026-11-25
+
+- Shipped the installable/offline workspace, native file and job-share review,
+  versioned local caches, offline banner and explicit update/reload flow.
+- Shipped the keyboard command palette, private input links, read-only autorun,
+  six validated WebMCP tools and in-page application confirmation.
+- Shipped Settings, workspace restore with deterministic merges, supported
+  folder backups, live storage status and the human /agents/ guide.
+- Expanded agent docs and hooks, corrected stale landing availability labels,
+  and added executable service-worker/native-view contract tests. All 83 tests
+  and release checks pass. Encrypted sync and supporting tools remain M6/M7.
+
 ## M4 — 2026-11-25
 
 - Shipped GPA target planning, saved terms/courses, locked greedy mixes,

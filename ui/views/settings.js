@@ -3,7 +3,7 @@ import {exportWorkspace,saveWorkspaceFolder,readWorkspace} from '../workspace-ex
 import {reviewWorkspaceImport,readWorkspaceFile} from '../workspace-import.js';
 import {setTheme} from '../theme.js';
 import {buildDeepLink} from '../../core/links/deep.js';
-import {readLink} from '../links.js';
+import {readLink,shareLinkButton} from '../links.js';
 export async function renderSettings({store,basePath,view,actions,agentStatus}) {
   const preferences=(await store.setting('preferences')).value,link=readLink('settings');
   const sections=el('div',{class:'stack settings-content'}),navigation=el('nav',{class:'settings-nav','aria-label':'Settings sections'}),layout=el('div',{class:'settings-layout'},navigation,sections);
@@ -26,7 +26,7 @@ export async function renderSettings({store,basePath,view,actions,agentStatus}) 
   add('agents','Agents',el('p',{class:'muted',text:agentStatus?.supported?`Browser tools: ${agentStatus.tools.filter(row=>row.status==='registered').length} registered via ${agentStatus.via}.`:'WebMCP is unavailable in this browser. Native controls and private input links remain available.'}),el('a',{class:'button small',href:`${basePath}app/agents/`,text:'Open agent tools and links','data-testid':'settings-agents'}));
   add('keyboard','Keyboard',el('dl',{class:'keyboard-map'},[['Ctrl+K / ⌘K','Open command menu'],['Escape','Close a dialog'],['↑ / ↓ / Enter','Select and open a command'],['N / M in Tracker','New application / move selected card'],['← / → on Match tabs','Choose a resume version']].map(([key,text])=>el('div',{},el('dt',{},el('kbd',{text:key})),el('dd',{text})))));
   add('about','About',el('p',{text:'Waypost · local-first tools for students and jobseekers · MIT license.'}),el('p',{class:'muted',text:'No analytics, CDNs or runtime npm dependencies. Demo and local tools make no cross-origin requests. PDF/DOCX parser files load when first used; after that they are cached for offline reuse.'}),el('div',{class:'actions'},el('a',{href:`${basePath}README.md`,text:'Read documentation','data-testid':'settings-docs'}),el('a',{href:`${basePath}privacy/`,text:'Privacy','data-testid':'settings-privacy'}),el('a',{href:'https://github.com/tanzir71/waypost',text:'Source code','data-testid':'settings-source'})));
-  actions.append(button('Export workspace',()=>exportWorkspace(store).catch(error=>announce(error.message)),'settings-export',{class:'small'}),button('Copy JSON',async()=>copyJSON(await readWorkspace(store)),'settings-copy-json',{class:'ghost small'}));view.replaceChildren(layout);
+  actions.append(shareLinkButton('settings',()=>readLink('settings').state,basePath),button('Export workspace',()=>exportWorkspace(store).catch(error=>announce(error.message)),'settings-export',{class:'small'}),button('Copy JSON',async()=>copyJSON(await readWorkspace(store)),'settings-copy-json',{class:'ghost small'}));view.replaceChildren(layout);
   result({storage:{persistent:!!persistent,usage:estimate?.usage??null,quota:estimate?.quota??null},sync:window.WAYPOST_CONFIG.mode==='demo'?'hidden in demo':preferences.sync.provider,ai:{provider:null},theme:preferences.theme,agentStatus});
   if(link.state.section)document.getElementById(`settings-${link.state.section}`)?.scrollIntoView({block:'start'});
   if(link.autorun&&link.state.action==='export')await exportWorkspace(store);

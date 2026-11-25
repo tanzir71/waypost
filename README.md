@@ -10,7 +10,10 @@ private workspace. MIT licensed. Made by [tanziro.com](https://tanziro.com).
 
 ## Current release
 
-M4 adds [GPA planning](https://tanzir71.github.io/waypost/app/gpa/),
+M5 adds offline support, a keyboard command palette,
+[Settings](https://tanzir71.github.io/waypost/app/settings/) and
+[agent tools](https://tanzir71.github.io/waypost/app/agents/).
+The study tools include [GPA planning](https://tanzir71.github.io/waypost/app/gpa/),
 [Final needed](https://tanzir71.github.io/waypost/app/finals/), and
 [Scale converter](https://tanzir71.github.io/waypost/app/scales/).
 The workspace also includes [Today](https://tanzir71.github.io/waypost/app/),
@@ -35,7 +38,8 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Supporting tools, PWA installation and sync remain Coming soon until their milestones.
+Offers, letters, contacts, deadlines, optional AI and encrypted sync remain
+Coming soon until M6/M7.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -92,7 +96,31 @@ python -m http.server 4173
 Serve this directory, then open http://localhost:4173/. To test a subdirectory,
 serve its parent and open /ats-scoring/; config.js detects the deployment root.
 On GitHub Pages, mode auto becomes demo; other hosts default to pwa. Sync and AI
-remain off. Later milestones add offline installation and optional sync.
+remain off. M6 adds optional encrypted sync.
+
+## Offline and browser integration
+
+The app registers a versioned service worker and caches the shell, every route,
+fonts, scripts, scale data and documentation. PDF/DOCX parsers are loaded and
+cached on first use; use them once online before opening those formats offline.
+Updates wait for the “New version ready — Reload” action. The offline banner
+shows when the browser reports no connection. Nothing is automatically synced.
+
+Installation is offered after a second browser session, never the first visit.
+iOS shows Share → Add to Home Screen instructions.
+File handlers and OS job sharing are available where the browser supports them.
+Opened files and shared jobs are reviewed before saving. Workspace JSON imports
+merge by update time, keep newer local records, and leave connections off.
+JSON exports and supported folder backups exclude credentials and original files.
+
+Ctrl+K / ⌘K opens a command dialog with tools, actions and saved-record jumps.
+Try “plan gpa 3.6”. Commands are ordinary URLs. Private tool inputs stay in
+fragments; without `autorun=1`, input links only prefill. Autorun calculations
+do not save raw inputs, course edits or application records. Agent application
+writes require an in-page confirmation. WebMCP is feature-detected through
+`document.modelContext`, with a legacy `navigator.modelContext` fallback;
+unsupported browsers retain the native controls and links. See
+[the current browser API](https://developer.chrome.com/docs/modern-web-guidance/guides/webmcp/agentic-javascript-tools).
 
 ## Develop and deploy
 
@@ -102,6 +130,12 @@ run `node scripts/build-extension.mjs`; its committed bundle is checked against
 the canonical sources and uses the same matching engine. Pure logic belongs in core/. No frameworks, runtime
 npm dependencies, CDNs, analytics, or GitHub Actions. Static Pages deploys the
 root of main directly, including .nojekyll. HANDOVER.md defines M0–M7.
+
+After changing runtime files or docs, run `node scripts/build-docs.mjs` followed
+by `node scripts/build-precache.mjs`. Commit precache.js: its content hash drives
+offline updates and the release check verifies it is current. PWA icons are
+committed PNGs rendered from the unchanged local Figma Logo A; the optional
+asset-build script uses PyMuPDF and is not needed to run tests or deploy.
 
 Fonts and their OFL licenses live in assets/fonts/. Figma design tokens are
 copied unchanged from handover/tokens.css to ui/tokens.css. `npm run check` also

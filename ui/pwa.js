@@ -10,7 +10,7 @@ export function initializePwa({basePath,mode,window=globalThis.window,navigator=
   const ios=/iPad|iPhone|iPod/.test(navigator.userAgent??'')||navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1;
   const standalone=()=>window.matchMedia?.('(display-mode: standalone)').matches||navigator.standalone===true;
   function paintInstall(){
-    const eligible=mode!=='demo'&&installEligibility({visits,dismissed,standalone:standalone(),ios,promptAvailable:!!prompt});card.hidden=!eligible;if(!eligible)return;
+    const eligible=installEligibility({visits,dismissed,standalone:standalone(),ios,promptAvailable:!!prompt});card.hidden=!eligible;if(!eligible)return;
     card.replaceChildren(el('div',{class:'install-heading'},el('img',{src:`${basePath}assets/icons/logo.svg`,alt:'',width:28,height:28,'aria-hidden':true}),el('h2',{text:'Install Waypost'})),el('p',{text:'Open your private workspace offline from your home screen.'}),el('ul',{},['Works without an account','Open PDF, DOCX and workspace JSON files where supported','Receive shared job links; review before saving'].map(text=>el('li',{text}))),...(ios?[el('p',{class:'muted',text:'On iOS: open Safari’s Share menu, then choose Add to Home Screen.'})]:[]),el('div',{class:'actions'},button('Not now',()=>{dismissed=true;try{localStorage.setItem('waypost:install-dismissed','1');}catch{}paintInstall();},'install-dismiss',{class:'ghost'}),...(!ios?[button('Install',async()=>{if(!prompt)return;const active=prompt;prompt=null;await active.prompt();await active.userChoice;paintInstall();},'install-button',{class:'primary'})]:[])));
   }
   window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();prompt=event;paintInstall();});

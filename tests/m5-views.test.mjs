@@ -11,9 +11,12 @@ import {renderMatch} from '../ui/views/match.js';
 import {renderShare} from '../ui/views/share.js';
 import {renderAgents} from '../ui/views/agents.js';
 import {renderSettings} from '../ui/views/settings.js';
+import {renderToday} from '../ui/views/today.js';
 import {reviewWorkspaceImport} from '../ui/workspace-import.js';
 import {initializePwa} from '../ui/pwa.js';
 import {installPalette} from '../ui/palette.js';
+import {initializeAgentTools} from '../ui/agent-tools.js';
+import {saveWorkspaceFolder} from '../ui/workspace-export.js';
 import {buildDeepLink} from '../core/links/deep.js';
 import {scoreBatch} from '../core/match/index.js';
 import {workspaceExport} from '../core/store/export.js';
@@ -38,11 +41,14 @@ test('a private match link computes without saving raw input or derived reports'
   const store=await open(),fixture=JSON.parse(await readFile(new URL('fixtures/northwind.json',import.meta.url),'utf8')),path=buildDeepLink('match',{jdText:fixture.job.text,resumeText:fixture.resume.text},{basePath,autorun:true}),dom=fakeDOM(path);
   try{await renderMatch({store,basePath,...dom,scorerFactory});assert.equal(dom.readResult().tier,'strong');assert.equal((await store.all('jobs')).length,0);assert.equal((await store.all('resumeVersions')).length,0);assert.equal((await store.all('matchReports')).length,0);accessible(dom);}finally{dom.restore();store.close();}
 });
+test('missing local scale references and invalid numeric fragments never silently compute a different plan',async()=>{
+  const store=await open();for(const [path,render]of [['/waypost/app/gpa/#scale=missing&target=3.6&autorun=1',renderGpa],['/waypost/app/finals/#scale=missing&autorun=1',renderFinals],['/waypost/app/scales/#from=missing&value=3.62&autorun=1',renderScales],['/waypost/app/gpa/#target=NaN&autorun=1',renderGpa]]){const dom=fakeDOM(path);try{await render({store,basePath,...dom});assert.equal(dom.readResult(),null,path);}finally{dom.restore();}}store.close();
+});
 test('shared jobs and workspace restores require explicit in-page save controls',async()=>{
   const store=await open();let dom=fakeDOM('/waypost/app/share/?title=Shared%20Engineer&url=https%3A%2F%2Fexample.test%2Fjob');
   try{await renderShare({store,basePath,...dom,scorerFactory});assert.equal((await store.all('applications')).length,0);assert.equal(location.search,'');assert.equal(dom.find('share-title')[0].value,'Shared Engineer');accessible(dom);await dom.find('share-save-tracker')[0].fire('click');assert.equal((await store.all('applications')).length,1);assert.equal((await store.all('jobs'))[0].source,'share-target');}finally{dom.restore();}
-  const contact=store.record({name:'New contact'}),workspace=workspaceExport({contacts:[contact]},{deviceId:store.deviceId,exportedAt:new Date().toISOString()});dom=fakeDOM('/waypost/app/settings/');
-  try{await reviewWorkspaceImport(store,workspace);assert.equal((await store.all('contacts')).length,0);await dom.find('workspace-import-confirm')[0].fire('click');assert.equal((await store.all('contacts')).length,1);assert.equal((await store.setting('preferences')).value.ai.provider,null);}finally{dom.restore();store.close();}
+  const contact=store.record({name:'New contact'}),workspace=workspaceExport({contacts:[contact],settings:[{key:'preferences',value:{study:{gpa:{current:3.42,completed:64,target:3.6,remaining:64,scaleId:'bd-ugc'}}}}]},{deviceId:store.deviceId,exportedAt:new Date().toISOString()});dom=fakeDOM('/waypost/app/settings/');
+  try{await reviewWorkspaceImport(store,workspace);assert.equal((await store.all('contacts')).length,0);await dom.find('workspace-import-confirm')[0].fire('click');assert.equal((await store.all('contacts')).length,1);assert.equal((await store.setting('preferences')).value.ai.provider,null);await store.setSetting('gpa-result',{current:1,target:2,needed:3});await renderToday({store,basePath,...dom});assert.equal(dom.readResult().gpa.current,3.42);assert.equal(dom.readResult().gpa.neededDisplay,3.78);}finally{dom.restore();store.close();}
 });
 test('Settings and Agents expose native named controls and a working private-link builder',async()=>{
   const store=await open();let dom=fakeDOM('/waypost/app/settings/');
@@ -61,4 +67,15 @@ test('PWA installation waits for a second visit and focused launches deliver fil
   try{document.body.append(el('div',{id:'pwa-notices'}));window.launchQueue={setConsumer:fn=>{consumer=fn;}};initializePwa({basePath,mode:'pwa',localStorage:local,sessionStorage:session,onFiles:files=>{received=files;}});await dom.events.fire('beforeinstallprompt',{prompt:async()=>{},userChoice:Promise.resolve({outcome:'dismissed'})});assert.equal(dom.find('install-card')[0].hidden,true);await consumer({files:[{getFile:async()=>({name:'resume.pdf'})}]});assert.equal(received[0].name,'resume.pdf');}finally{dom.restore();}
   dom=fakeDOM('/waypost/app/');session=memoryLocalStorage();
   try{document.body.append(el('div',{id:'pwa-notices'}));initializePwa({basePath,mode:'pwa',localStorage:local,sessionStorage:session});await dom.events.fire('beforeinstallprompt',{prompt:async()=>{},userChoice:Promise.resolve({outcome:'dismissed'})});assert.equal(dom.find('install-card')[0].hidden,false);await dom.find('install-dismiss')[0].fire('click');assert.equal(dom.find('install-card')[0].hidden,true);}finally{dom.restore();}
+});
+test('registered write tools show an actual confirmation dialog and folder exports use the chosen native handle',async()=>{
+  const store=await open(),dom=fakeDOM('/waypost/app/settings/'),tools=new Map();
+  try{
+    document.modelContext={registerTool:async tool=>tools.set(tool.name,tool)};const status=await initializeAgentTools(store);assert.equal(status.tools.length,6);
+    const pending=tools.get('add_application').execute({title:'Engineer',company:'Northwind'});
+    const deadline=Date.now()+1000;while(!dom.find('agent-write-confirm').length&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,1));
+    assert.equal(dom.find('agent-write-confirm').length,1);assert.equal((await store.all('applications')).length,0);await dom.find('agent-write-confirm')[0].fire('click');assert.equal((await pending).saved,true);assert.equal((await store.all('applications')).length,1);
+    let savedName,savedText,closed=false;await saveWorkspaceFolder(store,{showDirectoryPicker:async()=>({getFileHandle:async name=>{savedName=name;return {createWritable:async()=>({write:async text=>{savedText=text;},close:async()=>{closed=true;}})};}})});
+    assert.match(savedName,/^waypost-.*\.json$/);assert.equal(JSON.parse(savedText).format,'waypost-workspace');assert.equal(closed,true);
+  }finally{dom.restore();store.close();}
 });

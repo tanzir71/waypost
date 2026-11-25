@@ -5,85 +5,149 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 
 ## Build status
 
-M4: GPA planner, Final needed, Scale converter, Today, Tracker, import review,
-Honest Match, Parse check and Resumes are available. Other tool routes are
-placeholders until their milestone ships. The landing demo uses the same core.
-Read PROGRESS.md; do not assume a placeholder computed a result.
+M5 ships PWA/offline support, the command menu, Settings, Agents, shared-job
+review, GPA planner, Final needed, Scale converter, Today, Tracker, import
+review, Honest Match, Parse check and Resumes. Setup/sync arrives in M6; Offers,
+Deadlines, Letters, Stories, Contacts and optional AI arrive in M7. Unbuilt
+routes remain placeholders. Read PROGRESS.md; never assume a placeholder computed.
+
+## Routes and private inputs
+
+Paths below are relative to the deployment root, including a /waypost/ base
+path. Private tool inputs use fragments, never queries. Without autorun=1,
+input links only prefill. Autorun computes through the same core without saving
+raw inputs, course edits or application records. Saved-record navigation may
+show already-computed results. Shared links can contain private text: inspect
+before sharing. JD/resume text uses UTF-8 base64url, limited to 32 KB each;
+oversized links say Paste instead. M4 #plan=base64url(JSON) links still work.
+
+| Tool | Example |
+|---|---|
+| Today | app/#action=next |
+| GPA | app/gpa/#current=3.42&credits=64&target=3.6&remaining=64&scale=bd-ugc&autorun=1 |
+| Finals | app/finals/#w=20,10,30,40&s=92,85,78&target=A&scale=bd-ugc&autorun=1 |
+| Scales | app/scales/#from=bd-ugc&value=3.62&to=percentage,in-10&autorun=1 |
+| Match | app/match/#jd=BASE64URL_TEXT&resume=VERSION_UUID&autorun=1 |
+| Parse | app/parse/#text=BASE64URL_TEXT&autorun=1 |
+| Resumes | app/resumes/#resume=VERSION_UUID&mode=inline |
+| Tracker | app/tracker/#add=1&title=Engineer&company=Northwind |
+| Import | app/import/#paste=1 |
+| Share | app/share/#title=Engineer&url=https%3A%2F%2Fexample.test%2Fjob |
+| Agents | app/agents/#tool=gpa |
+| Settings | app/settings/#section=storage |
+| Setup (M6) | app/setup/#provider=php&endpoint=HTTPS_ENDPOINT |
+| Offers (M7) | app/offers/#selected=OFFER_UUID |
+| Deadlines (M7) | app/deadlines/#month=2026-11 |
+| Letters (M7) | app/letters/#job=JOB_UUID&resume=VERSION_UUID |
+| Contacts (M7) | app/contacts/#id=CONTACT_UUID |
+
+GPA also accepts locked=COURSE_UUID:A,COURSE_UUID:A%2B and scope=degree for all
+planned terms. Finals puts the unknown final last in w and omits it from s;
+target can be a grade letter or percentage. Match without jd scores saved jobs;
+optional resumeText=BASE64URL_TEXT remains unsaved. Scale/record IDs require
+local records; a missing scale does not silently compute a different result.
 
 ## Matching and resumes
 
-- app/resumes/: import a PDF, DOCX, TXT or JSON Resume, or create a text version.
-  Versions stay in IndexedDB; original uploads use OPFS where available. Select a
-  version to read a line and word diff and its effect on common scored jobs.
-- app/match/: Import jobs accepts pasted descriptions separated by ---, plus TXT
-  and JSON Clipper exports. Score N jobs runs every active resume × job in a
-  module worker. Tier filters show counts. Select a job and resume version to
-  expose the full evidence report in #result-data. Knockout answers are explicit;
-  no answer is inferred from the resume. Failed knockouts cap the tier at Partial.
-- app/parse/: choose a saved resume or upload a file. The text is shown in reading
-  order with section labels and issue highlights. Download plain text saves the
-  exact extracted text. Font/Unicode checks disclose when metadata is unavailable.
-- Saved selection links: app/match/#job=JOB_UUID&resume=VERSION_UUID,
-  app/parse/#resume=VERSION_UUID and app/resumes/#resume=VERSION_UUID.
-  The full input/autorun deep-link grammar is added in M5.
-- JSON copy/download is available for reports. Matching evidence is original
-  resume text and line positions, with additional supporting lines when needed.
-  Cluster gaps include count and total jobs; application questions remain separate.
+- app/resumes/: import PDF, DOCX, TXT or JSON Resume, or create a text version.
+  IndexedDB stores versions; OPFS stores originals where available. Read the
+  line/word diff and its effect on common scored jobs. Download exact text or
+  JSON Resume, or copy/download the complete result JSON.
+- app/match/: Import jobs accepts pasted descriptions separated by --- and TXT
+  or JSON Clipper exports. Score N jobs runs all active versions against jobs in
+  a worker. Tier filters, resume tabs, requirement evidence, checks and cluster
+  gaps are available. Knockout answers are explicit, never inferred; failed
+  answers cap the tier at Partial. Add to tracker confirms a local write.
+- Match tiers are strong/good/partial/limited with original evidence and line
+  locations. Keyword coverage is secondary. No hiring outcome is predicted.
+- app/parse/: select a saved version or upload/paste. Text is shown in reading
+  order with sections and issues; Download plain text preserves extracted text.
+  Font checks disclose when the source does not provide embedding metadata.
 
-## Routes
+## Today, Tracker and import review
 
-Use app/ relative to the deployment root (including a /waypost/ base path).
-Tools: app/match/, app/parse/, app/resumes/, app/tracker/, app/gpa/,
-app/finals/, app/scales/, app/offers/, app/deadlines/, app/letters/,
-app/contacts/, app/agents/, app/settings/, app/setup/, app/share/, app/import/.
-Future deep links use URL fragments, never queries, for private inputs.
-
-## Tracker, Today and imports
-
-- app/: next actions, pipeline in the last 30 days, per-resume replies/sent,
-  recent best matches, storage estimate and credential-free workspace export.
-- app/tracker/#view=board or #view=table: native board/table controls, sortable
-  columns, stage filter, application details and history. Every card has a labelled
-  Move to select. N opens a new job; M focuses the selected card's stage control.
-- app/tracker/#add=1&title=Backend&company=Northwind opens a prefilled form.
-  The application is written only after Save application. Selection links use
-  #selected=APPLICATION_UUID&edit=1.
-- app/import/#job=BASE64URL validates a Clipper envelope against
-  schemas/job-export.json, then shows a review panel. Save jobs, Save & score, or
-  Save to tracker confirms the selected writes. No import is saved automatically.
-  File imports accept Clipper TXT/JSON exports and resume files. Plain-text jobs
-  can also be pasted. Private fragment payloads are limited to about 32 KB;
-  oversized captures use JSON export/import or paste instead.
-- The Clipper's matching bundle is generated from the same core. Read this page
-  injects the capture script on click. Site chips are off by default and require
-  per-origin permission plus an explicit opt-in.
+- app/: due actions, near deadlines, recent pipeline counts, per-version replies,
+  best matches, the saved GPA result, storage estimate and workspace export.
+- app/tracker/: board and sortable native table, stage filters, keyboard N (new)
+  and M (move selected). Every card has a labelled Move to select. Keep the
+  resume used, applied date, next step/date, notes, contacts and stage history.
+- Tracker selection links use #selected=APPLICATION_UUID&edit=1. New-job links
+  open a prefilled form; nothing is saved until Save application.
+- app/import/#job=BASE64URL validates the Clipper envelope against
+  schemas/job-export.json, then reviews selected jobs. Save jobs, Save & score
+  and Save to tracker are explicit writes. File imports also handle workspace
+  JSON, PDF/DOCX resumes and JSON Resume. Large captures use file export/import.
+- Waypost Clipper reads pages only by explicit script injection. Its required
+  permissions are activeTab, storage, downloads and scripting. Optional site
+  chips require per-origin opt-in and permission; no all-site script is active.
+- OS-opened files are reviewed through Import. Shared jobs use an editable sheet
+  with Save to tracker / Save & score; neither automatically saves. OS share
+  targets use GET by protocol. The installed worker serves the clean route
+  without caching or forwarding shared parameters; the page removes the query.
+  A GET URL opened without a controlling worker can reach the host.
 
 ## Study tools
 
 - app/gpa/: enter current/target CGPA and completed/remaining credits. Solve
-  saves the target, updates Today, and runs the shared greedy course solver when
-  courses exist. Select This semester or Whole degree (all planned terms).
-  Course target locks stay fixed; difficulty is 1–3. Each course links to Final.
-  Reported trend GPAs are distinguished from computed course averages, with a
-  native table twin. Retake what-ifs disclose their counted-credit assumptions.
-- app/finals/#course=COURSE_UUID: use the course target grade and saved assessment
-  categories. Select exactly one unknown final category; weights must total 100%.
-  Calculate saves the categories. The full cutoff ladder is in #result-data.
-- app/scales/: select a source scale and CGPA; Convert saves inputs. Results have
-  system, value (null when uncomputable), method, confidence and note. Cohort
-  passing-student counts are required for ECTS. Edit institution tables creates
-  inclusive, nonoverlapping ranges, and Export tables saves them locally.
-- All three tools accept #plan=BASE64URL(JSON) for their input controls and offer
-  Share link, Copy JSON and Download JSON. Private input is never in a query.
-  Scale IDs reference built-in tables or custom scales in the local workspace.
-- Built-in scale tables live in data/scales/. Core entry points are
-  planTargetGpa/solveCourseMix, finalNeeded/finalLadder and convertGradeScale.
-  Every computation updates #result-data; writes use explicit Save/Calculate/Solve.
+  saves the target and runs the shared greedy solver when courses exist. Use
+  This semester or Whole degree; target locks stay fixed, difficulty is 1–3.
+  Every course links to Final. Reported term GPAs are distinguished from course
+  averages, with a table twin. Retakes disclose counted-credit assumptions.
+- app/finals/#course=COURSE_UUID: uses the course target and saved categories.
+  Exactly one category is unknown and weights must total 100%. Calculate saves
+  categories. The full cutoff ladder is available as text and in #result-data.
+- app/scales/: conversions show system, value (null if uncomputable), method,
+  confidence and note. ECTS needs real counts among passing cohort members.
+  Institution tables use inclusive, nonoverlapping ranges and are exportable.
+- Built-in scales live in data/scales/. Custom scales are editable saved copies.
+  Core entry points: planTargetGpa/solveCourseMix, finalNeeded/finalLadder,
+  convertGradeScale. Study inputs and tables survive workspace JSON exports.
+
+## Command menu and browser tools
+
+Ctrl+K / Command+K opens command-menu with a labelled combobox and listbox.
+Arrow keys select, Enter opens the URL, Escape closes. Groups are Tools,
+Actions and Jump to. Try plan gpa 3.6. The /agents/ human alias and
+app/agents/ expose a link builder, actual registration status, hooks and schemas.
+
+WebMCP is feature-detected with document.modelContext.registerTool, falling
+back to navigator.modelContext for older browsers. API support is browser-
+dependent. Native controls remain available if registration is unavailable.
+Each tool validates its schema, calls shared core and updates #result-data.
+
+- score_resume_against_jobs: {resumeVersionId? or resumeText?, jobIds? or jdText?}.
+- plan_target_gpa: {current, credits, target, remaining, scale?, courses?, locked?}.
+- final_needed: {categories:[{weight, score?}], target, scale?}.
+- convert_grade_scale: {from, value, to?, cohort?, table?}.
+- add_application: {title, company, text?, url?, stage?, resumeVersionId?}.
+  Waits for Confirm and save application in a native dialog. Cancel, close or
+  abort do not save. All other tools are read-only.
+- export_workspace: {} returns portable JSON, excluding credentials and keys.
+
+## Settings, backups and offline behavior
+
+Settings reports actual quota/persistence, exports JSON, reviews imports and
+supports folder backups where available. Imports merge by updatedAt, tie-break
+by deviceId, keep newer local records and leave AI/sync off. Original OPFS files
+are not in JSON backups; extracted text is retained. Demo mode hides sync.
+AI is off until M7 writing features ship. Appearance offers Light/Dark/System.
+
+The worker precaches every route, UI/core module, font, icon and local data file.
+Vendor/parser files cache after first use; use PDF/DOCX once online before
+opening those formats offline. Sync/authenticated requests, external origins
+and AI traffic are never cached. Unknown offline navigation returns to Today.
+Updates wait for Reload. Installation is offered after a second session; iOS
+receives native Add to Home Screen instructions. File handling
+and installation depend on browser support. No browser support is inferred from
+contract-fake tests alone.
 
 ## Results and stable hooks
 
-Every tool page has a JSON script #result-data, initially null. The landing
-demo updates it on each match. Native controls have accessible names.
+Every view has one h1, labelled native controls, and JSON #result-data updated
+on every computation. Prefer roles/labels. Every chart has a table twin. Read
+#result-data after computing; a live region announces completion. Writes confirm
+inside the page. Never use a tool to fabricate resume evidence or metrics.
+
 data-testid values: `result-data`, `open-search`, `clear-demo`, `footer-credit`,
 `hero-jd`, `hero-resume`, `hero-upload`, `score-button`, `requirement-row`,
 `copy-json`, `download-json`, `job-row`, `resume-tab`, `resume-version`,
@@ -91,15 +155,19 @@ data-testid values: `result-data`, `open-search`, `clear-demo`, `footer-credit`,
 `next-up-row`, `pipeline-row`, `response-rate-row`, `export-button`,
 `import-job-row`, `import-confirm-save`, `gpa-solve`, `gpa-result`, `course-row`,
 `course-lock`, `trend-row`, `grade-scale-row`, `final-calculate`, `final-category-row`,
-`final-ladder-row`, `scale-convert`, `conversion-row`. Requirement rows have data-status met/partial/missing.
-Navigation uses nav-<route>. Read the JSON for all requirements; the hero shows
-representative rows. No employer hiring outcome is predicted by the tier.
-Every actionable native control also has its own test hook. Native names are the
-preferred way to operate the UI. Add to tracker asks for in-page confirmation.
-That application record is saved locally and can be edited in Tracker.
+`final-ladder-row`, `scale-convert`, `conversion-row`, `command-menu`,
+`command-query`, `command-option`, `gpa-input-current`, `gpa-input-credits`,
+`gpa-input-target`, `gpa-input-remaining`, `workspace-import-confirm`,
+`agent-write-confirm`, `offline-banner`, `install-card`, `update-reload`.
+
+Requirement rows expose data-status met/partial/missing. Job rows expose
+ data-job-id and data-tier; tracker cards expose data-stage and data-job-id.
+Every actionable native control also has a test hook. Navigation uses nav-ROUTE.
 
 ## Documentation
 
 - [Source](https://github.com/tanzir71/waypost)
 - [Workspace schema](schemas/workspace.json)
 - [Full docs](llms-full.txt)
+- [Human agent guide](agents/)
+- [Privacy](privacy/)

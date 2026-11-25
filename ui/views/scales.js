@@ -6,6 +6,7 @@ export async function renderScales({store,view,actions,basePath=globalThis.windo
   document.body.classList.add('study-view');
   const preferences=await studyPreferences(store),linked=readLink('scales'),initial={scaleId:'bd-ugc',value:3.62,...preferences.conversion,...linked.state};
   let scales=await scaleOptions(store),scale=scales.find(row=>row.id===initial.scaleId)??scales[0],tables=preferences.institutionTables??[],output=null;
+  const unavailable=initial.scaleId&&!scales.some(row=>row.id===initial.scaleId);if(unavailable)announce('The linked scale is not in this workspace. Choose an available scale before converting.');
   if(initial.table){tables=[...tables,{...initial.table,id:'shared-link-table',name:initial.table.name??'Shared institution table'}];initial.institutionId='shared-link-table';}
   const from=selectInput('scale-from',scales,scale.id),value=numberInput('scale-value',initial.value,{max:scale.max,required:true}),institution=selectInput('scale-institution',[{id:'',name:'No institution table'},...tables],initial.institutionId??''),below=numberInput('cohort-below',initial.cohort?.below??'',{step:1}),total=numberInput('cohort-total',initial.cohort?.total??'',{step:1,min:1}),cards=el('div',{class:'conversion-grid','aria-live':'polite'});
   const form=el('form',{class:'study-fields conversion-fields'},field('From','scale-from',from),field('Your CGPA','scale-value',value),field('Institution table (optional)','scale-institution',institution));form.addEventListener('submit',event=>{event.preventDefault();compute();});
@@ -19,7 +20,7 @@ export async function renderScales({store,view,actions,basePath=globalThis.windo
   }
   from.addEventListener('change',()=>{scale=scales.find(row=>row.id===from.value);value.max=scale.max;compute();});
   for(const control of [value,institution,below,total])control.addEventListener('input',compute);
-  studyActions(actions,{getValue:()=>output,getLink:share,compute:async()=>{compute();if(output.error){announce(output.error);return;}try{if(institution.value==='shared-link-table')await saveStudy(store,'institutionTables',tables);await saveStudy(store,'conversion',config());history.replaceState(null,'',share());announce('Conversion inputs saved.');}catch(error){announce(error.message);}},label:'Convert',testid:'scale-convert'});
+  studyActions(actions,{getValue:()=>output,getLink:share,compute:async()=>{compute();if(output.error){announce(output.error);return;}try{if(institution.value==='shared-link-table')await saveStudy(store,'institutionTables',tables);await saveStudy(store,'conversion',config());share();announce('Conversion inputs saved.');}catch(error){announce(error.message);}},label:'Convert',testid:'scale-convert'});
   function editTables(existing=tables.find(row=>row.id===institution.value)){
     let rows=structuredClone(existing?.rows??[{min:0,max:4,value:''}]),inputs=[];
     const name=el('input',{id:'institution-name',value:existing?.name??'',required:true,'data-testid':'institution-name'}),system=el('input',{id:'institution-system',value:existing?.system??'',required:true,'data-testid':'institution-system'}),source=el('input',{id:'institution-source',value:existing?.source??'','data-testid':'institution-source'}),body=el('tbody');
@@ -30,5 +31,5 @@ export async function renderScales({store,view,actions,basePath=globalThis.windo
     form.addEventListener('submit',async event=>{event.preventDefault();try{capture();const table=validateInstitutionTable({id:existing?.id??crypto.randomUUID(),name:name.value.trim(),system:system.value.trim(),source:source.value.trim(),rows});tables=[...tables.filter(row=>row.id!==table.id),table];await saveStudy(store,'institutionTables',tables);refreshTables(table.id);modal.close();compute();announce('Institution table saved.');}catch(error){announce(error.message);}});
   }
   function refreshTables(selected){institution.replaceChildren(el('option',{value:'',text:'No institution table'}),...tables.map(row=>el('option',{value:row.id,text:row.name,selected:row.id===selected})));}
-  if(!linked.provided||linked.autorun)compute();else{cards.replaceChildren(el('p',{class:'muted',text:'Inputs prefilled. Choose Convert to compute equivalences.'}));result(null);}
+  if(!unavailable&&(!linked.provided||linked.autorun))compute();else{cards.replaceChildren(el('p',{class:'muted',text:'Inputs prefilled. Choose Convert to compute equivalences.'}));result(null);}
 }

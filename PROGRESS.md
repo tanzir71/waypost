@@ -9,7 +9,7 @@ Live demo: https://tanzir71.github.io/waypost/
 | M2 Match, parse, resumes | done | m2 | /app/match/, /app/parse/, /app/resumes/ |
 | M3 Today, tracker, clipper | done | m3 | /app/, /app/tracker/, /app/import/ |
 | M4 Study tools | done | m4 | /app/gpa/, /app/finals/, /app/scales/ |
-| M5 PWA, agents, settings | pending | | |
+| M5 PWA, agents, settings | done | m5 | /app/settings/, /app/agents/, /agents/, /app/share/ |
 | M6 Encrypted sync | pending | | |
 | M7 Offers and supporting tools | pending | | |
 
@@ -139,6 +139,47 @@ Live demo: https://tanzir71.github.io/waypost/
 - Pages URLs: https://tanzir71.github.io/waypost/app/gpa/,
   https://tanzir71.github.io/waypost/app/finals/,
   https://tanzir71.github.io/waypost/app/scales/.
+
+## M5
+
+- Added the base-path-aware manifest, real Logo A icons (192/512/maskable),
+  shortcuts, PDF/DOCX/JSON file handlers, GET share target and focus-existing
+  launches. OS-opened files and shared jobs are reviewed before explicit saves.
+- Added a content-versioned service worker and committed precache inventory for
+  every route, UI/core module, local font/icon/data file and documentation page.
+  Vendor parsers cache on first use; use PDF/DOCX once online before opening
+  those formats offline. Auth/sync/AI/external requests are excluded. Shared
+  parameters never become cache keys or forwarded network queries. Offline
+  navigation falls back to Today at a valid URL; updates wait for Reload.
+- Added offline status, installation after a second browser session, iOS native
+  instructions, and capability detection. Runtime behavior is conditional on
+  browser support; no support claim is inferred solely from contract fakes.
+- Added Ctrl+K / Command+K and mobile command sheets with a labelled combobox,
+  listbox, Tools/Actions/Jump to groups, arrow/Enter navigation, URL commands,
+  saved-record jumps and the “plan gpa 3.6” intent.
+- Added bounded UTF-8 private fragments for every route, the documented flat
+  GPA/final/scale grammar, legacy M4 links, read-only autorun and per-view Share
+  controls. Missing scale/record references do not silently compute a fallback.
+  Private matching links keep raw text and reports unsaved until explicit actions.
+- Registered all six WebMCP tools through document.modelContext with legacy
+  navigator fallback, JSON Schema validation, shared core, live result JSON and
+  actual registration status. Application writes wait for in-page confirmation;
+  cancellation and abort leave records untouched. Added /agents/ human alias,
+  link builder, hooks table, agent etiquette and refreshed llms documentation.
+- Added Settings for real storage/quota/persistence, JSON and native folder
+  backups, reviewed workspace merges, appearance, keyboard help and optional
+  connection controls. Demo hides sync. Imports keep newer local records and
+  leave AI/sync off; originals are explicitly excluded from JSON backups. Today
+  recomputes the saved GPA input so restored plans do not show stale results.
+- Validation: 83 Node tests and all release checks pass, including fake service
+  worker/cache execution, policy exclusions and offline navigation, manifest/icon
+  checks, every-route link round-trips, actual view prefill/autorun, native agent
+  confirmation, file-launch review, folder writes, command keyboard navigation
+  and backup restore. Syntax, static a11y, nested assets, route generation, parser
+  integrity, extension parity and precache-content freshness are also checked.
+- Source feature commit a892011 has built on Pages. HTTP checks confirm Settings,
+  both Agents paths, Share, the manifest and worker scripts return 200 with the
+  correct HTML/manifest/JavaScript MIME types. M6/M7 remain active work.
 
 ## Deployment status
 

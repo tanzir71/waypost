@@ -5,7 +5,7 @@ import {el,button,field,result,announce,download,copyJSON} from '../dom.js';
 export async function renderParse({store,basePath,view,actions}) {
   let versions=(await store.all('resumeVersions')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
   const linked=readLink('parse');
-  let version=versions.find(row=>row.id===linked.state.resume||row.label===linked.state.resume)??versions.at(-1);
+  let version=versions.find(row=>row.id===linked.state.resume||row.label===linked.state.resume)??(!linked.state.resume&&!linked.invalid?versions.at(-1):null);
   let report=version?.parse??(version?analyzeText(version.text):null);
   const content=el('div',{class:'parse-layout'}),textPanel=el('section',{class:'parse-text-panel','aria-label':'Extracted resume text'}),rail=el('aside',{class:'checks-rail','aria-label':'Parse checks'});
   const select=el('select',{id:'parse-version','data-testid':'parse-version'});

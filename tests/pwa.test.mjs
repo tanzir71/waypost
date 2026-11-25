@@ -31,10 +31,11 @@ test('the worker installs a complete cache, serves navigation offline and activa
   const handlers=new Map(),tables=new Map(),paths=['app/index.html','app/gpa/index.html','app/share/index.html'],version='waypost-test';let activated=0,claimed=0;
   const key=value=>typeof value==='string'?value:value.url??String(value),caches={keys:async()=>[...tables.keys()],delete:async name=>tables.delete(name),open:async name=>{if(!tables.has(name))tables.set(name,new Map());const rows=tables.get(name);return {addAll:async requests=>{for(const request of requests)rows.set(key(request),new Response('cached:'+key(request)));},match:async value=>rows.get(key(value)),put:async(value,response)=>rows.set(key(value),response)};}};
   const self={registration:{scope},addEventListener:(name,fn)=>handlers.set(name,fn),clients:{claim:async()=>{claimed++;}},skipWaiting:()=>{activated++;}};
-  const source=(await readFile(new URL('sw.js',root),'utf8')).replace(/^import .*;\r?\n/gm,'');runInNewContext(source,{VERSION:version,PRECACHE:paths,requestPolicy,self,caches,URL,Request,fetch:async()=>{throw new Error('offline');}});
+  const source=(await readFile(new URL('sw.js',root),'utf8')).replace(/^import .*;\r?\n/gm,'');runInNewContext(source,{VERSION:version,PRECACHE:paths,requestPolicy,self,caches,URL,Request,Response,fetch:async()=>{throw new Error('offline');}});
   let pending;handlers.get('install')({waitUntil:value=>{pending=value;}});await pending;assert.equal(activated,0);
   handlers.get('activate')({waitUntil:value=>{pending=value;}});await pending;assert.equal(claimed,1);
   let response;handlers.get('fetch')({request:{url:scope+'app/gpa/',method:'GET',headers:new Headers(),mode:'navigate'},respondWith:value=>{response=value;}});assert.match(await (await response).text(),/gpa\/index\.html/);
   handlers.get('fetch')({request:{url:scope+'app/share/?text=PRIVATE',method:'GET',headers:new Headers(),mode:'navigate'},respondWith:value=>{response=value;}});assert.match(await (await response).text(),/share\/index\.html/);assert.ok([...tables.get(version).keys()].every(value=>!value.includes('PRIVATE')));
+  handlers.get('fetch')({request:{url:scope+'missing/route/',method:'GET',headers:new Headers(),mode:'navigate'},respondWith:value=>{response=value;}});const fallback=await response;assert.equal(fallback.status,302);assert.equal(fallback.headers.get('location'),scope+'app/');
   handlers.get('message')({data:{type:'WAYPOST_ACTIVATE_UPDATE'}});assert.equal(activated,1);
 });

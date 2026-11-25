@@ -11,7 +11,7 @@ export async function renderMatch({store,basePath,view,actions,scorerFactory=cre
   const preferences=(await store.setting('preferences')).value,linked=readLink('match');
   if(linked.state.jdText)jobs=[{id:'link-job',title:linked.state.jdText.split('\n')[0]||'Shared job description',text:linked.state.jdText,source:'deep-link',_ephemeral:true}];
   if(linked.state.resumeText)versions=[{id:'link-resume',label:'Unsaved link resume',text:linked.state.resumeText,_ephemeral:true}];
-  let selectedJob=jobs.find(job=>job.id===linked.state.job)??jobs[0];
+  let selectedJob=linked.invalid?null:jobs.find(job=>job.id===linked.state.job)??(!linked.state.job?jobs[0]:null);
   let selectedResume=versions.find(version=>version.id===preferences.defaultResumeVersionId)??versions.at(-1);
   let filter='all',busy=false,lastElapsed;
   const scorer=scorerFactory();window.addEventListener('pagehide',()=>scorer.close(),{once:true});
@@ -129,7 +129,7 @@ export async function renderMatch({store,basePath,view,actions,scorerFactory=cre
     rail.append(el('a',{class:'button',href:`${basePath}app/letters/#job=${encodeURIComponent(selectedJob.id)}&resume=${encodeURIComponent(selectedResume.id)}`,text:'Draft letter from this report','data-testid':'draft-letter'}),button('Add to tracker',addToTracker,'add-to-tracker',{class:'ghost'}));
     result(report);
   }
-  const fragment=new URLSearchParams(location.hash.slice(1));selectedResume=versions.find(row=>row.id===linked.state.resume||row.label===linked.state.resume)??selectedResume;
+  const fragment=new URLSearchParams(location.hash.slice(1));selectedResume=versions.find(row=>row.id===linked.state.resume||row.label===linked.state.resume)??(!linked.state.resume?selectedResume:null);
   actions.append(shareLinkButton('match',linkState,basePath),button('Import jobs',importDialog,'import-jobs',{class:'ghost small'}),button('Copy JSON',()=>currentReport()&&copyJSON(currentReport()),'copy-json',{class:'small'}),button('Download JSON',()=>currentReport()&&download('waypost-match.json',JSON.stringify(currentReport(),null,2)),'download-json',{class:'small'}),scoreButton);
   view.replaceChildren(layout);paint();
   if(linked.state.import)importDialog();

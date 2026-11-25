@@ -3,6 +3,8 @@ import {el,button,result,announce,copyJSON,localDay,download} from '../dom.js';
 import {shareLinkButton} from '../links.js';
 import {tierBadge,titleCase} from '../components/match-report.js';
 import {exportWorkspace} from '../workspace-export.js';
+import {planTargetGpa} from '../../core/gpa/index.js';
+import {builtInScales} from '../../core/scales/index.js';
 export async function renderToday({store,basePath,view,actions}) {
   const records=Object.fromEntries(await Promise.all(['jobs','applications','resumeVersions','matchReports','deadlines'].map(async type=>[type,await store.all(type)])));
   const now=new Date(),day=localDay(now);
@@ -27,7 +29,11 @@ export async function renderToday({store,basePath,view,actions}) {
   const rates=el('table',{},el('caption',{class:'muted',text:'Response rate by resume'}),el('thead',{},el('tr',{},el('th',{scope:'col',text:'Version'}),el('th',{scope:'col',text:'Replies / sent'}),el('th',{scope:'col',text:'Rate'}))),el('tbody'));
   for(const row of summary.responseRates)rates.tBodies[0].append(el('tr',{'data-testid':'response-rate-row'},el('th',{scope:'row',text:row.label}),el('td',{class:'wp-num',text:`${row.replies} / ${row.sent}`}),el('td',{class:'wp-num',text:row.rate===null?'Not sent':`${Math.round(row.rate*100)}%`})));
   pipeline.append(rates);left.append(pipeline);
-  const study=el('section',{class:'card stack today-study'},el('h2',{text:'Study'})),gpa=(await store.setting('gpa-result'))?.value;
+  const study=el('section',{class:'card stack today-study'},el('h2',{text:'Study'})),savedPlan=(await store.setting('preferences'))?.value?.study?.gpa;
+  let gpa;
+  if(savedPlan){try{const scale=[...builtInScales(),...await store.all('scales')].find(row=>row.id===savedPlan.scaleId);if(scale)gpa=planTargetGpa({...savedPlan,scale});}catch{/* Invalid imported inputs stay uncomputed until corrected. */}}
+  else gpa=(await store.setting('gpa-result'))?.value;
+  summary.gpa=gpa??null;
   if(gpa)study.append(el('dl',{class:'study-values'},['current','target','needed'].map(key=>el('div',{},el('dt',{text:titleCase(key)}),el('dd',{class:'wp-num',text:Number(gpa[key]).toFixed(2)})))));
   else study.append(el('p',{class:'muted',text:'Your saved GPA target will appear here when you plan it.'}));
   study.append(el('a',{href:`${basePath}app/gpa/`,'data-testid':'today-gpa',text:'Open GPA planner'}));right.append(study);
