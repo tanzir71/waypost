@@ -8183,5 +8183,133 @@
       "createdAt": "2026-11-21T12:00:00.000Z",
       "updatedAt": "2026-11-21T12:00:00.000Z"
     }
+  ],
+  "terms": [
+    {
+      "id": "study-s1",
+      "label": "S1",
+      "order": 1,
+      "planned": false,
+      "scaleId": "bd-ugc",
+      "reportedGpa": 3.21
+    },
+    {
+      "id": "study-s2",
+      "label": "S2",
+      "order": 2,
+      "planned": false,
+      "scaleId": "bd-ugc",
+      "reportedGpa": 3.35
+    },
+    {
+      "id": "study-s3",
+      "label": "S3",
+      "order": 3,
+      "planned": false,
+      "scaleId": "bd-ugc",
+      "reportedGpa": 3.48
+    },
+    {
+      "id": "study-s4",
+      "label": "S4",
+      "order": 4,
+      "planned": false,
+      "scaleId": "bd-ugc",
+      "reportedGpa": 3.55
+    },
+    {
+      "id": "study-s5",
+      "label": "S5",
+      "order": 5,
+      "planned": false,
+      "scaleId": "bd-ugc",
+      "reportedGpa": 3.51
+    },
+    {
+      "id": "study-s6",
+      "label": "S6",
+      "order": 6,
+      "planned": true,
+      "scaleId": "bd-ugc"
+    }
+  ],
+  "courses": [
+    {
+      "id": "study-course-0",
+      "name": "CSE 331 · Algorithms",
+      "credits": 3,
+      "targetGrade": "A",
+      "grade": null,
+      "locked": false,
+      "difficulty": 1,
+      "termId": "study-s6",
+      "scaleId": "bd-ugc",
+      "categories": [
+        {
+          "name": "Homework",
+          "weight": 20,
+          "score": 92
+        },
+        {
+          "name": "Quizzes",
+          "weight": 10,
+          "score": 85
+        },
+        {
+          "name": "Midterm",
+          "weight": 30,
+          "score": 78
+        },
+        {
+          "name": "Final exam",
+          "weight": 40,
+          "score": null
+        }
+      ]
+    },
+    {
+      "id": "study-course-1",
+      "name": "CSE 340 · Operating Systems",
+      "credits": 3,
+      "targetGrade": "A",
+      "grade": null,
+      "locked": false,
+      "difficulty": 1,
+      "termId": "study-s6",
+      "scaleId": "bd-ugc"
+    },
+    {
+      "id": "study-course-2",
+      "name": "MAT 361 · Probability",
+      "credits": 3,
+      "targetGrade": "A+",
+      "grade": "A+",
+      "locked": true,
+      "difficulty": 1,
+      "termId": "study-s6",
+      "scaleId": "bd-ugc"
+    },
+    {
+      "id": "study-course-3",
+      "name": "ENG 201 · Technical Writing",
+      "credits": 3,
+      "targetGrade": "A",
+      "grade": null,
+      "locked": false,
+      "difficulty": 1,
+      "termId": "study-s6",
+      "scaleId": "bd-ugc"
+    },
+    {
+      "id": "study-course-4",
+      "name": "CSE 350 · Software Engineering Lab",
+      "credits": 1.5,
+      "targetGrade": "A",
+      "grade": null,
+      "locked": false,
+      "difficulty": 1,
+      "termId": "study-s6",
+      "scaleId": "bd-ugc"
+    }
   ]
 }

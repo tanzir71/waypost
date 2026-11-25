@@ -60,9 +60,9 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
     return written;
   };
   const setting=async key=>(await all('settings')).find(row=>row.key===key);
-  const setSetting=async(key,value)=>{
+  const setSetting=async(key,value,{meaningful=false}={})=>{
     const previous=await setting(key);const row=record({...previous,key,value});
-    try {await putMany({settings:[row]},{meaningful:false});return row;}
+    try {await putMany({settings:[row]},{meaningful});return row;}
     catch(error) {if(error?.name==='ConstraintError' && !previous) {const winner=await setting(key);if(winner)return winner;}throw error;}
   };
   const device=await setting('device-id');
@@ -92,13 +92,21 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
     async clearSamples() {
       const active=Object.fromEntries(await Promise.all(stores.filter(type=>!['settings','changes'].includes(type)).map(async type=>[type,await all(type)])));
       const records=Object.fromEntries(Object.entries(sampleRemovalPlan(active)).map(([type,rows])=>[type,rows.map(row=>record({...row,deleted:true}))]));
-      await putMany(records,{meaningful:false});await setSetting('demo-seeded',true);
+      await putMany(records,{meaningful:false});await setSetting('demo-seeded',true);await setSetting('demo-cleared',true);
     },
     async seed(seed) {
       if(await setting('demo-seeded')) {
         // Existing M2 demos receive the M3 examples once. A cleared demo has no
         // active sample jobs, so it never gets silently populated again.
-        if(await setting('demo-supplements-m3'))return;
+        if(await setting('demo-cleared'))return;
+        const supplementStudy=async()=>{
+          if(await setting('demo-supplements-m4'))return;
+          if(!(await all('jobs')).some(row=>row.sample))return;
+          const mapping=new Map((seed.terms??[]).map(term=>[term.id,uuidv7()]));
+          const additions={terms:(seed.terms??[]).map(term=>record({...term,id:mapping.get(term.id),seedId:term.id,sample:true})),courses:(seed.courses??[]).map(course=>record({...course,id:uuidv7(),termId:mapping.get(course.termId),seedId:course.id,sample:true})),settings:[record({key:'demo-supplements-m4',value:true})]};
+          await putMany(additions,{meaningful:false,guardSetting:'demo-supplements-m4'});
+        };
+        if(await setting('demo-supplements-m3')){await supplementStudy();return;}
         const existingJobs=(await all('jobs')).filter(row=>row.sample),existingVersions=(await all('resumeVersions')).filter(row=>row.sample);
         if(!existingJobs.length)return;
         const mapping=new Map();
@@ -108,7 +116,7 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
         for(const app of seed.applications??[]) if(mapping.has(app.jobId))additions.applications.push(record({...app,id:uuidv7(),seedId:app.id,jobId:mapping.get(app.jobId),resumeVersionId:mapping.get(app.resumeVersionId)??null,sample:true}));
         for(const deadline of seed.deadlines??[]) additions.deadlines.push(record({...deadline,id:uuidv7(),seedId:deadline.id,sample:true}));
         additions.settings=[record({key:'demo-supplements-m3',value:true})];
-        await putMany(additions,{meaningful:false,guardSetting:'demo-supplements-m3'});return;
+        await putMany(additions,{meaningful:false,guardSetting:'demo-supplements-m3'});await supplementStudy();return;
       }
       const mapping=new Map();
       for(const rows of Object.values(seed)) if(Array.isArray(rows)) for(const row of rows) if(row.id) mapping.set(row.id,uuidv7());
@@ -118,7 +126,7 @@ export async function openWorkspace({indexedDB=globalThis.indexedDB,localStorage
         if(!stores.includes(type)||!Array.isArray(rows)) continue;
         records[type]=rows.map(row=>{const copy={...row,id:mapping.get(row.id),seedId:row.id,sample:true};for(const key of references)if(mapping.has(copy[key]))copy[key]=mapping.get(copy[key]);return record(copy);});
       }
-      records.settings=[record({key:'demo-seeded',value:true}),record({key:'demo-supplements-m3',value:true})];
+      records.settings=[record({key:'demo-seeded',value:true}),record({key:'demo-supplements-m3',value:true}),record({key:'demo-supplements-m4',value:true})];
       await putMany(records,{meaningful:false,guardSetting:'demo-seeded'});
     }
   };

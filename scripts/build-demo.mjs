@@ -24,5 +24,11 @@ const applications=jobs.map((job,i)=>{
   return {id:`sample-application-${job.id}`,jobId:job.id,resumeVersionId:version,stage,appliedAt:applied?'2026-11-17':null,next:stage==='applied'?{label:'Follow up',at:'2026-11-25T09:00:00.000Z'}:stage==='interview'?{label:'Prepare interview examples',at:'2026-11-26T10:00:00.000Z'}:stage==='offer'?{label:'Compare the offer',at:'2026-12-05T12:00:00.000Z'}:null,contactIds:[],notes:'Sample application. Replace it with your own details.',history,createdAt:'2026-11-15T12:00:00.000Z',updatedAt:'2026-11-23T12:00:00.000Z'};
 });
 const deadlines=[{id:'sample-scholarship',title:'Scholarship essay (sample)',date:'2026-11-28',kind:'scholarship'},{id:'sample-exam',title:'Algorithms revision (sample)',date:'2026-11-30',kind:'exam'}].map(row=>({...row,createdAt:'2026-11-21T12:00:00.000Z',updatedAt:'2026-11-21T12:00:00.000Z'}));
-await writeFile(new URL('data/workspace-demo.json',root),JSON.stringify({resumeVersions,jobs,matchReports,applications,deadlines},null,2)+'\n');
-console.log('Generated sample workspace: 12 jobs, 3 versions, 36 reports, 12 applications and 2 deadlines.');
+const terms=Array.from({length:6},(_,i)=>({id:`study-s${i+1}`,label:`S${i+1}`,order:i+1,planned:i===5,scaleId:'bd-ugc',...(i<5?{reportedGpa:[3.21,3.35,3.48,3.55,3.51][i]}:{})}));
+// Historical bars are explicitly reported term GPAs from the Figma sample.
+// They do not pretend to reconstruct grades from course records we lack.
+const courses=[
+  ...[['CSE 331 · Algorithms',3,'A'],['CSE 340 · Operating Systems',3,'A'],['MAT 361 · Probability',3,'A+'],['ENG 201 · Technical Writing',3,'A'],['CSE 350 · Software Engineering Lab',1.5,'A']].map(([name,credits,targetGrade],i)=>({id:`study-course-${i}`,name,credits,targetGrade,grade:i===2?'A+':null,locked:i===2,difficulty:1,termId:'study-s6',scaleId:'bd-ugc',...(i===0?{categories:[{name:'Homework',weight:20,score:92},{name:'Quizzes',weight:10,score:85},{name:'Midterm',weight:30,score:78},{name:'Final exam',weight:40,score:null}]}:{})}))
+];
+await writeFile(new URL('data/workspace-demo.json',root),JSON.stringify({resumeVersions,jobs,matchReports,applications,deadlines,terms,courses},null,2)+'\n');
+console.log('Generated sample workspace: jobs, versions, reports, applications, deadlines, terms and courses.');

@@ -5,7 +5,8 @@ required. Assets and computations stay on this origin in demo and PWA mode.
 
 ## Build status
 
-M3: Today, Tracker, import review, Honest Match, Parse check and Resumes are available. Other tool routes are
+M4: GPA planner, Final needed, Scale converter, Today, Tracker, import review,
+Honest Match, Parse check and Resumes are available. Other tool routes are
 placeholders until their milestone ships. The landing demo uses the same core.
 Read PROGRESS.md; do not assume a placeholder computed a result.
 
@@ -57,6 +58,28 @@ Future deep links use URL fragments, never queries, for private inputs.
   injects the capture script on click. Site chips are off by default and require
   per-origin permission plus an explicit opt-in.
 
+## Study tools
+
+- app/gpa/: enter current/target CGPA and completed/remaining credits. Solve
+  saves the target, updates Today, and runs the shared greedy course solver when
+  courses exist. Select This semester or Whole degree (all planned terms).
+  Course target locks stay fixed; difficulty is 1–3. Each course links to Final.
+  Reported trend GPAs are distinguished from computed course averages, with a
+  native table twin. Retake what-ifs disclose their counted-credit assumptions.
+- app/finals/#course=COURSE_UUID: use the course target grade and saved assessment
+  categories. Select exactly one unknown final category; weights must total 100%.
+  Calculate saves the categories. The full cutoff ladder is in #result-data.
+- app/scales/: select a source scale and CGPA; Convert saves inputs. Results have
+  system, value (null when uncomputable), method, confidence and note. Cohort
+  passing-student counts are required for ECTS. Edit institution tables creates
+  inclusive, nonoverlapping ranges, and Export tables saves them locally.
+- All three tools accept #plan=BASE64URL(JSON) for their input controls and offer
+  Share link, Copy JSON and Download JSON. Private input is never in a query.
+  Scale IDs reference built-in tables or custom scales in the local workspace.
+- Built-in scale tables live in data/scales/. Core entry points are
+  planTargetGpa/solveCourseMix, finalNeeded/finalLadder and convertGradeScale.
+  Every computation updates #result-data; writes use explicit Save/Calculate/Solve.
+
 ## Results and stable hooks
 
 Every tool page has a JSON script #result-data, initially null. The landing
@@ -66,7 +89,9 @@ data-testid values: `result-data`, `open-search`, `clear-demo`, `footer-credit`,
 `copy-json`, `download-json`, `job-row`, `resume-tab`, `resume-version`,
 `parse-line`, `parse-check`, `diff-row`, `tracker-card`, `move-to-menu`,
 `next-up-row`, `pipeline-row`, `response-rate-row`, `export-button`,
-`import-job-row`, `import-confirm-save`. Requirement rows have data-status met/partial/missing.
+`import-job-row`, `import-confirm-save`, `gpa-solve`, `gpa-result`, `course-row`,
+`course-lock`, `trend-row`, `grade-scale-row`, `final-calculate`, `final-category-row`,
+`final-ladder-row`, `scale-convert`, `conversion-row`. Requirement rows have data-status met/partial/missing.
 Navigation uses nav-<route>. Read the JSON for all requirements; the hero shows
 representative rows. No employer hiring outcome is predicted by the tier.
 Every actionable native control also has its own test hook. Native names are the

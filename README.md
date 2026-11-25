@@ -10,7 +10,10 @@ private workspace. MIT licensed. Made by [tanziro.com](https://tanziro.com).
 
 ## Current release
 
-M3 adds [Today](https://tanzir71.github.io/waypost/app/),
+M4 adds [GPA planning](https://tanzir71.github.io/waypost/app/gpa/),
+[Final needed](https://tanzir71.github.io/waypost/app/finals/), and
+[Scale converter](https://tanzir71.github.io/waypost/app/scales/).
+The workspace also includes [Today](https://tanzir71.github.io/waypost/app/),
 [Tracker](https://tanzir71.github.io/waypost/app/tracker/),
 and [reviewed imports](https://tanzir71.github.io/waypost/app/import/) to
 [Honest Match](https://tanzir71.github.io/waypost/app/match/),
@@ -32,7 +35,7 @@ so and retains the extracted text. Legacy ats-scoring:v1 data is migrated once,
 recomputing evidence reports and keeping the original localStorage backup.
 Demo mode seeds twelve jobs and three versions once. Clear sample data keeps
 personal records. Light, Dark and System appearance are available in the footer.
-Study and supporting tools remain Coming soon until their milestones.
+Supporting tools, PWA installation and sync remain Coming soon until their milestones.
 Pricing sources are dated in data/competitors.json.
 
 Today derives next actions, recent pipeline counts and per-resume reply rates
@@ -40,6 +43,25 @@ from your records. Tracker has a board, a sortable table, native Move to control
 N for a new job and M to move the selected card. Keep the resume used, notes,
 contacts, next step/date and stage history with each application. Export JSON
 from Today saves the workspace without credentials or internal keys.
+
+GPA planning shows the needed average, actual formula and maximum achievable
+CGPA. Save terms and courses, pin target grades, set difficulty 1–3, and solve a
+deterministic greedy mix for a semester or all planned terms. Trend bars have a
+table twin; reported term GPAs are labelled. Retake what-ifs support replace,
+average and both-count policies. Edit a scale to save a custom copy.
+
+Final needed validates a total weight of 100%, computes every grade cutoff,
+and can save categories to a linked GPA course. Scale conversions show their
+methods, confidence and limitations. ECTS requires real cohort counts; custom
+institution tables are editable and exportable. All study inputs and custom
+tables are retained in workspace exports. Share links keep inputs in fragments.
+
+Study fixtures reproduce 3.78 needed, a 3.81 supplied mix, final targets
+61.8 / 74.3 / 49.3 / 36.8 (maximum 90.3), and 72.4% / 9.05 conversions.
+The mockup's UK 2:1 label conflicts with its percentage method: 72.4% falls in
+the First band, so this implementation labels it First (estimate), following
+[the published UK bands](https://student.sussex.ac.uk/your-studies/degree).
+The supplied mix is distinct from the greedy solver's concentrated upgrades.
 
 Waypost Clipper 2 is an MV3 extension. Reading is click-triggered; its required
 permissions are exactly activeTab, storage, downloads and scripting. Configure
